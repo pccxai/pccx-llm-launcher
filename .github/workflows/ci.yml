@@ -95,7 +95,9 @@ jobs:
           for f in scripts/check.sh \
                    scripts/check-device-stub.sh \
                    scripts/install-stub.sh \
-                   scripts/launch-stub.sh; do
+                   scripts/launch-stub.sh \
+                   scripts/status-stub.sh \
+                   scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
           done
       - name: run scripts/check.sh
@@ -114,10 +116,25 @@ jobs:
           else
             echo "scripts/install-stub.sh not present; skipping"
           fi
-      - name: run scripts/launch-stub.sh (preview only)
+      - name: run scripts/launch-stub.sh (dry-run)
+        run: ./scripts/launch-stub.sh --dry-run
+      - name: launch-stub refuses without --dry-run
         run: |
-          if [ -x scripts/launch-stub.sh ]; then
-            ./scripts/launch-stub.sh
-          else
-            echo "scripts/launch-stub.sh not present; skipping"
+          set -e
+          if ./scripts/launch-stub.sh; then
+            echo "::error::expected non-zero exit without --dry-run"
+            exit 1
           fi
+          echo "launch-stub correctly refused without --dry-run"
+      - name: run scripts/status-stub.sh
+        run: ./scripts/status-stub.sh
+      - name: run scripts/chat-stub.sh --dry-run
+        run: ./scripts/chat-stub.sh --dry-run --prompt "hello"
+      - name: chat-stub refuses without --dry-run
+        run: |
+          set -e
+          if ./scripts/chat-stub.sh --prompt "hello"; then
+            echo "::error::expected non-zero exit without --dry-run"
+            exit 1
+          fi
+          echo "chat-stub correctly refused without --dry-run"

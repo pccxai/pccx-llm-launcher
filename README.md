@@ -81,21 +81,26 @@ and verify host-side prerequisites before the real engine lands.
 
 | Script | What it does |
 |---|---|
-| [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. |
-| [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). |
-| [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. |
-| [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence (host check → device bind → model pick → handoff → diagnostics). |
+| [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
+| [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
+| [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary — what is wired up, what is deferred, what is gated. Always exits 0. |
+| [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
+| [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
 
 ```bash
 bash scripts/check.sh
 bash scripts/check-device-stub.sh
 bash scripts/install-stub.sh
-bash scripts/launch-stub.sh
+bash scripts/status-stub.sh
+bash scripts/launch-stub.sh --dry-run
+bash scripts/chat-stub.sh --dry-run --prompt "hello"
 ```
 
-All four are exit-0 by design. They will be replaced by real
-implementations only after `pccxai/pccx-FPGA-NPU-LLM-kv260` publishes
-verified bring-up evidence.
+The `--dry-run` scripts exit 1 without the flag as a deliberate guard —
+there is no real inference engine to hand off to. They will be replaced
+by real implementations only after `pccxai/pccx-FPGA-NPU-LLM-kv260`
+publishes verified bring-up evidence.
 
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
