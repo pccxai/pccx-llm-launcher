@@ -84,7 +84,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary — what is wired up, what is deferred, what is gated. Always exits 0. |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
 
@@ -101,6 +101,34 @@ The `--dry-run` scripts exit 1 without the flag as a deliberate guard —
 there is no real inference engine to hand off to. They will be replaced
 by real implementations only after `pccxai/pccx-FPGA-NPU-LLM-kv260`
 publishes verified bring-up evidence.
+
+### pccx-lab status backend (opt-in)
+
+`scripts/status-stub.sh` can call the `pccx-lab status --format json`
+controlled CLI/core boundary and forward the run-status envelope:
+
+```bash
+# Requires pccx-lab binary on PATH or PCCX_LAB_BIN set.
+bash scripts/status-stub.sh --backend pccx-lab
+
+# Point to a specific build:
+PCCX_LAB_BIN=/path/to/pccx-lab bash scripts/status-stub.sh --backend pccx-lab
+```
+
+Binary resolution order:
+
+1. `PCCX_LAB_BIN` environment variable (if non-empty and executable).
+2. `pccx-lab` on `PATH`.
+
+**No silent fallback.** If `--backend pccx-lab` is explicitly requested
+but the binary is not found or returns an error, the script exits
+non-zero with a clear message. It does not fall back to local scaffold
+output.
+
+The pccx-lab status output is an early, pre-stable run-status envelope.
+It operates in host-dry-run mode: no real KV260 device probing is
+performed, no model is executed, and no inference is started. This is a
+planned KV260-oriented launcher path, not a production-ready claim.
 
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
