@@ -83,6 +83,17 @@ does not claim that the launcher path is wired up — it is a probe.
 bash scripts/check.sh
 ```
 
+A second helper, [`scripts/launch-stub.sh`](./scripts/launch-stub.sh),
+prints a dry-run preview of the *intended* launch sequence (host check,
+target binding, model selection, log surfacing). It does **not** run
+inference, does **not** open a model, and does **not** contact a target
+device — it is a planning preview that will be replaced when the real
+launch path is wired up after the PCCX FPGA bring-up evidence lands.
+
+```bash
+bash scripts/launch-stub.sh
+```
+
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
 reference (see that directory's README for status).
