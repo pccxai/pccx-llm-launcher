@@ -1,0 +1,96 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shell:
+    name: shell-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: shellcheck on scripts/
+        run: |
+          # Lint actual runnable scripts (.sh) but not frozen .snapshot files,
+          # which are kept as historical reference and may not pass current rules.
+          mapfile -t files < <(find scripts -type f -name '*.sh' -not -name '*.snapshot' 2>/dev/null)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "no .sh scripts to lint"
+          else
+            shellcheck "${files[@]}"
+          fi
+
+  claim-scan:
+    name: claim-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: forbidden-claim grep
+        run: |
+          # Block accidental overclaims in user-facing surfaces.
+          # Scope: README + docs/ + scripts/.
+          # Exclusions: scripts/legacy/* (frozen historical material) and
+          # this workflow file itself (which contains the patterns by design).
+          set -e
+          python3 - <<'PY'
+          import os, re, sys
+          PATTERN = re.compile(
+              r"(?:\bis\s+|\bnow\s+|\balready\s+|\bcurrently\s+)?"
+              r"(production[- ]ready|timing[- ]closed|fully verified|"
+              r"kv260 inference (?:works|works now|is working|is functional))",
+              re.IGNORECASE,
+          )
+          # A line is only flagged if the matched phrase is *asserted*.
+          # Lines that explicitly negate the claim ("no production-ready",
+          # "not described as", "is not", etc.) are allowed.
+          NEGATION = re.compile(
+              r"\b(?:no|not|never|avoid|without|forbidden|skip|do not"
+              r"|does not|is not|are not)\b",
+              re.IGNORECASE,
+          )
+          SCAN_EXTS = {".md", ".sh", ".yml", ".yaml"}
+          SKIP_DIRS = {".git", "scripts/legacy"}
+          SKIP_FILES = {".github/workflows/ci.yml"}
+          violations = []
+          for root, dirs, files in os.walk("."):
+              dirs[:] = [
+                  d for d in dirs
+                  if os.path.relpath(os.path.join(root, d), ".") not in SKIP_DIRS
+              ]
+              for name in files:
+                  rel = os.path.relpath(os.path.join(root, name), ".")
+                  if rel in SKIP_FILES:
+                      continue
+                  if not any(rel.endswith(ext) for ext in SCAN_EXTS):
+                      continue
+                  if "scripts/legacy/" in rel:
+                      continue
+                  with open(rel, encoding="utf-8", errors="replace") as fh:
+                      for i, line in enumerate(fh, 1):
+                          if PATTERN.search(line) and not NEGATION.search(line):
+                              violations.append(f"{rel}:{i}: {line.rstrip()}")
+          if violations:
+              print("Forbidden positive claims detected:")
+              for v in violations:
+                  print(v)
+              print(
+                  "::error::Rephrase as target / planned / pending verification.",
+              )
+              sys.exit(1)
+          print("claim-scan clean")
+          PY
+
+  check-script:
+    name: check-script-runs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: chmod scripts/check.sh
+        run: chmod +x scripts/check.sh
+      - name: run scripts/check.sh
+        run: ./scripts/check.sh
