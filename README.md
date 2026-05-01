@@ -113,7 +113,7 @@ explicit list of what was and was not imported are in
 - [pccxai/pccx][pccx] — spec / docs / roadmap / release coordination
 - [pccxai/pccx-FPGA-NPU-LLM-kv260][pccx-fpga] — RTL / Sail / KV260 / hardware evidence
 - [pccxai/pccx-lab][pccx-lab] — verification lab + analysis backend
-- [pccxai/pccx-systemverilog-ide][pccx-ide] — SystemVerilog IDE spin-out
+- [pccxai/systemverilog-ide][pccx-ide] — SystemVerilog IDE spin-out
 
 ## License
 
@@ -122,4 +122,4 @@ Apache License 2.0 — see [LICENSE](./LICENSE).
 [pccx]: https://github.com/pccxai/pccx
 [pccx-fpga]: https://github.com/pccxai/pccx-FPGA-NPU-LLM-kv260
 [pccx-lab]: https://github.com/pccxai/pccx-lab
-[pccx-ide]: https://github.com/pccxai/pccx-systemverilog-ide
+[pccx-ide]: https://github.com/pccxai/systemverilog-ide
