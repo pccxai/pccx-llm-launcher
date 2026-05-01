@@ -90,7 +90,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: chmod scripts/check.sh
-        run: chmod +x scripts/check.sh
+      - name: chmod scripts
+        run: |
+          chmod +x scripts/check.sh
+          [ -f scripts/launch-stub.sh ] && chmod +x scripts/launch-stub.sh || true
       - name: run scripts/check.sh
         run: ./scripts/check.sh
+      - name: run scripts/launch-stub.sh (preview only)
+        run: |
+          if [ -x scripts/launch-stub.sh ]; then
+            ./scripts/launch-stub.sh
+          else
+            echo "scripts/launch-stub.sh not present; skipping"
+          fi
