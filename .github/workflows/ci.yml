@@ -138,3 +138,22 @@ jobs:
             exit 1
           fi
           echo "chat-stub correctly refused without --dry-run"
+
+  status-backend:
+    name: status-backend-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: chmod scripts
+        run: |
+          chmod +x scripts/status-stub.sh
+          chmod +x scripts/chat-stub.sh
+          chmod +x scripts/launch-stub.sh
+          chmod +x scripts/tests/status-backend.sh
+      - name: shellcheck status-stub and test script
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q shellcheck
+          shellcheck scripts/status-stub.sh
+          shellcheck scripts/tests/status-backend.sh
+      - name: run status-backend tests
+        run: bash scripts/tests/status-backend.sh scripts/status-stub.sh
