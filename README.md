@@ -72,27 +72,30 @@ evidence lands.
 - No kernel development requirement for normal users.
 - This repo is not labelled as stable or as ready for unattended use.
 
-## Quick check
+## Usage
 
-A minimal probe script lives at [`scripts/check.sh`](./scripts/check.sh).
-It reports host info, available tooling, and any edge-device hints from
-`/proc/device-tree/model`. It does **not** attempt to run inference and
-does not claim that the launcher path is wired up — it is a probe.
+The current scripts are all **probe / preview** helpers — none of them
+runs inference, contacts a remote device, or installs anything. They
+exist so contributors can see the planned shape of the launcher flow
+and verify host-side prerequisites before the real engine lands.
+
+| Script | What it does |
+|---|---|
+| [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. |
+| [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). |
+| [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. |
+| [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence (host check → device bind → model pick → handoff → diagnostics). |
 
 ```bash
 bash scripts/check.sh
-```
-
-A second helper, [`scripts/launch-stub.sh`](./scripts/launch-stub.sh),
-prints a dry-run preview of the *intended* launch sequence (host check,
-target binding, model selection, log surfacing). It does **not** run
-inference, does **not** open a model, and does **not** contact a target
-device — it is a planning preview that will be replaced when the real
-launch path is wired up after the PCCX FPGA bring-up evidence lands.
-
-```bash
+bash scripts/check-device-stub.sh
+bash scripts/install-stub.sh
 bash scripts/launch-stub.sh
 ```
+
+All four are exit-0 by design. They will be replaced by real
+implementations only after `pccxai/pccx-FPGA-NPU-LLM-kv260` publishes
+verified bring-up evidence.
 
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
