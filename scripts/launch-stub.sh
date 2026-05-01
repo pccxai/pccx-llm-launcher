@@ -9,13 +9,27 @@
 # pccxai/pccx-FPGA-NPU-LLM-kv260 publishing verified bring-up
 # evidence. Until that lands, this stub stays as a description.
 #
-# Always exits 0 (preview-only).
+# Requires --dry-run. Exits 1 without it.
 
 set -u
 
 INFO()  { printf '[INFO]  %s\n' "$*"; }
 NOTE()  { printf '[NOTE]  %s\n' "$*"; }
 HEAD()  { printf '\n=== %s ===\n' "$*"; }
+
+DRY_RUN=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --dry-run) DRY_RUN=1; shift ;;
+        *) printf '[ERROR] unknown option: %s\n' "$1" >&2; exit 1 ;;
+    esac
+done
+
+if [ "$DRY_RUN" -eq 0 ]; then
+    printf '[ERROR] --dry-run is required. This stub does not execute a real launch.\n' >&2
+    printf '        Pass --dry-run to see the planned launch sequence preview.\n' >&2
+    exit 1
+fi
 
 HEAD "host"
 INFO "uname -s : $(uname -s)"
@@ -64,5 +78,5 @@ NOTE "Step 4 (launch backend)    requires that bring-up plus a launcher engine."
 NOTE "Step 5 (diagnostics)       requires pccx-lab CLI / core boundary integration."
 
 HEAD "summary"
-INFO "preview complete; no inference was started, no device was contacted"
+INFO "dry-run preview complete; no inference was started, no device was contacted"
 exit 0
