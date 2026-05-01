@@ -70,3 +70,9 @@ bring-up and verification work that is happening in
 `pccxai/pccx-FPGA-NPU-LLM-kv260`. No release of this repository should
 claim KV260 inference until that repository publishes a verified
 end-to-end path (RTL bring-up, simulation evidence, timing closure).
+
+---
+
+*See also*:
+[AI-assisted engineering discipline](https://github.com/pccxai/pccxai/blob/main/docs/AI_ASSISTED_ENGINEERING.md) —
+org-level evidence-first release rules that apply to launcher and device bridge work.
