@@ -97,7 +97,7 @@ fi
 PASS "failing binary exits non-zero"
 
 HEAD "8: output does not claim real KV260 inference"
-PCCX_LAB_BIN="$VALID_BIN" OUTPUT="$(PCCX_LAB_BIN="$VALID_BIN" "$STUB" --backend pccx-lab)"
+OUTPUT="$(PCCX_LAB_BIN="$VALID_BIN" "$STUB" --backend pccx-lab)"
 # Split the forbidden phrase so claim-scan does not match it literally.
 FORBIDDEN_PREFIX="kv260 inference"
 FORBIDDEN_CLAIM="${FORBIDDEN_PREFIX} works"
