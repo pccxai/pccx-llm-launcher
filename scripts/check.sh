@@ -11,7 +11,6 @@ set -u
 
 INFO()  { printf '[INFO]  %s\n' "$*"; }
 NOTE()  { printf '[NOTE]  %s\n' "$*"; }
-WARN()  { printf '[WARN]  %s\n' "$*" >&2; }
 HEAD()  { printf '\n=== %s ===\n' "$*"; }
 
 HEAD "host"
