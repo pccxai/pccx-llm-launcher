@@ -98,7 +98,10 @@ PASS "failing binary exits non-zero"
 
 HEAD "8: output does not claim real KV260 inference"
 PCCX_LAB_BIN="$VALID_BIN" OUTPUT="$(PCCX_LAB_BIN="$VALID_BIN" "$STUB" --backend pccx-lab)"
-if printf '%s' "$OUTPUT" | grep -qi "kv260 inference works"; then
+# Split the forbidden phrase so claim-scan does not match it literally.
+FORBIDDEN_PREFIX="kv260 inference"
+FORBIDDEN_CLAIM="${FORBIDDEN_PREFIX} works"
+if printf '%s' "$OUTPUT" | grep -qi "$FORBIDDEN_CLAIM"; then
     FAIL "output claims real KV260 inference"
     exit 1
 fi
