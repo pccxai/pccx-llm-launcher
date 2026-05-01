@@ -92,10 +92,28 @@ jobs:
       - uses: actions/checkout@v4
       - name: chmod scripts
         run: |
-          chmod +x scripts/check.sh
-          [ -f scripts/launch-stub.sh ] && chmod +x scripts/launch-stub.sh || true
+          for f in scripts/check.sh \
+                   scripts/check-device-stub.sh \
+                   scripts/install-stub.sh \
+                   scripts/launch-stub.sh; do
+            [ -f "$f" ] && chmod +x "$f" || true
+          done
       - name: run scripts/check.sh
         run: ./scripts/check.sh
+      - name: run scripts/check-device-stub.sh
+        run: |
+          if [ -x scripts/check-device-stub.sh ]; then
+            ./scripts/check-device-stub.sh
+          else
+            echo "scripts/check-device-stub.sh not present; skipping"
+          fi
+      - name: run scripts/install-stub.sh (preview only)
+        run: |
+          if [ -x scripts/install-stub.sh ]; then
+            ./scripts/install-stub.sh
+          else
+            echo "scripts/install-stub.sh not present; skipping"
+          fi
       - name: run scripts/launch-stub.sh (preview only)
         run: |
           if [ -x scripts/launch-stub.sh ]; then
