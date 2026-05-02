@@ -149,6 +149,25 @@ load a model, implement an editor bridge, or make a compatibility
 promise. See
 [docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md](./docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md).
 
+### Model / runtime descriptor boundary (planned)
+
+The launcher also has a small data-only model/runtime descriptor boundary:
+
+```bash
+python3 contracts/model_runtime_descriptor_contract.py
+python3 scripts/tests/model_runtime_descriptor_test.py
+```
+
+The checked fixture covers Gemma 3N E4B as a descriptor target and a
+KV260 PCCX runtime placeholder. Model assets are external/user-provided
+and not bundled. The runtime path is planned, unavailable, and not
+configured, so compatibility remains provisional until evidence exists.
+
+This boundary does not load weights, execute a runtime, call a provider,
+touch KV260 hardware, report performance, implement MCP/LSP, or make an
+API/ABI compatibility commitment. See
+[docs/MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md](./docs/MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md).
+
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
 reference (see that directory's README for status).

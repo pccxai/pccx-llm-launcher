@@ -52,6 +52,19 @@ The planned mapping is:
 These names are a draft bridge sketch, not a compatibility guarantee.
 The shape may change before a versioned interface is declared.
 
+## Model / Runtime Descriptor Reference
+
+`model.runtime.descriptor` is backed by a separate data-only descriptor
+boundary in
+[`MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md`](./MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md).
+That boundary names model and runtime descriptors, target placeholders,
+lifecycle vocabulary, and a compatibility sketch without adding runtime
+logic to this status contract.
+
+The status contract remains a status summary. Future consumers may use
+the operation id as a reference, but this module does not import the
+descriptor module or execute model/runtime code.
+
 ## pccx-lab Boundary
 
 pccx-lab remains the CLI/core lower boundary. Launcher and editor flows
