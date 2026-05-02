@@ -189,6 +189,9 @@ touch KV260 hardware, call providers, implement MCP/LSP, or add a
 marketplace flow. See
 [docs/DIAGNOSTICS_HANDOFF_CONTRACT.md](./docs/DIAGNOSTICS_HANDOFF_CONTRACT.md).
 
+pccx-lab has a separate read-only validator for this JSON shape. The
+launcher does not invoke that command or depend on it at runtime.
+
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
 reference (see that directory's README for status).
