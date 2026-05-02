@@ -41,8 +41,13 @@ jobs:
           import os, re, sys
           PATTERN = re.compile(
               r"(?:\bis\s+|\bnow\s+|\balready\s+|\bcurrently\s+)?"
-              r"(production[- ]ready|timing[- ]closed|fully verified|"
-              r"kv260 inference (?:works|works now|is working|is functional))",
+              r"(production[- ]ready|marketplace[- ]ready|"
+              r"(?<!pre-)stable\s+(?:api|abi|lsp)|"
+              r"mcp\s+ready|ai\s+provider\s+ready|"
+              r"kv260 inference (?:works|works now|is working|is functional)|"
+              r"20\s*tok/s\s+achieved|timing[- ]closed|fully verified|"
+              r"vibe coding|autonomous coding|"
+              r"(?:claude|gpt)\s+directly\s+controls)",
               re.IGNORECASE,
           )
           # A line is only flagged if the matched phrase is *asserted*.
@@ -53,7 +58,7 @@ jobs:
               r"|does not|is not|are not)\b",
               re.IGNORECASE,
           )
-          SCAN_EXTS = {".md", ".sh", ".yml", ".yaml"}
+          SCAN_EXTS = {".md", ".sh", ".yml", ".yaml", ".json"}
           SKIP_DIRS = {".git", "scripts/legacy"}
           SKIP_FILES = {".github/workflows/ci.yml"}
           violations = []
@@ -71,9 +76,14 @@ jobs:
                   if "scripts/legacy/" in rel:
                       continue
                   with open(rel, encoding="utf-8", errors="replace") as fh:
-                      for i, line in enumerate(fh, 1):
-                          if PATTERN.search(line) and not NEGATION.search(line):
-                              violations.append(f"{rel}:{i}: {line.rstrip()}")
+                      lines = fh.read().splitlines()
+                      for index, line in enumerate(lines):
+                          context = " ".join(
+                              lines[i]
+                              for i in range(max(0, index - 2), min(len(lines), index + 2))
+                          )
+                          if PATTERN.search(line) and not NEGATION.search(context):
+                              violations.append(f"{rel}:{index + 1}: {line}")
           if violations:
               print("Forbidden positive claims detected:")
               for v in violations:
@@ -138,6 +148,8 @@ jobs:
             exit 1
           fi
           echo "chat-stub correctly refused without --dry-run"
+      - name: run launcher/IDE contract tests
+        run: python3 scripts/tests/launcher_ide_contract_test.py
 
   status-backend:
     name: status-backend-tests
