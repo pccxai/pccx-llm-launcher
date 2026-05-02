@@ -150,6 +150,8 @@ jobs:
           echo "chat-stub correctly refused without --dry-run"
       - name: run launcher/IDE contract tests
         run: python3 scripts/tests/launcher_ide_contract_test.py
+      - name: run model/runtime descriptor tests
+        run: python3 scripts/tests/model_runtime_descriptor_test.py
 
   status-backend:
     name: status-backend-tests
