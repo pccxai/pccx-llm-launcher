@@ -1,0 +1,104 @@
+{
+  "availabilityState": "unavailable",
+  "configuredTarget": {
+    "id": "not_configured",
+    "label": "not_configured",
+    "source": "default_placeholder"
+  },
+  "diagnosticsHandoff": {
+    "automaticUpload": false,
+    "lowerBoundary": "pccx-lab CLI/core",
+    "mode": "read_only_handoff",
+    "rawLogsIncluded": false,
+    "state": "planned",
+    "writeBack": false
+  },
+  "evidenceState": "evidence_required",
+  "futureConsumers": [
+    "pccx-systemverilog-ide",
+    "future editor integration consumer",
+    "local coding-assistant mode, planned"
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#4",
+    "pccxai/pccx-llm-launcher#3",
+    "pccxai/pccx-llm-launcher#5",
+    "pccxai/pccx-llm-launcher#12"
+  ],
+  "launcherMode": "placeholder",
+  "limitations": [
+    "No launcher runtime call is performed by this contract.",
+    "No KV260 run is claimed by this contract.",
+    "No AI provider integration is implemented by this contract.",
+    "No MCP, LSP, packaging, or marketplace flow is implemented by this contract.",
+    "Evidence is required before hardware or performance claims.",
+    "The contract shape may change before a versioned compatibility commitment."
+  ],
+  "modelState": "not_configured",
+  "runtimeState": "planned",
+  "safetyFlags": {
+    "dataOnly": true,
+    "disabledByDefault": true,
+    "executesLauncher": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "marketplaceFlow": false,
+    "mcpServerImplemented": false,
+    "modelExecution": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "privatePathsIncluded": false,
+    "providerCalls": false,
+    "rawLogsIncluded": false,
+    "secretsIncluded": false,
+    "shellExecution": false,
+    "touchesHardware": false
+  },
+  "schemaVersion": "pccx.launcherIdeStatus.v0",
+  "supportedOperations": [
+    {
+      "execution": "data_only",
+      "futureConsumerCommand": "pccxLauncher.showStatus",
+      "id": "launcher.status.local",
+      "label": "local launcher status",
+      "state": "placeholder"
+    },
+    {
+      "execution": "data_only",
+      "futureConsumerCommand": "pccxLauncher.showModelRuntimeDescriptor",
+      "id": "model.runtime.descriptor",
+      "label": "model/runtime descriptor availability",
+      "state": "planned"
+    },
+    {
+      "execution": "data_only",
+      "futureConsumerCommand": "pccxLauncher.showDeviceSessionStatus",
+      "id": "device.session.status",
+      "label": "device/session status placeholder",
+      "state": "placeholder"
+    },
+    {
+      "futureConsumerCommand": "pccxLauncher.exportDiagnosticsForLab",
+      "handoffMode": "read_only_handoff",
+      "id": "pccxlab.diagnostics.handoff",
+      "label": "pccx-lab diagnostics handoff placeholder",
+      "lowerBoundary": "pccx-lab CLI/core",
+      "state": "planned"
+    },
+    {
+      "execution": "data_only",
+      "futureConsumerCommand": "pccxLauncher.prepareEditorBridgeStatus",
+      "id": "editor.bridge.consumer",
+      "label": "future editor bridge consumer",
+      "state": "planned"
+    },
+    {
+      "execution": "disabled_by_default",
+      "futureConsumerCommand": "pccxLauncher.prepareLocalCodingAssistantStatus",
+      "id": "local.coding.assistant.consumer",
+      "label": "local coding-assistant mode consumer",
+      "state": "planned"
+    }
+  ],
+  "targetKind": "not_configured"
+}

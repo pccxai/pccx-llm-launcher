@@ -52,7 +52,7 @@ publishes a verified end-to-end path.
 ## Roadmap
 
 - Coding-assistant mode (AI-assisted local workflow with a controlled
-  MCP-style interface).
+  tool boundary).
 - VS Code extension bridge for guided launches and log inspection.
 - Additional target models beyond Gemma 3N E4B.
 - Additional edge devices beyond KV260.
@@ -125,10 +125,29 @@ but the binary is not found or returns an error, the script exits
 non-zero with a clear message. It does not fall back to local scaffold
 output.
 
-The pccx-lab status output is an early, pre-stable run-status envelope.
+The pccx-lab status output is an early, pre-compatibility run-status envelope.
 It operates in host-dry-run mode: no real KV260 device probing is
 performed, no model is executed, and no inference is started. This is a
-planned KV260-oriented launcher path, not a production-ready claim.
+planned KV260-oriented launcher path, not a readiness claim.
+
+### Launcher / IDE bridge contract (planned)
+
+The launcher now has a small data-only status contract for future editor
+consumers:
+
+```bash
+python3 contracts/launcher_ide_status_contract.py
+python3 scripts/tests/launcher_ide_contract_test.py
+```
+
+The contract reports conservative placeholder state: configured target,
+availability, runtime/model/evidence status, supported future operations,
+safety flags, and a planned read-only pccx-lab diagnostics handoff.
+
+It does not execute the launcher, call a provider, contact hardware,
+load a model, implement an editor bridge, or make a compatibility
+promise. See
+[docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md](./docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md).
 
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
