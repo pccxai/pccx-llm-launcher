@@ -308,6 +308,16 @@ def test_no_private_data_runtime_calls_or_overclaims() -> None:
     assert_no_unsupported_claims(scan_text)
 
 
+def test_docs_reference_pccx_lab_read_only_consumer_without_invocation() -> None:
+    docs_text = read_text(DOC_PATH)
+    readme_text = read_text(README_PATH)
+
+    assert "pccx-lab diagnostics-handoff validate --file <path> --format json" in docs_text
+    assert "matching read-only validation boundary" in docs_text
+    assert "This launcher repository does not invoke it" in docs_text
+    assert "does not invoke that command" in readme_text
+
+
 test_handoff_matches_fixture_and_is_deterministic()
 test_handoff_shape_and_diagnostic_values()
 test_read_only_privacy_and_safety_flags()
@@ -315,5 +325,6 @@ test_transport_sketches_are_future_safe()
 test_fixture_references_descriptors_without_runtime_coupling()
 test_handoff_can_be_referenced_by_launcher_status_contract()
 test_no_private_data_runtime_calls_or_overclaims()
+test_docs_reference_pccx_lab_read_only_consumer_without_invocation()
 
 print("diagnostics handoff contract tests ok")

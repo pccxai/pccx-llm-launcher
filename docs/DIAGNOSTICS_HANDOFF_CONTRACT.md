@@ -126,6 +126,17 @@ The launcher may produce a sanitized, read-only summary. pccx-lab may
 consume that summary later as evidence-adjacent input. This repository
 does not implement that pccx-lab consumer in this PR.
 
+pccx-lab now has a matching read-only validation boundary:
+
+```bash
+pccx-lab diagnostics-handoff validate --file <path> --format json
+```
+
+That command lives on the pccx-lab side and validates a local JSON file.
+This launcher repository does not invoke it, require it, watch for it,
+or write back from it. Fixture sync is manual while the handoff remains
+pre-compatibility.
+
 ## Safety Notes
 
 This boundary does not add:
