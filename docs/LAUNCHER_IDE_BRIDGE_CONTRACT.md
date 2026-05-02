@@ -79,6 +79,17 @@ Diagnostics handoff is planned as read-only first:
 - no user data
 - no model weight path
 
+The launcher now has a separate diagnostics handoff fixture for this
+planned boundary:
+
+- `contracts/diagnostics_handoff_contract.py`
+- `contracts/fixtures/diagnostics-handoff.gemma3n-e4b-kv260-placeholder.json`
+- [`DIAGNOSTICS_HANDOFF_CONTRACT.md`](./DIAGNOSTICS_HANDOFF_CONTRACT.md)
+
+That fixture references this status operation by id. It does not execute
+pccx-lab, invoke the launcher runtime, watch files, upload data, or write
+back into launcher state.
+
 ## Safety Notes
 
 This contract does not claim a KV260 run. It does not report throughput,

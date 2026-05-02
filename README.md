@@ -168,6 +168,27 @@ touch KV260 hardware, report performance, implement MCP/LSP, or make an
 API/ABI compatibility commitment. See
 [docs/MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md](./docs/MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md).
 
+### Diagnostics handoff boundary (planned)
+
+The launcher has a read-only diagnostics handoff contract for future
+pccx-lab consumers:
+
+```bash
+python3 contracts/diagnostics_handoff_contract.py
+python3 scripts/tests/diagnostics_handoff_contract_test.py
+```
+
+The checked fixture references the launcher/IDE status contract and the
+model/runtime descriptor fixture by id. It summarizes blocked or
+not-configured placeholder state without raw logs, private paths, user
+prompts, source code, secrets, tokens, provider configuration, model
+weight paths, telemetry, automatic upload, or write-back.
+
+This boundary does not execute pccx-lab, invoke launcher runtime code,
+touch KV260 hardware, call providers, implement MCP/LSP, or add a
+marketplace flow. See
+[docs/DIAGNOSTICS_HANDOFF_CONTRACT.md](./docs/DIAGNOSTICS_HANDOFF_CONTRACT.md).
+
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
 reference (see that directory's README for status).
