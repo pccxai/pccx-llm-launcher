@@ -9,6 +9,8 @@ The later-track plan for JetBrains and generic editor adapters is tracked in
 [`OTHER_EDITOR_BRIDGE_PLAN.md`](./OTHER_EDITOR_BRIDGE_PLAN.md).
 The later-track plan for local coding-assistant mode is tracked in
 [`LOCAL_CODING_ASSISTANT_MODE_PLAN.md`](./LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
+The later-track plan for multi-model and multi-device support is tracked in
+[`MULTI_MODEL_DEVICE_SUPPORT_PLAN.md`](./MULTI_MODEL_DEVICE_SUPPORT_PLAN.md).
 
 The contract lives in:
 
@@ -53,6 +55,10 @@ The planned mapping is:
 | `pccxlab.diagnostics.handoff` | Prepare read-only diagnostics handoff for pccx-lab. |
 | `editor.bridge.consumer` | Prepare editor bridge status. |
 | `local.coding.assistant.consumer` | Prepare local coding-assistant status, disabled by default. |
+
+Future multi-model and multi-device views should consume descriptor and
+readiness data through these boundaries first. This contract does not add a
+model catalog, device manager, runtime adapter, or compatibility guarantee.
 
 These names are a draft bridge sketch, not a compatibility guarantee.
 The shape may change before a versioned interface is declared.
@@ -113,6 +119,7 @@ This PR also does not add:
 - JetBrains plugin implementation
 - generic editor adapter implementation
 - local coding-assistant runtime implementation
+- multi-model selector or device manager implementation
 - model weights or generated blobs
 
 The purpose is to make future integration work easier to review by
