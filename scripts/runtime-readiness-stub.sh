@@ -58,8 +58,8 @@ if [ "$TARGET" != "kv260" ]; then
     exit 1
 fi
 
-SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-ROOT_DIR="$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)"
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
 
 python3 "$ROOT_DIR/contracts/runtime_readiness_contract.py" \
     --model "$MODEL" \
