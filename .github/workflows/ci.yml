@@ -142,6 +142,8 @@ jobs:
           echo "launch-stub correctly refused without --dry-run"
       - name: run scripts/status-stub.sh
         run: ./scripts/status-stub.sh
+      - name: run scripts/status-stub.sh with runtime readiness
+        run: ./scripts/status-stub.sh --include-runtime-readiness
       - name: run scripts/runtime-readiness-stub.sh
         run: ./scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
@@ -174,10 +176,14 @@ jobs:
           chmod +x scripts/chat-stub.sh
           chmod +x scripts/launch-stub.sh
           chmod +x scripts/tests/status-backend.sh
+          chmod +x scripts/tests/status-readiness.sh
       - name: shellcheck status-stub and test script
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q shellcheck
           shellcheck scripts/status-stub.sh
           shellcheck scripts/tests/status-backend.sh
+          shellcheck scripts/tests/status-readiness.sh
       - name: run status-backend tests
         run: bash scripts/tests/status-backend.sh scripts/status-stub.sh
+      - name: run status-readiness tests
+        run: bash scripts/tests/status-readiness.sh scripts/status-stub.sh

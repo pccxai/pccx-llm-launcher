@@ -84,7 +84,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
@@ -94,6 +94,7 @@ bash scripts/check.sh
 bash scripts/check-device-stub.sh
 bash scripts/install-stub.sh
 bash scripts/status-stub.sh
+bash scripts/status-stub.sh --include-runtime-readiness
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/launch-stub.sh --dry-run
 bash scripts/chat-stub.sh --dry-run --prompt "hello"
@@ -202,6 +203,7 @@ surface for the Gemma 3N E4B + KV260 target:
 ```bash
 python3 contracts/runtime_readiness_contract.py --model gemma3n-e4b --target kv260
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-runtime-readiness
 python3 scripts/tests/runtime_readiness_contract_test.py
 ```
 
@@ -212,6 +214,9 @@ descriptor evidence, xsim evidence of 11 passed and 0 failed, and Vivado
 synthesis evidence while keeping timing, implementation, bitstream,
 KV260 smoke, runtime evidence, and throughput measurement in blocked or
 target-only states. 20 tok/s remains a target until measured.
+
+The status command reads the same local readiness stub and prints a
+short human summary. It is still read-only status data.
 
 This surface does not load weights, execute a runtime, touch KV260
 hardware, call providers, invoke pccx-lab, invoke systemverilog-ide,

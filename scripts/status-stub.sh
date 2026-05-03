@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
 # scripts/status-stub.sh — launcher state summary
 # Default mode: local scaffold output, no external calls, always exits 0.
+#
+# Runtime readiness summary (explicit opt-in, read-only local data):
+#   --include-runtime-readiness
 #
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
@@ -17,9 +22,85 @@ ERROR() { printf '[ERROR] %s\n' "$*" >&2; }
 HEAD()  { printf '\n=== %s ===\n' "$*"; }
 
 BACKEND=""
+INCLUDE_RUNTIME_READINESS="0"
+
+print_runtime_readiness_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    READINESS_STUB="$ROOT_DIR/scripts/runtime-readiness-stub.sh"
+
+    if [ ! -f "$READINESS_STUB" ]; then
+        ERROR "runtime readiness stub not found: $READINESS_STUB"
+        return 1
+    fi
+
+    if ! READINESS_JSON="$(bash "$READINESS_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "runtime readiness stub failed"
+        printf '%s\n' "$READINESS_JSON" >&2
+        return 1
+    fi
+
+    if ! READINESS_SUMMARY="$(
+        printf '%s\n' "$READINESS_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+performance = data["performanceTargets"][0]
+flags = data["safetyFlags"]
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no hardware/model/provider/lab/IDE execution")
+print("[INFO]  model      : {} {}".format(data["modelFamily"], data["modelVariant"]))
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  status     : {}".format(data["statusAnswer"]))
+print("[INFO]  readiness  : {}".format(data["readinessState"]))
+print("[INFO]  evidence   : {}".format(data["evidenceState"]))
+print("[INFO]  descriptor : {}".format(data["descriptorState"]))
+print("[INFO]  xsim       : {}".format(data["simulationEvidenceState"]))
+print("[INFO]  synth      : {}".format(data["vivadoSynthState"]))
+print("[INFO]  timing     : {}".format(data["timingEvidenceState"]))
+print("[INFO]  impl       : {}".format(data["implementationState"]))
+print("[INFO]  bitstream  : {}".format(data["bitstreamState"]))
+print("[INFO]  smoke      : {}".format(data["kv260SmokeState"]))
+print("[INFO]  runtime    : {}".format(data["runtimeEvidenceState"]))
+print("[INFO]  throughput : target-only; {} unmeasured".format(performance["target"]))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "runtimeExecution={} modelLoaded={} modelExecution={} kv260Access={} "
+    "providerCalls={} networkCalls={} executesPccxLab={} executesSystemverilogIde={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["runtimeExecution"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["providerCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["executesPccxLab"]),
+        b(flags["executesSystemverilogIde"]),
+    )
+)
+'
+    )"; then
+        ERROR "runtime readiness JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "runtime readiness"
+    printf '%s\n' "$READINESS_SUMMARY"
+}
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        --include-runtime-readiness)
+            INCLUDE_RUNTIME_READINESS="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -35,6 +116,11 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+if [ -n "$BACKEND" ] && [ "$INCLUDE_RUNTIME_READINESS" = "1" ]; then
+    ERROR "--include-runtime-readiness is only supported in local scaffold mode"
+    exit 1
+fi
+
 # ── Default mode ──────────────────────────────────────────────────────────────
 if [ -z "$BACKEND" ]; then
     HEAD "launcher state"
@@ -44,7 +130,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "KV260 path     : gated on pccxai/pccx-FPGA-NPU-LLM-kv260 bring-up"
     NOTE "pccx-lab diag  : deferred (analyze handoff not yet wired into launcher)"
     NOTE "pccx-lab status: opt-in via --backend pccx-lab (host-dry-run scaffold)"
+    NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_RUNTIME_READINESS" = "1" ]; then
+        if ! print_runtime_readiness_summary; then
+            exit 1
+        fi
+    fi
 
     HEAD "summary"
     INFO "no inference engine is wired up; all paths are planned or deferred"
