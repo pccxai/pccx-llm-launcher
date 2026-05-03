@@ -13,6 +13,9 @@
 # Chat/session status and lifecycle plan (explicit opt-in, read-only local data):
 #   --include-chat-session
 #
+# Chat model status display plan (explicit opt-in, read-only local data):
+#   --include-chat-model-status
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -31,6 +34,90 @@ BACKEND=""
 INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
+INCLUDE_CHAT_MODEL_STATUS="0"
+
+print_chat_model_status_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_MODEL_STATUS_STUB="$ROOT_DIR/scripts/chat-model-status-stub.sh"
+
+    if [ ! -f "$CHAT_MODEL_STATUS_STUB" ]; then
+        ERROR "chat model status stub not found: $CHAT_MODEL_STATUS_STUB"
+        return 1
+    fi
+
+    if ! CHAT_MODEL_STATUS_JSON="$(bash "$CHAT_MODEL_STATUS_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat model status stub failed"
+        printf '%s\n' "$CHAT_MODEL_STATUS_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_MODEL_STATUS_SUMMARY="$(
+        printf '%s\n' "$CHAT_MODEL_STATUS_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+rows = " ".join(
+    "{}={}".format(row["rowId"], row["state"])
+    for row in data["statusRows"]
+)
+actions = " ".join(
+    "{}={}".format(action["actionId"], action["state"])
+    for action in data["loadActions"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no model load/provider/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  display    : {}".format(data["displayState"]))
+print("[INFO]  descriptor : {}".format(data["descriptorState"]))
+print("[INFO]  assets     : {}".format(data["assetState"]))
+print("[INFO]  load       : {}".format(data["loadState"]))
+print("[INFO]  runtime    : {}".format(data["runtimeState"]))
+print("[INFO]  context    : {}".format(data["contextState"]))
+print("[INFO]  response   : {}".format(data["responseState"]))
+print("[INFO]  provider   : {}".format(data["providerState"]))
+print("[INFO]  rows       : {}".format(rows))
+print("[INFO]  actions    : {}".format(actions))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "statusDisplayOnly={} modelLoadAttempted={} modelLoaded={} "
+    "modelExecution={} runtimeExecution={} responseGenerated={} "
+    "kv260Access={} providerCalls={} cloudCalls={} networkCalls={} "
+    "modelAssetPathsIncluded={} modelWeightPathsIncluded={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["statusDisplayOnly"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["responseGenerated"]),
+        b(flags["kv260Access"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["modelAssetPathsIncluded"]),
+        b(flags["modelWeightPathsIncluded"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat model status JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat model status"
+    printf '%s\n' "$CHAT_MODEL_STATUS_SUMMARY"
+}
 
 print_chat_session_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -306,6 +393,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SESSION="1"
             shift
             ;;
+        --include-chat-model-status)
+            INCLUDE_CHAT_MODEL_STATUS="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -321,8 +412,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, and --include-chat-session are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, and --include-chat-model-status are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -338,7 +429,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
+    NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ]; then
+        if ! print_chat_model_status_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_CHAT_SESSION" = "1" ]; then
         if ! print_chat_session_summary; then
