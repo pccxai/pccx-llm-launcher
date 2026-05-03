@@ -7,6 +7,9 @@
 # Runtime readiness summary (explicit opt-in, read-only local data):
 #   --include-runtime-readiness
 #
+# Device/session status panel (explicit opt-in, read-only local data):
+#   --include-device-session
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -23,6 +26,82 @@ HEAD()  { printf '\n=== %s ===\n' "$*"; }
 
 BACKEND=""
 INCLUDE_RUNTIME_READINESS="0"
+INCLUDE_DEVICE_SESSION="0"
+
+print_device_session_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    DEVICE_SESSION_STUB="$ROOT_DIR/scripts/device-session-status-stub.sh"
+
+    if [ ! -f "$DEVICE_SESSION_STUB" ]; then
+        ERROR "device/session status stub not found: $DEVICE_SESSION_STUB"
+        return 1
+    fi
+
+    if ! DEVICE_SESSION_JSON="$(bash "$DEVICE_SESSION_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "device/session status stub failed"
+        printf '%s\n' "$DEVICE_SESSION_JSON" >&2
+        return 1
+    fi
+
+    if ! DEVICE_SESSION_SUMMARY="$(
+        printf '%s\n' "$DEVICE_SESSION_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+rows = " ".join(
+    "{}={}".format(row["rowId"], row["state"])
+    for row in data["statusPanel"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no hardware/model/provider/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  connection : {}".format(data["connectionState"]))
+print("[INFO]  discovery  : {}".format(data["discoveryState"]))
+print("[INFO]  auth       : {}".format(data["authenticationState"]))
+print("[INFO]  runtime    : {}".format(data["runtimeState"]))
+print("[INFO]  model load : {}".format(data["modelLoadState"]))
+print("[INFO]  session    : {}".format(data["sessionState"]))
+print("[INFO]  logs       : {}".format(data["logStreamState"]))
+print("[INFO]  diagnostic : {}".format(data["diagnosticsState"]))
+print("[INFO]  readiness  : {}".format(data["readinessState"]))
+print("[INFO]  panel      : {}".format(rows))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "runtimeExecution={} modelLoaded={} modelExecution={} kv260Access={} "
+    "opensSerialPort={} networkCalls={} networkScan={} sshExecution={} "
+    "authenticationAttempt={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["runtimeExecution"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["opensSerialPort"]),
+        b(flags["networkCalls"]),
+        b(flags["networkScan"]),
+        b(flags["sshExecution"]),
+        b(flags["authenticationAttempt"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "device/session status JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "device/session status"
+    printf '%s\n' "$DEVICE_SESSION_SUMMARY"
+}
 
 print_runtime_readiness_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -101,6 +180,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_RUNTIME_READINESS="1"
             shift
             ;;
+        --include-device-session)
+            INCLUDE_DEVICE_SESSION="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -116,8 +199,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && [ "$INCLUDE_RUNTIME_READINESS" = "1" ]; then
-    ERROR "--include-runtime-readiness is only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ]; }; then
+    ERROR "--include-runtime-readiness and --include-device-session are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -131,7 +214,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "pccx-lab diag  : deferred (analyze handoff not yet wired into launcher)"
     NOTE "pccx-lab status: opt-in via --backend pccx-lab (host-dry-run scaffold)"
     NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
+    NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_DEVICE_SESSION" = "1" ]; then
+        if ! print_device_session_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_RUNTIME_READINESS" = "1" ]; then
         if ! print_runtime_readiness_summary; then
