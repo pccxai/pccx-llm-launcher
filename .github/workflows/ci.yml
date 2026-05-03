@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
+
 name: ci
 
 on:
@@ -107,6 +110,7 @@ jobs:
                    scripts/install-stub.sh \
                    scripts/launch-stub.sh \
                    scripts/status-stub.sh \
+                   scripts/runtime-readiness-stub.sh \
                    scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
           done
@@ -138,6 +142,8 @@ jobs:
           echo "launch-stub correctly refused without --dry-run"
       - name: run scripts/status-stub.sh
         run: ./scripts/status-stub.sh
+      - name: run scripts/runtime-readiness-stub.sh
+        run: ./scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
         run: ./scripts/chat-stub.sh --dry-run --prompt "hello"
       - name: chat-stub refuses without --dry-run
@@ -152,6 +158,10 @@ jobs:
         run: python3 scripts/tests/launcher_ide_contract_test.py
       - name: run model/runtime descriptor tests
         run: python3 scripts/tests/model_runtime_descriptor_test.py
+      - name: run diagnostics handoff contract tests
+        run: python3 scripts/tests/diagnostics_handoff_contract_test.py
+      - name: run runtime readiness contract tests
+        run: python3 scripts/tests/runtime_readiness_contract_test.py
 
   status-backend:
     name: status-backend-tests
