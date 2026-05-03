@@ -80,6 +80,12 @@ The model descriptor also names `cpu_reference_placeholder` as an
 expected future runtime kind. That is vocabulary only; this PR does not
 add a CPU runtime descriptor or execution path.
 
+Future multi-model and multi-device support should build catalog-level entries
+over this descriptor vocabulary. The launcher-side plan is tracked in
+[`MULTI_MODEL_DEVICE_SUPPORT_PLAN.md`](./MULTI_MODEL_DEVICE_SUPPORT_PLAN.md).
+That plan does not add a model loader, device manager, hardware probe, runtime
+adapter, or compatibility promise.
+
 ## Lifecycle Vocabulary
 
 The descriptor names the future lifecycle states:

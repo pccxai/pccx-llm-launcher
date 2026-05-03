@@ -56,8 +56,9 @@ publishes a verified end-to-end path.
   [docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
 - VS Code and other editor bridge planning for guided launches and log
   inspection.
-- Additional target models beyond Gemma 3N E4B.
-- Additional edge devices beyond KV260.
+- Additional target models beyond Gemma 3N E4B and additional edge devices
+  beyond KV260. The later-track plan is tracked in
+  [docs/MULTI_MODEL_DEVICE_SUPPORT_PLAN.md](./docs/MULTI_MODEL_DEVICE_SUPPORT_PLAN.md).
 - Integration with `pccx-lab` diagnostics so device / kernel state can be
   surfaced through the launcher UI.
 
@@ -184,6 +185,8 @@ This boundary does not load weights, execute a runtime, call a provider,
 touch KV260 hardware, report performance, implement MCP/LSP, or make an
 API/ABI compatibility commitment. See
 [docs/MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md](./docs/MODEL_RUNTIME_DESCRIPTOR_BOUNDARY.md).
+The later-track multi-model and multi-device direction is tracked in
+[docs/MULTI_MODEL_DEVICE_SUPPORT_PLAN.md](./docs/MULTI_MODEL_DEVICE_SUPPORT_PLAN.md).
 
 ### Diagnostics handoff boundary (planned)
 
