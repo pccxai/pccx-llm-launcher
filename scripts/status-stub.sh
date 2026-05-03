@@ -10,6 +10,9 @@
 # Device/session status panel (explicit opt-in, read-only local data):
 #   --include-device-session
 #
+# Chat/session status (explicit opt-in, read-only local data):
+#   --include-chat-session
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -27,6 +30,81 @@ HEAD()  { printf '\n=== %s ===\n' "$*"; }
 BACKEND=""
 INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
+INCLUDE_CHAT_SESSION="0"
+
+print_chat_session_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_SESSION_STUB="$ROOT_DIR/scripts/chat-session-stub.sh"
+
+    if [ ! -f "$CHAT_SESSION_STUB" ]; then
+        ERROR "chat/session stub not found: $CHAT_SESSION_STUB"
+        return 1
+    fi
+
+    if ! CHAT_SESSION_JSON="$(bash "$CHAT_SESSION_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat/session stub failed"
+        printf '%s\n' "$CHAT_SESSION_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_SESSION_SUMMARY="$(
+        printf '%s\n' "$CHAT_SESSION_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+controls = " ".join(
+    "{}={}".format(control["controlId"], control["state"])
+    for control in data["sessionControls"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/model/provider/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  surface    : {}".format(data["surfaceState"]))
+print("[INFO]  chat       : {}".format(data["chatState"]))
+print("[INFO]  input      : {}".format(data["inputState"]))
+print("[INFO]  send       : {}".format(data["sendState"]))
+print("[INFO]  model load : {}".format(data["modelStatus"]))
+print("[INFO]  transcript : {}".format(data["transcriptPolicy"]["state"]))
+print("[INFO]  response   : {}".format(data["messageEnvelope"]["responseState"]))
+print("[INFO]  controls   : {}".format(controls))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "runtimeExecution={} modelLoaded={} modelExecution={} kv260Access={} "
+    "providerCalls={} cloudCalls={} networkCalls={} transcriptPersistence={} "
+    "promptContentIncluded={} responseContentIncluded={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["runtimeExecution"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["transcriptPersistence"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat/session JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat/session status"
+    printf '%s\n' "$CHAT_SESSION_SUMMARY"
+}
 
 print_device_session_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -184,6 +262,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_DEVICE_SESSION="1"
             shift
             ;;
+        --include-chat-session)
+            INCLUDE_CHAT_SESSION="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -199,8 +281,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ]; }; then
-    ERROR "--include-runtime-readiness and --include-device-session are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, and --include-chat-session are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -215,7 +297,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "pccx-lab status: opt-in via --backend pccx-lab (host-dry-run scaffold)"
     NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
+    NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_CHAT_SESSION" = "1" ]; then
+        if ! print_chat_session_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_DEVICE_SESSION" = "1" ]; then
         if ! print_device_session_summary; then
