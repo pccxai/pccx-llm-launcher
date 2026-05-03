@@ -1,0 +1,233 @@
+{
+  "assetState": "external_not_configured",
+  "blockedReasons": [
+    {
+      "reasonId": "runtime_readiness_blocked",
+      "requiredBefore": "load_model_enabled",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked for the Gemma 3N E4B plus KV260 target."
+    },
+    {
+      "reasonId": "model_assets_external",
+      "requiredBefore": "configure_model_assets_enabled",
+      "state": "external_not_configured",
+      "summary": "Model assets are external and no reviewed local asset input boundary exists."
+    },
+    {
+      "reasonId": "kv260_session_inactive",
+      "requiredBefore": "load_model_enabled",
+      "state": "inactive",
+      "summary": "No target device session exists and no board runtime status is measured."
+    },
+    {
+      "reasonId": "chat_runtime_not_started",
+      "requiredBefore": "assistant_response_available",
+      "state": "not_started",
+      "summary": "The local chat runtime is not implemented or started."
+    }
+  ],
+  "contextState": "unavailable",
+  "descriptorState": "available_as_data",
+  "displayState": "blocked",
+  "fixtureVersion": "chat-model-status.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/model-runtime-descriptor.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "model_runtime_descriptor",
+      "schemaVersion": "pccx.modelRuntimeDescriptorBundle.v0",
+      "state": "available_as_data",
+      "summary": "Model/runtime descriptor data is consumed by reference only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "refId": "runtime_readiness",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "state": "blocked",
+      "summary": "Runtime readiness is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json",
+      "refId": "device_session_status",
+      "schemaVersion": "pccx.deviceSessionStatus.v0",
+      "state": "available_as_data",
+      "summary": "Device/session status is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "available_as_data",
+      "summary": "Base chat/session state is consumed as local data only."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_model_status_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat model status fixture; no model load is attempted.",
+    "No prompts, responses, transcripts, model paths, generated artifacts, private paths, secrets, or tokens are stored.",
+    "No KV260 hardware access, serial access, network call, provider call, telemetry, upload, or write-back is performed.",
+    "Model load controls remain disabled until runtime readiness, model asset, and device/session evidence are available.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "loadActions": [
+    {
+      "actionId": "select_model_target",
+      "enabled": false,
+      "label": "select model target",
+      "launcherAction": "Render target metadata from checked fixtures only.",
+      "requiredEvidence": [
+        "descriptor_fixture_available"
+      ],
+      "sideEffectPolicy": "local_render_only",
+      "state": "target_selected",
+      "userAction": "Review the target model descriptor in the future chat UI."
+    },
+    {
+      "actionId": "configure_model_assets",
+      "enabled": false,
+      "label": "configure model assets",
+      "launcherAction": "Do not read or echo local asset paths.",
+      "requiredEvidence": [
+        "local_model_asset_input_boundary_reviewed",
+        "redaction_policy_reviewed"
+      ],
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "state": "blocked",
+      "userAction": "Provide model assets only after a reviewed local input boundary exists."
+    },
+    {
+      "actionId": "load_model",
+      "enabled": false,
+      "label": "load model",
+      "launcherAction": "Refuse model load while runtime readiness is blocked.",
+      "requiredEvidence": [
+        "runtime_readiness_available",
+        "model_assets_configured",
+        "kv260_session_available"
+      ],
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "disabled",
+      "userAction": "Load only after runtime readiness and model asset checks are evidence-backed."
+    },
+    {
+      "actionId": "refresh_status",
+      "enabled": false,
+      "label": "refresh status",
+      "launcherAction": "Render deterministic fixture data only.",
+      "requiredEvidence": [
+        "checked_fixture_data_available"
+      ],
+      "sideEffectPolicy": "read_only_data",
+      "state": "available_as_data",
+      "userAction": "Refresh the model status display from checked local fixtures."
+    }
+  ],
+  "loadState": "blocked",
+  "modelSelectionState": "target_selected",
+  "providerState": "not_used",
+  "responseState": "unavailable",
+  "runtimeState": "not_started",
+  "safetyFlags": {
+    "automaticUpload": false,
+    "cloudCalls": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathsIncluded": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptContentIncluded": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "secretsIncluded": false,
+    "stableApiAbiClaim": false,
+    "statusDisplayOnly": true,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatModelStatus.v0",
+  "statusId": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "statusRows": [
+    {
+      "displayPolicy": "show descriptor id and target label without model paths",
+      "label": "model descriptor",
+      "rowId": "model_descriptor",
+      "severity": "info",
+      "state": "available_as_data",
+      "summary": "Gemma 3N E4B is represented by the checked descriptor fixture only."
+    },
+    {
+      "displayPolicy": "show blocked state without local paths or filenames",
+      "label": "model assets",
+      "rowId": "model_assets",
+      "severity": "blocked",
+      "state": "external_not_configured",
+      "summary": "Model assets are user-provided future inputs and are not configured here."
+    },
+    {
+      "displayPolicy": "show conservative readiness summary only",
+      "label": "runtime readiness",
+      "rowId": "runtime_readiness",
+      "severity": "blocked",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked and not yet evidence-backed."
+    },
+    {
+      "displayPolicy": "show inactive target state without probing hardware",
+      "label": "device session",
+      "rowId": "device_session",
+      "severity": "blocked",
+      "state": "inactive",
+      "summary": "No KV260 target session exists in this fixture."
+    },
+    {
+      "displayPolicy": "show disabled action state only",
+      "label": "load operation",
+      "rowId": "load_operation",
+      "severity": "blocked",
+      "state": "disabled",
+      "summary": "Model load controls stay disabled until readiness evidence exists."
+    },
+    {
+      "displayPolicy": "show unavailable context state without token data",
+      "label": "chat context",
+      "rowId": "chat_context",
+      "severity": "blocked",
+      "state": "unavailable",
+      "summary": "No runtime context window or token state exists."
+    },
+    {
+      "displayPolicy": "show response unavailable state only",
+      "label": "assistant response",
+      "rowId": "assistant_response",
+      "severity": "blocked",
+      "state": "unavailable",
+      "summary": "No response can be generated because no model runtime is active."
+    }
+  ],
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}

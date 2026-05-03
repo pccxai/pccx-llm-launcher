@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
+# scripts/chat-model-status-stub.sh - print data-only chat model status JSON.
+#
+# This script does not load model assets, start runtime code, touch KV260
+# hardware, call providers, read prompts, write artifacts, or invoke pccx-lab.
+
+set -eu
+
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+
+MODEL="gemma3n-e4b"
+TARGET="kv260"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --model)
+            MODEL="${2:-}"
+            if [ -z "$MODEL" ]; then
+                printf '[ERROR] --model requires an argument\n' >&2
+                exit 2
+            fi
+            shift 2
+            ;;
+        --target)
+            TARGET="${2:-}"
+            if [ -z "$TARGET" ]; then
+                printf '[ERROR] --target requires an argument\n' >&2
+                exit 2
+            fi
+            shift 2
+            ;;
+        *)
+            printf '[ERROR] unknown option: %s\n' "$1" >&2
+            exit 2
+            ;;
+    esac
+done
+
+exec python3 "$ROOT_DIR/contracts/chat_model_status_contract.py" \
+    --model "$MODEL" \
+    --target "$TARGET"

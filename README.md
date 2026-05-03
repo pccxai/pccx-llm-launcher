@@ -87,11 +87,12 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/chat-session-stub.sh`](./scripts/chat-session-stub.sh) | Data-only standalone chat/session JSON for the Gemma 3N E4B + KV260 target. Reports disabled send controls, inactive session state, no prompt/response persistence, and readiness handoff references. |
 | [`scripts/chat-session-lifecycle-stub.sh`](./scripts/chat-session-lifecycle-stub.sh) | Data-only chat session lifecycle JSON for the Gemma 3N E4B + KV260 target. Reports create, restore, clear, close, and export-summary operations as disabled, blocked, inactive, or unavailable. |
+| [`scripts/chat-model-status-stub.sh`](./scripts/chat-model-status-stub.sh) | Data-only chat model-status JSON for the Gemma 3N E4B + KV260 target. Reports descriptor, asset, load, runtime, context, and response display rows as blocked, disabled, or unavailable. |
 | [`scripts/chat-surface-preview.sh`](./scripts/chat-surface-preview.sh) | Read-only terminal preview of the standalone chat surface. Renders the checked chat/session contract as blocked UI state without accepting prompts, executing a model, or writing artifacts. |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
@@ -101,11 +102,13 @@ bash scripts/check.sh
 bash scripts/check-device-stub.sh
 bash scripts/install-stub.sh
 bash scripts/status-stub.sh
+bash scripts/status-stub.sh --include-chat-model-status
 bash scripts/status-stub.sh --include-chat-session
 bash scripts/status-stub.sh --include-device-session
 bash scripts/status-stub.sh --include-runtime-readiness
 bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
@@ -273,22 +276,30 @@ the planned local chat entry point:
 
 ```bash
 python3 contracts/chat_session_contract.py --model gemma3n-e4b --target kv260
+python3 contracts/chat_model_status_contract.py --model gemma3n-e4b --target kv260
+bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-model-status
 bash scripts/status-stub.sh --include-chat-session
 python3 scripts/tests/chat_session_contract_test.py
+python3 scripts/tests/chat_model_status_contract_test.py
 python3 scripts/tests/chat_session_lifecycle_contract_test.py
 python3 scripts/tests/chat_surface_preview_test.py
+bash scripts/tests/status-chat-model-status.sh
 bash scripts/tests/status-chat-session.sh
 ```
 
-The checked fixture reports the chat surface as blocked, the model as
-not loaded, the session as inactive, and send controls as disabled. It
-defines a message envelope vocabulary without storing prompts,
-responses, transcripts, model paths, generated artifacts, private paths,
-secrets, or tokens. It references the runtime readiness and
-device/session status fixtures as local data only.
+The checked chat/session fixture reports the chat surface as blocked,
+the session as inactive, and send controls as disabled. The checked chat
+model-status fixture adds descriptor, asset, load, runtime, context, and
+response display rows for the planned model-status panel. Model loading
+stays disabled and blocked. These fixtures define display and message
+envelope shapes without storing prompts, responses, transcripts, model
+paths, generated artifacts, private paths, secrets, or tokens. They
+reference the model/runtime descriptor, runtime readiness,
+device/session status, and chat/session fixtures as local data only.
 
 The lifecycle fixture defines the session-management boundary for create,
 restore, clear, close, and export-summary operations. All operations stay

@@ -9,15 +9,20 @@ Current answer: **blocked / no local chat runtime is active**.
 The implementation lives in:
 
 - `contracts/chat_session_contract.py`
+- `contracts/chat_model_status_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
+- `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
+- `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
+- `scripts/tests/status-chat-model-status.sh`
 
 ## What Is Implemented
 
@@ -39,6 +44,18 @@ JSON for the supported model and target pair:
 ```bash
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 ```
+
+The chat model-status fixture records the display boundary for model
+descriptor, asset, load, runtime, context, and response rows:
+
+```bash
+bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-model-status
+```
+
+Model loading stays blocked and disabled. The model-status fixture does
+not read model paths, load weights, start runtimes, generate responses,
+touch hardware, call providers, invoke pccx-lab, or write artifacts.
 
 The lifecycle fixture records the session-management boundary for create,
 restore, clear, close, and export-summary operations:
@@ -81,6 +98,7 @@ The chat/session states are deliberately narrow:
 - `not_configured`: required configuration is absent
 - `not_loaded`: no model assets are loaded
 - `not_started`: no transcript or log stream exists
+- `not_used`: no external provider state is used
 - `unavailable`: output is not available
 - `available_as_data`: local fixture shape is available as data only
 
@@ -100,11 +118,12 @@ content:
 
 ## Coordination Boundary
 
-The standalone chat surface depends on the existing launcher readiness
-and device/session status contracts. The lifecycle contract adds a
-reviewable session-management shape, but it does not add runtime
-execution, model loading, provider calls, persistence, target access,
-artifact reads, or artifact writes.
+The standalone chat surface depends on the existing launcher model
+descriptor, readiness, and device/session status contracts. The
+model-status contract adds reviewable display rows for model-load state.
+The lifecycle contract adds a reviewable session-management shape, but
+these contracts do not add runtime execution, model loading, provider
+calls, persistence, target access, artifact reads, or artifact writes.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
