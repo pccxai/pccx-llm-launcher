@@ -11,7 +11,9 @@ The implementation lives in:
 - `contracts/chat_session_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
+- `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
+- `scripts/tests/chat_surface_preview_test.py`
 
 ## What Is Implemented
 
@@ -33,6 +35,19 @@ JSON for the supported model and target pair:
 ```bash
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 ```
+
+The terminal preview command renders the same checked contract as a
+read-only chat surface sketch:
+
+```bash
+bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
+```
+
+The preview shows the blocked chat surface, inactive session state,
+disabled controls, blocked reasons, and unavailable assistant response.
+It does not accept or echo prompts, persist transcripts, execute a
+model, touch hardware, call providers, invoke pccx-lab, or write
+artifacts.
 
 ## State Separation
 
