@@ -16,6 +16,9 @@
 # Chat model status display plan (explicit opt-in, read-only local data):
 #   --include-chat-model-status
 #
+# Chat readiness checks and recovery actions (explicit opt-in, read-only local data):
+#   --include-chat-readiness
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -35,6 +38,98 @@ INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
+INCLUDE_CHAT_READINESS="0"
+
+print_chat_readiness_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_READINESS_STUB="$ROOT_DIR/scripts/chat-readiness-stub.sh"
+
+    if [ ! -f "$CHAT_READINESS_STUB" ]; then
+        ERROR "chat readiness stub not found: $CHAT_READINESS_STUB"
+        return 1
+    fi
+
+    if ! CHAT_READINESS_JSON="$(bash "$CHAT_READINESS_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat readiness stub failed"
+        printf '%s\n' "$CHAT_READINESS_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_READINESS_SUMMARY="$(
+        printf '%s\n' "$CHAT_READINESS_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+checks = " ".join(
+    "{}={}".format(check["checkId"], check["state"])
+    for check in data["readinessChecks"]
+)
+errors = " ".join(
+    "{}={}".format(error["errorId"], error["state"])
+    for error in data["errorTaxonomy"]
+)
+actions = " ".join(
+    "{}={}".format(action["actionId"], action["state"])
+    for action in data["recoveryActions"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-readiness-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/model/provider/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  overall    : {}".format(data["overallState"]))
+print("[INFO]  input      : {}".format(data["inputReadinessState"]))
+print("[INFO]  send       : {}".format(data["sendReadinessState"]))
+print("[INFO]  recovery   : {}".format(data["recoveryState"]))
+print("[INFO]  evidence   : {}".format(data["evidenceState"]))
+print("[INFO]  checks     : {}".format(checks))
+print("[INFO]  errors     : {}".format(errors))
+print("[INFO]  actions    : {}".format(actions))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "readinessDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "promptContentIncluded={} responseContentIncluded={} sessionPersistence={} "
+    "modelLoadAttempted={} modelLoaded={} modelExecution={} runtimeExecution={} "
+    "responseGenerated={} kv260Access={} opensSerialPort={} networkCalls={} "
+    "sshExecution={} providerCalls={} cloudCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["readinessDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["sessionPersistence"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["responseGenerated"]),
+        b(flags["kv260Access"]),
+        b(flags["opensSerialPort"]),
+        b(flags["networkCalls"]),
+        b(flags["sshExecution"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat readiness JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat readiness"
+    printf '%s\n' "$CHAT_READINESS_SUMMARY"
+}
 
 print_chat_model_status_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -397,6 +492,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_MODEL_STATUS="1"
             shift
             ;;
+        --include-chat-readiness)
+            INCLUDE_CHAT_READINESS="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -412,8 +511,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, and --include-chat-model-status are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, and --include-chat-readiness are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -430,6 +529,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
+    NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
 
     if [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ]; then
@@ -440,6 +540,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_SESSION" = "1" ]; then
         if ! print_chat_session_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_READINESS" = "1" ]; then
+        if ! print_chat_readiness_summary; then
             exit 1
         fi
     fi
