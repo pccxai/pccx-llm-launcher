@@ -1,0 +1,169 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "runtime_readiness_blocked",
+      "requiredBefore": "send_message_enabled",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked for the Gemma 3N E4B plus KV260 target."
+    },
+    {
+      "reasonId": "model_assets_not_configured",
+      "requiredBefore": "model_load_enabled",
+      "state": "not_configured",
+      "summary": "Model assets are external and are not configured by this fixture."
+    },
+    {
+      "reasonId": "chat_runtime_not_implemented",
+      "requiredBefore": "session_start_enabled",
+      "state": "planned",
+      "summary": "The local chat runtime boundary has not been implemented in this repository."
+    },
+    {
+      "reasonId": "kv260_session_absent",
+      "requiredBefore": "assistant_response_available",
+      "state": "inactive",
+      "summary": "No target device session exists and no log stream has started."
+    }
+  ],
+  "chatState": "inactive",
+  "deviceSessionStatusRef": "device_session_status_gemma3n_e4b_kv260_placeholder",
+  "fixtureVersion": "chat-session.gemma3n-e4b-kv260.2026-05-03",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "refId": "runtime_readiness",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "state": "blocked",
+      "summary": "Runtime readiness is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json",
+      "refId": "device_session_status",
+      "schemaVersion": "pccx.deviceSessionStatus.v0",
+      "state": "available_as_data",
+      "summary": "Device/session status is consumed as local data only."
+    }
+  ],
+  "inputState": "ready_for_inputs",
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_boundary_2026-05-03",
+  "limitations": [
+    "Data-only standalone chat/session fixture; no model response is generated.",
+    "No prompts, responses, transcripts, model paths, generated artifacts, private paths, secrets, or tokens are stored.",
+    "No KV260 hardware access, serial access, network call, provider call, telemetry, upload, or write-back is performed.",
+    "Send controls remain disabled until runtime readiness and model/session evidence are available.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "messageEnvelope": {
+    "contentPolicy": "fixture carries field shape only; no prompt or response content is stored",
+    "messageIdPolicy": "local_session_scoped_future_id",
+    "orderingPolicy": "future session-local monotonic order",
+    "redactionPolicy": "prompt and response bodies stay outside checked fixtures",
+    "responseState": "unavailable",
+    "roleVocabulary": [
+      "system_notice",
+      "user",
+      "assistant"
+    ],
+    "schemaVersion": "pccx.chatMessage.v0",
+    "state": "available_as_data"
+  },
+  "modelStatus": "not_loaded",
+  "runtimeReadinessRef": "runtime_readiness_gemma3n_e4b_kv260",
+  "safetyFlags": {
+    "automaticUpload": false,
+    "cloudCalls": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelExecution": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptContentIncluded": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "responseContentIncluded": false,
+    "runtimeExecution": false,
+    "secretsIncluded": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatSession.v0",
+  "sendState": "disabled",
+  "sessionControls": [
+    {
+      "controlId": "new_session",
+      "enabled": false,
+      "label": "new session",
+      "launcherAction": "Render deterministic placeholder session state.",
+      "sideEffectPolicy": "local_render_only",
+      "state": "placeholder",
+      "userAction": "Open the chat surface when the launcher UI exists."
+    },
+    {
+      "controlId": "model_status",
+      "enabled": false,
+      "label": "model status",
+      "launcherAction": "Show the target descriptor and blocked model-load state.",
+      "sideEffectPolicy": "data_only",
+      "state": "not_loaded",
+      "userAction": "Review model readiness before chat controls are enabled."
+    },
+    {
+      "controlId": "send_message",
+      "enabled": false,
+      "label": "send message",
+      "launcherAction": "Keep send disabled while runtime readiness is blocked.",
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "disabled",
+      "userAction": "Draft input only after a reviewed local session boundary exists."
+    },
+    {
+      "controlId": "clear_session",
+      "enabled": false,
+      "label": "clear session",
+      "launcherAction": "No-op because no transcript exists in this fixture.",
+      "sideEffectPolicy": "no_write",
+      "state": "inactive",
+      "userAction": "Clear only a future local transcript owned by the launcher."
+    },
+    {
+      "controlId": "export_summary",
+      "enabled": false,
+      "label": "export summary",
+      "launcherAction": "Refuse export because no chat session exists.",
+      "sideEffectPolicy": "no_artifact_write",
+      "state": "blocked",
+      "userAction": "Export only bounded summaries after an explicit export boundary exists."
+    }
+  ],
+  "sessionId": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "surfaceState": "blocked",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "transcriptPolicy": {
+    "persistence": "not_configured",
+    "promptCapture": "disabled",
+    "responseCapture": "disabled",
+    "state": "not_started",
+    "summary": "This fixture stores no user prompts, responses, transcripts, or generated content."
+  }
+}
