@@ -53,7 +53,8 @@ publishes a verified end-to-end path.
 
 - Coding-assistant mode (AI-assisted local workflow with a controlled
   tool boundary).
-- VS Code extension bridge for guided launches and log inspection.
+- VS Code and other editor bridge planning for guided launches and log
+  inspection.
 - Additional target models beyond Gemma 3N E4B.
 - Additional edge devices beyond KV260.
 - Integration with `pccx-lab` diagnostics so device / kernel state can be
@@ -159,6 +160,8 @@ It does not execute the launcher, call a provider, contact hardware,
 load a model, implement an editor bridge, or make a compatibility
 promise. See
 [docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md](./docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md).
+The later-track JetBrains and generic editor direction is tracked in
+[docs/OTHER_EDITOR_BRIDGE_PLAN.md](./docs/OTHER_EDITOR_BRIDGE_PLAN.md).
 
 ### Model / runtime descriptor boundary (planned)
 
