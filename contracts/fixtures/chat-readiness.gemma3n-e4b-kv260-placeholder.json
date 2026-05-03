@@ -1,0 +1,291 @@
+{
+  "chatModelStatusRef": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "chatSessionLifecycleRef": "chat_session_lifecycle_gemma3n_e4b_kv260_placeholder",
+  "errorTaxonomy": [
+    {
+      "contentPolicy": "no_prompt_response_or_log_content",
+      "diagnosticHint": "Review the runtime readiness data contract before enabling send.",
+      "errorId": "runtime_not_ready",
+      "recoveryActionId": "review_runtime_readiness",
+      "severity": "blocked",
+      "state": "blocked",
+      "userMessage": "Local chat is blocked until runtime readiness evidence exists."
+    },
+    {
+      "contentPolicy": "no_model_paths_or_weight_names",
+      "diagnosticHint": "A future reviewed asset input boundary must redact local paths.",
+      "errorId": "model_assets_missing",
+      "recoveryActionId": "configure_model_assets_future",
+      "severity": "blocked",
+      "state": "external_not_configured",
+      "userMessage": "Model assets are not configured by this launcher fixture."
+    },
+    {
+      "contentPolicy": "no_serial_ssh_or_network_output",
+      "diagnosticHint": "Use device/session status data only; this fixture does not probe hardware.",
+      "errorId": "device_session_absent",
+      "recoveryActionId": "review_device_session_status",
+      "severity": "blocked",
+      "state": "inactive",
+      "userMessage": "No target device session is active."
+    },
+    {
+      "contentPolicy": "no_generated_response_content",
+      "diagnosticHint": "Runtime execution requires a separate reviewed implementation boundary.",
+      "errorId": "chat_runtime_absent",
+      "recoveryActionId": "wait_for_runtime_boundary",
+      "severity": "blocked",
+      "state": "not_started",
+      "userMessage": "No local chat runtime is available for assistant responses."
+    },
+    {
+      "contentPolicy": "no_manifest_transcript_or_summary_content",
+      "diagnosticHint": "A future local session store must define retention and redaction rules.",
+      "errorId": "session_store_absent",
+      "recoveryActionId": "review_session_store_policy",
+      "severity": "blocked",
+      "state": "not_configured",
+      "userMessage": "Session restore and export are unavailable."
+    }
+  ],
+  "evidenceState": "blocked",
+  "fixtureVersion": "chat-readiness.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "available_as_data",
+      "summary": "Base chat/session state is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "available_as_data",
+      "summary": "Model display status is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "state": "blocked",
+      "summary": "Session lifecycle state remains disabled or blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "refId": "runtime_readiness",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "state": "blocked",
+      "summary": "Runtime readiness is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json",
+      "refId": "device_session_status",
+      "schemaVersion": "pccx.deviceSessionStatus.v0",
+      "state": "available_as_data",
+      "summary": "Device/session status is consumed as local data only."
+    }
+  ],
+  "inputReadinessState": "available_as_data",
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_readiness_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat readiness fixture; no readiness check executes runtime code.",
+    "No prompts, responses, transcripts, model paths, generated artifacts, private paths, secrets, or tokens are stored.",
+    "No KV260 hardware access, serial access, SSH execution, network call, provider call, telemetry, upload, or write-back is performed.",
+    "Send controls remain disabled until runtime readiness, model-load, device-session, and local session evidence are available.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "overallState": "blocked",
+  "parentChatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "readinessChecks": [
+    {
+      "checkId": "chat_surface_fixture",
+      "displayPolicy": "show local fixture availability without accepting prompts",
+      "label": "chat surface fixture",
+      "requiredBefore": "surface_preview_rendered",
+      "severity": "info",
+      "state": "available_as_data",
+      "summary": "The checked chat/session fixture can be rendered as local data only."
+    },
+    {
+      "checkId": "model_target",
+      "displayPolicy": "show target label without model paths",
+      "label": "model target",
+      "requiredBefore": "model_status_displayed",
+      "severity": "info",
+      "state": "target_selected",
+      "summary": "Gemma 3N E4B is selected as a planned target descriptor."
+    },
+    {
+      "checkId": "model_assets",
+      "displayPolicy": "show blocked state without filenames or paths",
+      "label": "model assets",
+      "requiredBefore": "model_load_enabled",
+      "severity": "blocked",
+      "state": "external_not_configured",
+      "summary": "Model assets are external and no reviewed local asset input boundary exists."
+    },
+    {
+      "checkId": "runtime_readiness",
+      "displayPolicy": "show conservative readiness summary only",
+      "label": "runtime readiness",
+      "requiredBefore": "send_message_enabled",
+      "severity": "blocked",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked and not yet evidence-backed."
+    },
+    {
+      "checkId": "device_session",
+      "displayPolicy": "show inactive state without probing hardware",
+      "label": "device session",
+      "requiredBefore": "runtime_session_started",
+      "severity": "blocked",
+      "state": "inactive",
+      "summary": "No KV260 target session exists in this fixture."
+    },
+    {
+      "checkId": "chat_runtime",
+      "displayPolicy": "show blocked state without executing runtime code",
+      "label": "chat runtime",
+      "requiredBefore": "assistant_response_available",
+      "severity": "blocked",
+      "state": "not_started",
+      "summary": "No local chat runtime has been implemented or started."
+    },
+    {
+      "checkId": "session_store",
+      "displayPolicy": "show unavailable storage state without reading artifacts",
+      "label": "session store",
+      "requiredBefore": "session_restore_or_export_enabled",
+      "severity": "blocked",
+      "state": "not_configured",
+      "summary": "No reviewed local session store or retention policy exists."
+    },
+    {
+      "checkId": "provider_mode",
+      "displayPolicy": "show no-provider state without provider configuration",
+      "label": "provider mode",
+      "requiredBefore": "core_chat_available",
+      "severity": "info",
+      "state": "not_used",
+      "summary": "External provider state is not used for this local launcher boundary."
+    }
+  ],
+  "readinessId": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "recoveryActions": [
+    {
+      "actionId": "review_runtime_readiness",
+      "enabled": false,
+      "label": "review runtime readiness",
+      "launcherAction": "Render local readiness data only.",
+      "requiredEvidence": [
+        "runtime_readiness_fixture_available"
+      ],
+      "sideEffectPolicy": "read_only_data",
+      "state": "available_as_data",
+      "userAction": "Review the checked runtime readiness summary."
+    },
+    {
+      "actionId": "configure_model_assets_future",
+      "enabled": false,
+      "label": "configure model assets",
+      "launcherAction": "Do not read or echo local asset paths.",
+      "requiredEvidence": [
+        "local_model_asset_input_boundary_reviewed",
+        "redaction_policy_reviewed"
+      ],
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "state": "blocked",
+      "userAction": "Provide model assets only after a reviewed local input boundary exists."
+    },
+    {
+      "actionId": "review_device_session_status",
+      "enabled": false,
+      "label": "review device session status",
+      "launcherAction": "Render the checked device/session status fixture.",
+      "requiredEvidence": [
+        "device_session_fixture_available"
+      ],
+      "sideEffectPolicy": "read_only_data",
+      "state": "available_as_data",
+      "userAction": "Review target status as deterministic local fixture data."
+    },
+    {
+      "actionId": "wait_for_runtime_boundary",
+      "enabled": false,
+      "label": "wait for runtime boundary",
+      "launcherAction": "Refuse runtime execution from this fixture.",
+      "requiredEvidence": [
+        "runtime_boundary_reviewed",
+        "model_load_evidence_available",
+        "device_session_evidence_available"
+      ],
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "requires_evidence",
+      "userAction": "Keep send disabled until a runtime boundary is reviewed."
+    },
+    {
+      "actionId": "review_session_store_policy",
+      "enabled": false,
+      "label": "review session store policy",
+      "launcherAction": "Do not read, write, or summarize session artifacts.",
+      "requiredEvidence": [
+        "session_store_boundary_reviewed",
+        "summary_redaction_policy_reviewed"
+      ],
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "state": "planned",
+      "userAction": "Enable restore or export only after explicit retention rules exist."
+    }
+  ],
+  "recoveryState": "requires_evidence",
+  "safetyFlags": {
+    "automaticUpload": false,
+    "cloudCalls": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathsIncluded": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptContentIncluded": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readinessDisplayOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "secretsIncluded": false,
+    "sessionPersistence": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatReadiness.v0",
+  "sendReadinessState": "disabled",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}

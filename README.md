@@ -87,12 +87,13 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-chat-readiness`, adds read-only chat readiness checks and recovery actions. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/chat-session-stub.sh`](./scripts/chat-session-stub.sh) | Data-only standalone chat/session JSON for the Gemma 3N E4B + KV260 target. Reports disabled send controls, inactive session state, no prompt/response persistence, and readiness handoff references. |
 | [`scripts/chat-session-lifecycle-stub.sh`](./scripts/chat-session-lifecycle-stub.sh) | Data-only chat session lifecycle JSON for the Gemma 3N E4B + KV260 target. Reports create, restore, clear, close, and export-summary operations as disabled, blocked, inactive, or unavailable. |
 | [`scripts/chat-model-status-stub.sh`](./scripts/chat-model-status-stub.sh) | Data-only chat model-status JSON for the Gemma 3N E4B + KV260 target. Reports descriptor, asset, load, runtime, context, and response display rows as blocked, disabled, or unavailable. |
+| [`scripts/chat-readiness-stub.sh`](./scripts/chat-readiness-stub.sh) | Data-only chat readiness JSON for the Gemma 3N E4B + KV260 target. Reports readiness checks, error categories, and recovery actions as blocked, disabled, or local data only. |
 | [`scripts/chat-surface-preview.sh`](./scripts/chat-surface-preview.sh) | Read-only terminal preview of the standalone chat surface. Renders the checked chat/session contract as blocked UI state without accepting prompts, executing a model, or writing artifacts. |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
@@ -104,6 +105,7 @@ bash scripts/install-stub.sh
 bash scripts/status-stub.sh
 bash scripts/status-stub.sh --include-chat-model-status
 bash scripts/status-stub.sh --include-chat-session
+bash scripts/status-stub.sh --include-chat-readiness
 bash scripts/status-stub.sh --include-device-session
 bash scripts/status-stub.sh --include-runtime-readiness
 bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
@@ -111,6 +113,7 @@ bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
 bash scripts/launch-stub.sh --dry-run
 bash scripts/chat-stub.sh --dry-run --prompt "hello"
@@ -277,18 +280,23 @@ the planned local chat entry point:
 ```bash
 python3 contracts/chat_session_contract.py --model gemma3n-e4b --target kv260
 python3 contracts/chat_model_status_contract.py --model gemma3n-e4b --target kv260
+python3 contracts/chat_readiness_contract.py --model gemma3n-e4b --target kv260
 bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
 bash scripts/status-stub.sh --include-chat-model-status
 bash scripts/status-stub.sh --include-chat-session
+bash scripts/status-stub.sh --include-chat-readiness
 python3 scripts/tests/chat_session_contract_test.py
 python3 scripts/tests/chat_model_status_contract_test.py
 python3 scripts/tests/chat_session_lifecycle_contract_test.py
+python3 scripts/tests/chat_readiness_contract_test.py
 python3 scripts/tests/chat_surface_preview_test.py
 bash scripts/tests/status-chat-model-status.sh
 bash scripts/tests/status-chat-session.sh
+bash scripts/tests/status-chat-readiness.sh
 ```
 
 The checked chat/session fixture reports the chat surface as blocked,
@@ -307,6 +315,14 @@ disabled, blocked, inactive, or unavailable until readiness evidence, model
 load evidence, a reviewed local session store, and explicit export/redaction
 rules exist. It does not read or write manifests, transcripts, summaries,
 prompts, responses, or model paths.
+
+The chat readiness fixture defines the readiness checklist and recovery
+action boundary for the standalone chat surface. It records local fixture
+availability, target model display, model assets, runtime readiness, device
+session state, chat runtime state, session-store state, and no-provider
+mode as deterministic data. Recovery actions remain disabled or local data
+only; the fixture does not read prompts, model assets, paths, manifests,
+transcripts, summaries, or logs.
 
 The preview command renders that same contract as a deterministic
 terminal chat surface sketch with disabled controls, blocked reasons, and

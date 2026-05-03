@@ -11,18 +11,23 @@ The implementation lives in:
 - `contracts/chat_session_contract.py`
 - `contracts/chat_model_status_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
+- `contracts/chat_readiness_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
+- `scripts/chat-readiness-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
+- `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
+- `scripts/tests/status-chat-readiness.sh`
 
 ## What Is Implemented
 
@@ -70,6 +75,22 @@ store, and explicit export/redaction rules exist. The fixture does not
 read or write manifests, transcripts, summaries, prompts, responses, or
 model paths.
 
+The chat readiness fixture records the checklist and recovery-action
+boundary used to decide whether the standalone chat surface can move
+beyond preview state:
+
+```bash
+bash scripts/chat-readiness-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-readiness
+```
+
+It records local fixture availability, target model display, model asset
+state, runtime readiness, device session state, chat runtime state,
+session-store state, and no-provider mode. Recovery actions are disabled,
+blocked, planned, or local data only. The fixture does not read prompts,
+model assets, paths, manifests, transcripts, summaries, logs, device
+state, or provider configuration.
+
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
 
@@ -116,6 +137,24 @@ content:
 - `unavailable`: no prior local session can be restored
 - `available_as_data`: referenced local fixture shape is available as data only
 
+The readiness states keep send-control gating separate from model-status
+display and lifecycle operations:
+
+- `available_as_data`: referenced local fixture data is available without
+  executing anything
+- `blocked`: a required evidence item or reviewed boundary is missing
+- `disabled`: a UI command is intentionally unavailable
+- `external_not_configured`: user-provided model assets are not configured
+- `inactive`: no target device or runtime session exists
+- `not_configured`: no local store or retention policy exists
+- `not_loaded`: model assets are not loaded
+- `not_started`: no local chat runtime has started
+- `not_used`: external provider state is not part of this boundary
+- `planned`: described for a future reviewed boundary
+- `requires_evidence`: future enablement requires evidence first
+- `target_selected`: target descriptor data can be displayed
+- `unavailable`: output or operation state is unavailable
+
 ## Coordination Boundary
 
 The standalone chat surface depends on the existing launcher model
@@ -124,6 +163,9 @@ model-status contract adds reviewable display rows for model-load state.
 The lifecycle contract adds a reviewable session-management shape, but
 these contracts do not add runtime execution, model loading, provider
 calls, persistence, target access, artifact reads, or artifact writes.
+The readiness contract ties those display and lifecycle states into a
+single checklist and recovery-action view without enabling any send,
+load, restore, or export action.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -136,6 +178,7 @@ This chat/session surface does not add:
 - model execution or generated responses
 - prompt, response, or transcript persistence
 - session creation, restore, clear, close, or export behavior
+- readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes
 - model loading or model weight paths
 - KV260 runtime execution
