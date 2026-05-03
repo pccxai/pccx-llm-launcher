@@ -10,7 +10,7 @@
 # Device/session status panel (explicit opt-in, read-only local data):
 #   --include-device-session
 #
-# Chat/session status (explicit opt-in, read-only local data):
+# Chat/session status and lifecycle plan (explicit opt-in, read-only local data):
 #   --include-chat-session
 #
 # pccx-lab backend (explicit opt-in):
@@ -36,9 +36,14 @@ print_chat_session_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
     ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
     CHAT_SESSION_STUB="$ROOT_DIR/scripts/chat-session-stub.sh"
+    CHAT_SESSION_LIFECYCLE_STUB="$ROOT_DIR/scripts/chat-session-lifecycle-stub.sh"
 
     if [ ! -f "$CHAT_SESSION_STUB" ]; then
         ERROR "chat/session stub not found: $CHAT_SESSION_STUB"
+        return 1
+    fi
+    if [ ! -f "$CHAT_SESSION_LIFECYCLE_STUB" ]; then
+        ERROR "chat/session lifecycle stub not found: $CHAT_SESSION_LIFECYCLE_STUB"
         return 1
     fi
 
@@ -47,17 +52,30 @@ print_chat_session_summary() {
         printf '%s\n' "$CHAT_SESSION_JSON" >&2
         return 1
     fi
+    if ! CHAT_SESSION_LIFECYCLE_JSON="$(bash "$CHAT_SESSION_LIFECYCLE_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat/session lifecycle stub failed"
+        printf '%s\n' "$CHAT_SESSION_LIFECYCLE_JSON" >&2
+        return 1
+    fi
 
     if ! CHAT_SESSION_SUMMARY="$(
-        printf '%s\n' "$CHAT_SESSION_JSON" | python3 -c '
+        printf '%s\n%s\n' "$CHAT_SESSION_JSON" "$CHAT_SESSION_LIFECYCLE_JSON" | python3 -c '
 import json
 import sys
 
-data = json.load(sys.stdin)
+decoder = json.JSONDecoder()
+text = sys.stdin.read()
+data, offset = decoder.raw_decode(text)
+lifecycle, _ = decoder.raw_decode(text[offset:].lstrip())
 flags = data["safetyFlags"]
+lifecycle_flags = lifecycle["safetyFlags"]
 controls = " ".join(
     "{}={}".format(control["controlId"], control["state"])
     for control in data["sessionControls"]
+)
+operations = " ".join(
+    "{}={}".format(operation["operationId"], operation["state"])
+    for operation in lifecycle["lifecycleOperations"]
 )
 
 def b(value):
@@ -75,6 +93,12 @@ print("[INFO]  model load : {}".format(data["modelStatus"]))
 print("[INFO]  transcript : {}".format(data["transcriptPolicy"]["state"]))
 print("[INFO]  response   : {}".format(data["messageEnvelope"]["responseState"]))
 print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  lifecycle  : {}".format(lifecycle["lifecycleState"]))
+print("[INFO]  active     : {}".format(lifecycle["activeSessionState"]))
+print("[INFO]  storage    : {}".format(lifecycle["storageState"]))
+print("[INFO]  restore    : {}".format(lifecycle["restoreState"]))
+print("[INFO]  export     : {}".format(lifecycle["exportState"]))
+print("[INFO]  operations : {}".format(operations))
 print(
     "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
     "runtimeExecution={} modelLoaded={} modelExecution={} kv260Access={} "
@@ -94,6 +118,22 @@ print(
         b(flags["promptContentIncluded"]),
         b(flags["responseContentIncluded"]),
         b(flags["executesPccxLab"]),
+    )
+)
+print(
+    "[INFO]  lifecycle flags : readOnly={} dataOnly={} deterministic={} "
+    "writesArtifacts={} readsArtifacts={} sessionPersistence={} "
+    "sessionRestoreImplemented={} sessionClearImplemented={} "
+    "summaryExportImplemented={}".format(
+        b(lifecycle_flags["readOnly"]),
+        b(lifecycle_flags["dataOnly"]),
+        b(lifecycle_flags["deterministic"]),
+        b(lifecycle_flags["writesArtifacts"]),
+        b(lifecycle_flags["readsArtifacts"]),
+        b(lifecycle_flags["sessionPersistence"]),
+        b(lifecycle_flags["sessionRestoreImplemented"]),
+        b(lifecycle_flags["sessionClearImplemented"]),
+        b(lifecycle_flags["summaryExportImplemented"]),
     )
 )
 '
@@ -297,7 +337,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "pccx-lab status: opt-in via --backend pccx-lab (host-dry-run scaffold)"
     NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
-    NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat data)"
+    NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
 
     if [ "$INCLUDE_CHAT_SESSION" = "1" ]; then

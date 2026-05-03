@@ -1,0 +1,256 @@
+{
+  "activeSessionState": "inactive",
+  "blockedReasons": [
+    {
+      "reasonId": "runtime_readiness_blocked",
+      "requiredBefore": "create_session_enabled",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked for the Gemma 3N E4B plus KV260 target."
+    },
+    {
+      "reasonId": "model_load_not_available",
+      "requiredBefore": "create_session_enabled",
+      "state": "not_loaded",
+      "summary": "Model assets are not loaded and no model runtime session exists."
+    },
+    {
+      "reasonId": "session_store_not_configured",
+      "requiredBefore": "restore_or_clear_enabled",
+      "state": "not_configured",
+      "summary": "No local session store, retention rule, or manifest schema is configured."
+    },
+    {
+      "reasonId": "summary_export_boundary_absent",
+      "requiredBefore": "export_summary_enabled",
+      "state": "planned",
+      "summary": "A reviewed redaction and summary schema is required before export can exist."
+    },
+    {
+      "reasonId": "active_session_absent",
+      "requiredBefore": "clear_or_close_enabled",
+      "state": "inactive",
+      "summary": "No launcher-owned local chat session is active."
+    }
+  ],
+  "exportState": "disabled",
+  "fixtureVersion": "chat-session-lifecycle.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "available_as_data",
+      "summary": "Base chat/session surface is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "refId": "runtime_readiness",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "state": "blocked",
+      "summary": "Runtime readiness remains a prerequisite for lifecycle changes."
+    },
+    {
+      "fixturePath": "contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json",
+      "refId": "device_session_status",
+      "schemaVersion": "pccx.deviceSessionStatus.v0",
+      "state": "available_as_data",
+      "summary": "Device/session status is consumed as local data only."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_lifecycle_boundary_2026-05-04",
+  "lifecycleId": "chat_session_lifecycle_gemma3n_e4b_kv260_placeholder",
+  "lifecycleOperations": [
+    {
+      "contentPolicy": "no_prompt_response_or_transcript_content",
+      "enabled": false,
+      "label": "create session",
+      "launcherAction": "Render placeholder lifecycle state only.",
+      "operationId": "create_session",
+      "requiredEvidence": [
+        "runtime_readiness_available",
+        "model_load_reviewed",
+        "session_store_boundary_reviewed"
+      ],
+      "sideEffectPolicy": "local_render_only",
+      "state": "blocked",
+      "userAction": "Request a new local chat session after readiness exists."
+    },
+    {
+      "contentPolicy": "no_session_manifest_or_transcript_content",
+      "enabled": false,
+      "label": "restore session",
+      "launcherAction": "Refuse restore because no session manifest exists.",
+      "operationId": "restore_session",
+      "requiredEvidence": [
+        "local_session_store_configured",
+        "session_manifest_schema_reviewed"
+      ],
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "state": "unavailable",
+      "userAction": "Select a prior local session only after a reviewed store exists."
+    },
+    {
+      "contentPolicy": "no_prompt_response_or_transcript_content",
+      "enabled": false,
+      "label": "clear session",
+      "launcherAction": "No-op because no local chat session exists.",
+      "operationId": "clear_session",
+      "requiredEvidence": [
+        "active_session_exists",
+        "clear_boundary_reviewed"
+      ],
+      "sideEffectPolicy": "no_write",
+      "state": "inactive",
+      "userAction": "Clear only an active future session owned by the launcher."
+    },
+    {
+      "contentPolicy": "no_transcript_mutation",
+      "enabled": false,
+      "label": "close session",
+      "launcherAction": "No-op because no runtime session exists.",
+      "operationId": "close_session",
+      "requiredEvidence": [
+        "active_session_exists"
+      ],
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "inactive",
+      "userAction": "Close an active future session without altering artifacts."
+    },
+    {
+      "contentPolicy": "no_generated_summary_or_transcript_content",
+      "enabled": false,
+      "label": "export summary",
+      "launcherAction": "Refuse export because no chat session or summary schema exists.",
+      "operationId": "export_summary",
+      "requiredEvidence": [
+        "summary_schema_reviewed",
+        "redaction_policy_reviewed",
+        "explicit_user_export_request"
+      ],
+      "sideEffectPolicy": "no_artifact_write",
+      "state": "blocked",
+      "userAction": "Export only a bounded local summary after explicit review."
+    }
+  ],
+  "lifecycleState": "blocked",
+  "limitations": [
+    "Data-only chat session lifecycle fixture; no lifecycle operation is enabled.",
+    "No prompts, responses, transcripts, manifests, summaries, model paths, generated artifacts, private paths, secrets, or tokens are stored.",
+    "No artifacts are read or written and no retention policy is active.",
+    "No KV260 hardware access, serial access, network call, provider call, telemetry, upload, or write-back is performed.",
+    "Create, restore, clear, close, and export controls remain disabled or blocked until explicit evidence and reviewed boundaries exist.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "parentChatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "restoreState": "unavailable",
+  "safetyFlags": {
+    "automaticUpload": false,
+    "cloudCalls": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelExecution": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptContentIncluded": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "runtimeExecution": false,
+    "secretsIncluded": false,
+    "sessionClearImplemented": false,
+    "sessionPersistence": false,
+    "sessionRestoreImplemented": false,
+    "stableApiAbiClaim": false,
+    "summaryExportImplemented": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatSessionLifecycle.v0",
+  "sessionIdentityPolicy": {
+    "idScope": "future_local_session_only",
+    "idSource": "deterministic_fixture_identifier_only",
+    "pathPolicy": "no user, model, or workspace paths are emitted by this fixture",
+    "reusePolicy": "future session reuse requires a reviewed lifecycle boundary",
+    "state": "placeholder"
+  },
+  "sessionStoragePolicy": {
+    "artifactPolicy": "no manifest, transcript, summary, or lifecycle artifact is written",
+    "pathPolicy": "no filesystem path is configured, read, or emitted by this fixture",
+    "promptPolicy": "prompt bodies are not accepted, stored, summarized, or exported",
+    "responsePolicy": "response bodies are not generated, stored, summarized, or exported",
+    "retentionPolicy": "future retention must be explicit, local, and user controlled",
+    "scope": "launcher_local_future_store",
+    "state": "not_configured",
+    "transcriptPolicy": "no transcript exists and transcript persistence is disabled"
+  },
+  "stateTransitions": [
+    {
+      "event": "open_chat_surface",
+      "fromState": "inactive",
+      "guard": "checked chat/session fixture data is available",
+      "sideEffectPolicy": "local_render_only",
+      "state": "placeholder",
+      "toState": "placeholder",
+      "transitionId": "open_surface"
+    },
+    {
+      "event": "create_session",
+      "fromState": "placeholder",
+      "guard": "runtime readiness, model load, and session store evidence are absent",
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "blocked",
+      "toState": "blocked",
+      "transitionId": "request_create"
+    },
+    {
+      "event": "restore_session",
+      "fromState": "inactive",
+      "guard": "no local session manifest boundary exists",
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "state": "unavailable",
+      "toState": "unavailable",
+      "transitionId": "request_restore"
+    },
+    {
+      "event": "clear_session",
+      "fromState": "inactive",
+      "guard": "no active session exists",
+      "sideEffectPolicy": "no_write",
+      "state": "inactive",
+      "toState": "inactive",
+      "transitionId": "request_clear"
+    },
+    {
+      "event": "export_summary",
+      "fromState": "inactive",
+      "guard": "no transcript summary boundary exists",
+      "sideEffectPolicy": "no_artifact_write",
+      "state": "disabled",
+      "toState": "disabled",
+      "transitionId": "request_export"
+    }
+  ],
+  "storageState": "not_configured",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}

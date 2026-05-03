@@ -113,6 +113,7 @@ jobs:
                    scripts/device-session-status-stub.sh \
                    scripts/runtime-readiness-stub.sh \
                    scripts/chat-session-stub.sh \
+                   scripts/chat-session-lifecycle-stub.sh \
                    scripts/chat-surface-preview.sh \
                    scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
@@ -155,6 +156,8 @@ jobs:
         run: ./scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-session-stub.sh
         run: ./scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/chat-session-lifecycle-stub.sh
+        run: ./scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-surface-preview.sh
         run: ./scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
@@ -179,6 +182,8 @@ jobs:
         run: python3 scripts/tests/runtime_readiness_contract_test.py
       - name: run chat/session contract tests
         run: python3 scripts/tests/chat_session_contract_test.py
+      - name: run chat/session lifecycle contract tests
+        run: python3 scripts/tests/chat_session_lifecycle_contract_test.py
       - name: run chat surface preview tests
         run: python3 scripts/tests/chat_surface_preview_test.py
 
@@ -192,6 +197,7 @@ jobs:
           chmod +x scripts/status-stub.sh
           chmod +x scripts/chat-stub.sh
           chmod +x scripts/chat-session-stub.sh
+          chmod +x scripts/chat-session-lifecycle-stub.sh
           chmod +x scripts/launch-stub.sh
           chmod +x scripts/tests/status-backend.sh
           chmod +x scripts/tests/status-device-session.sh
