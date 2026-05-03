@@ -9,10 +9,14 @@ Current answer: **blocked / no local chat runtime is active**.
 The implementation lives in:
 
 - `contracts/chat_session_contract.py`
+- `contracts/chat_session_lifecycle_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
+- `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
+- `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 
 ## What Is Implemented
@@ -35,6 +39,19 @@ JSON for the supported model and target pair:
 ```bash
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 ```
+
+The lifecycle fixture records the session-management boundary for create,
+restore, clear, close, and export-summary operations:
+
+```bash
+bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
+```
+
+Every lifecycle operation is disabled, blocked, inactive, or unavailable
+until runtime readiness, model-load evidence, a reviewed local session
+store, and explicit export/redaction rules exist. The fixture does not
+read or write manifests, transcripts, summaries, prompts, responses, or
+model paths.
 
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
@@ -67,12 +84,27 @@ The chat/session states are deliberately narrow:
 - `unavailable`: output is not available
 - `available_as_data`: local fixture shape is available as data only
 
+The lifecycle states keep session management separate from chat message
+content:
+
+- `blocked`: a required readiness or policy boundary is missing
+- `disabled`: a UI command is intentionally unavailable
+- `inactive`: no launcher-owned chat session exists
+- `not_configured`: no local session store or retention rule exists
+- `not_loaded`: model assets are not loaded
+- `placeholder`: deterministic local fixture state only
+- `planned`: described for a future reviewed boundary
+- `requires_evidence`: future operation needs evidence before enablement
+- `unavailable`: no prior local session can be restored
+- `available_as_data`: referenced local fixture shape is available as data only
+
 ## Coordination Boundary
 
 The standalone chat surface depends on the existing launcher readiness
-and device/session status contracts. It may later become the primary
-user-facing entry point, but this contract does not add runtime
-execution, model loading, provider calls, persistence, or target access.
+and device/session status contracts. The lifecycle contract adds a
+reviewable session-management shape, but it does not add runtime
+execution, model loading, provider calls, persistence, target access,
+artifact reads, or artifact writes.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -84,6 +116,8 @@ This chat/session surface does not add:
 
 - model execution or generated responses
 - prompt, response, or transcript persistence
+- session creation, restore, clear, close, or export behavior
+- manifest, transcript, summary, or lifecycle artifact reads or writes
 - model loading or model weight paths
 - KV260 runtime execution
 - serial, SSH, or network target access
