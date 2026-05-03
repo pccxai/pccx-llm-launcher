@@ -5,6 +5,9 @@ integrations. It is a data-only status boundary. It does not start the
 launcher, inspect a device, load a model, call a provider, or connect to
 an editor.
 
+The later-track plan for JetBrains and generic editor adapters is tracked in
+[`OTHER_EDITOR_BRIDGE_PLAN.md`](./OTHER_EDITOR_BRIDGE_PLAN.md).
+
 The contract lives in:
 
 - `contracts/launcher_ide_status_contract.py`
@@ -33,10 +36,10 @@ planned unless there is checked evidence for something stronger.
 
 ## Planned Consumers
 
-Future editor integrations may read this status before presenting
-launcher actions to a user. `pccx-systemverilog-ide` is one possible
-consumer, but this repository does not implement that integration in
-this PR.
+Future editor integrations may read this status before presenting launcher
+actions to a user. `pccx-systemverilog-ide`, JetBrains plugin work, and
+generic editor adapters are possible consumers, but this repository does not
+implement those integrations in this PR.
 
 The planned mapping is:
 
@@ -105,6 +108,8 @@ This PR also does not add:
 - LSP implementation
 - editor extension implementation
 - packaging or publisher flow
+- JetBrains plugin implementation
+- generic editor adapter implementation
 - model weights or generated blobs
 
 The purpose is to make future integration work easier to review by
