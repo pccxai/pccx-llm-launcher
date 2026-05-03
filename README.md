@@ -52,7 +52,8 @@ publishes a verified end-to-end path.
 ## Roadmap
 
 - Coding-assistant mode (AI-assisted local workflow with a controlled
-  tool boundary).
+  tool boundary). The later-track plan is tracked in
+  [docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
 - VS Code and other editor bridge planning for guided launches and log
   inspection.
 - Additional target models beyond Gemma 3N E4B.
@@ -162,6 +163,8 @@ promise. See
 [docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md](./docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md).
 The later-track JetBrains and generic editor direction is tracked in
 [docs/OTHER_EDITOR_BRIDGE_PLAN.md](./docs/OTHER_EDITOR_BRIDGE_PLAN.md).
+The later-track local coding-assistant mode direction is tracked in
+[docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
 
 ### Model / runtime descriptor boundary (planned)
 

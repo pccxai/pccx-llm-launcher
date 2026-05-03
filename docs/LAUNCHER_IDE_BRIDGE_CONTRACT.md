@@ -7,6 +7,8 @@ an editor.
 
 The later-track plan for JetBrains and generic editor adapters is tracked in
 [`OTHER_EDITOR_BRIDGE_PLAN.md`](./OTHER_EDITOR_BRIDGE_PLAN.md).
+The later-track plan for local coding-assistant mode is tracked in
+[`LOCAL_CODING_ASSISTANT_MODE_PLAN.md`](./LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
 
 The contract lives in:
 
@@ -110,6 +112,7 @@ This PR also does not add:
 - packaging or publisher flow
 - JetBrains plugin implementation
 - generic editor adapter implementation
+- local coding-assistant runtime implementation
 - model weights or generated blobs
 
 The purpose is to make future integration work easier to review by
