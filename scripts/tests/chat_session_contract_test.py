@@ -21,6 +21,7 @@ FIXTURE_PATH = (
     / "chat-session.gemma3n-e4b-kv260-placeholder.json"
 )
 SCRIPT_PATH = ROOT / "scripts" / "chat-session-stub.sh"
+PREVIEW_SCRIPT_PATH = ROOT / "scripts" / "chat-surface-preview.sh"
 DOC_PATH = ROOT / "docs" / "STANDALONE_CHAT_SESSION_CONTRACT.md"
 README_PATH = ROOT / "README.md"
 TEST_PATH = Path(__file__).resolve()
@@ -301,6 +302,7 @@ def test_safety_flags_preserve_data_only_boundary() -> None:
 def test_docs_and_sources_avoid_private_data_runtime_calls_or_overclaims() -> None:
     module_source = read_text(MODULE_PATH)
     script_source = read_text(SCRIPT_PATH)
+    preview_script_source = read_text(PREVIEW_SCRIPT_PATH)
     status = load_module().create_gemma3n_e4b_kv260_chat_session()
     scan_text = "\n".join([
         read_text(FIXTURE_PATH),
@@ -309,10 +311,11 @@ def test_docs_and_sources_avoid_private_data_runtime_calls_or_overclaims() -> No
         flatten(status),
         module_source,
         script_source,
+        preview_script_source,
     ])
-    runtime_source = "\n".join([module_source, script_source])
+    runtime_source = "\n".join([module_source, script_source, preview_script_source])
 
-    assert_no_runtime_implementation_terms(module_source)
+    assert_no_runtime_implementation_terms(runtime_source)
     assert_no_private_or_generated_data(scan_text)
     assert_no_provider_configs(status)
     assert_no_unsupported_claims(scan_text)
@@ -327,6 +330,11 @@ def test_source_headers_for_touched_code_files() -> None:
             "# Copyright 2026 pccxai",
         ],
         SCRIPT_PATH: [
+            "#!/usr/bin/env bash",
+            "# SPDX-License-Identifier: Apache-2.0",
+            "# Copyright 2026 pccxai",
+        ],
+        PREVIEW_SCRIPT_PATH: [
             "#!/usr/bin/env bash",
             "# SPDX-License-Identifier: Apache-2.0",
             "# Copyright 2026 pccxai",

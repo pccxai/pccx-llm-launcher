@@ -88,6 +88,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/chat-session-stub.sh`](./scripts/chat-session-stub.sh) | Data-only standalone chat/session JSON for the Gemma 3N E4B + KV260 target. Reports disabled send controls, inactive session state, no prompt/response persistence, and readiness handoff references. |
+| [`scripts/chat-surface-preview.sh`](./scripts/chat-surface-preview.sh) | Read-only terminal preview of the standalone chat surface. Renders the checked chat/session contract as blocked UI state without accepting prompts, executing a model, or writing artifacts. |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
 
@@ -102,6 +103,7 @@ bash scripts/status-stub.sh --include-runtime-readiness
 bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
 bash scripts/launch-stub.sh --dry-run
 bash scripts/chat-stub.sh --dry-run --prompt "hello"
 ```
@@ -261,8 +263,10 @@ the planned local chat entry point:
 ```bash
 python3 contracts/chat_session_contract.py --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
 bash scripts/status-stub.sh --include-chat-session
 python3 scripts/tests/chat_session_contract_test.py
+python3 scripts/tests/chat_surface_preview_test.py
 bash scripts/tests/status-chat-session.sh
 ```
 
@@ -272,6 +276,10 @@ defines a message envelope vocabulary without storing prompts,
 responses, transcripts, model paths, generated artifacts, private paths,
 secrets, or tokens. It references the runtime readiness and
 device/session status fixtures as local data only.
+
+The preview command renders that same contract as a deterministic
+terminal chat surface sketch with disabled controls, blocked reasons, and
+an unavailable assistant response. It does not accept or echo prompts.
 
 This surface does not execute a model, generate responses, persist
 transcripts, touch KV260 hardware, open serial ports, scan networks, call
