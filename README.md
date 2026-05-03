@@ -84,7 +84,8 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
@@ -94,7 +95,9 @@ bash scripts/check.sh
 bash scripts/check-device-stub.sh
 bash scripts/install-stub.sh
 bash scripts/status-stub.sh
+bash scripts/status-stub.sh --include-device-session
 bash scripts/status-stub.sh --include-runtime-readiness
+bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/launch-stub.sh --dry-run
 bash scripts/chat-stub.sh --dry-run --prompt "hello"
@@ -222,6 +225,30 @@ This surface does not load weights, execute a runtime, touch KV260
 hardware, call providers, invoke pccx-lab, invoke systemverilog-ide,
 upload telemetry, or write artifacts. See
 [docs/RUNTIME_READINESS_STATUS.md](./docs/RUNTIME_READINESS_STATUS.md).
+
+### Device/session status panel and KV260 flow (planned)
+
+The launcher now has a data-only status panel and connection-flow
+contract for the planned Gemma 3N E4B + KV260 path:
+
+```bash
+python3 contracts/device_session_status_contract.py --model gemma3n-e4b --target kv260
+bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-device-session
+python3 scripts/tests/device_session_status_contract_test.py
+bash scripts/tests/status-device-session.sh
+```
+
+The checked fixture reports device connection as not configured, model
+load as not loaded, session activity as inactive, pccx-lab diagnostics
+as a read-only placeholder, and runtime readiness as blocked. It also
+documents planned discovery paths, a gated connection and launch flow,
+and an error taxonomy with user remediation text.
+
+This surface does not probe hardware, open serial ports, scan networks,
+attempt authentication, load model assets, invoke pccx-lab, start a
+runtime, stream logs, upload telemetry, or write artifacts. See
+[docs/KV260_CONNECTION_AND_STATUS_FLOW.md](./docs/KV260_CONNECTION_AND_STATUS_FLOW.md).
 
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
