@@ -37,6 +37,13 @@ JSON for the supported model and target pair:
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 ```
 
+The launcher status surface can include a short read-only summary of the
+same data:
+
+```bash
+bash scripts/status-stub.sh --include-runtime-readiness
+```
+
 The stub does not probe hardware, load weights, run inference, call a
 provider, invoke pccx-lab, invoke systemverilog-ide, upload telemetry,
 or write artifacts.
