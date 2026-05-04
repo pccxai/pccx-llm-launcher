@@ -1,0 +1,348 @@
+{
+  "actionBarId": "chat_action_bar_gemma3n_e4b_kv260_placeholder",
+  "actionBarState": "blocked",
+  "actionControls": [
+    {
+      "actionId": "new_chat",
+      "blockedReasonRef": "session_lifecycle_not_enabled",
+      "enabled": false,
+      "groupId": "conversation_actions",
+      "label": "new chat",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "sideEffectPolicy": "no_session_create",
+      "sourceRef": "chat_session_lifecycle",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "actionId": "clear_conversation",
+      "blockedReasonRef": "transcript_store_not_configured",
+      "enabled": false,
+      "groupId": "conversation_actions",
+      "label": "clear conversation",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "sideEffectPolicy": "no_transcript_delete",
+      "sourceRef": "chat_transcript_policy",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "actionId": "export_transcript",
+      "blockedReasonRef": "transcript_export_not_reviewed",
+      "enabled": false,
+      "groupId": "transcript_actions",
+      "label": "export transcript",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "sideEffectPolicy": "no_transcript_export",
+      "sourceRef": "chat_transcript_policy",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "actionId": "retry_response",
+      "blockedReasonRef": "response_stream_blocked",
+      "enabled": false,
+      "groupId": "message_actions",
+      "label": "retry response",
+      "requiresExplicitUserAction": true,
+      "resultState": "not_generated",
+      "sideEffectPolicy": "no_send_or_runtime_execution",
+      "sourceRef": "chat_send_result",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "actionId": "copy_response",
+      "blockedReasonRef": "message_content_absent",
+      "enabled": false,
+      "groupId": "message_actions",
+      "label": "copy response",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "sideEffectPolicy": "no_clipboard_write",
+      "sourceRef": "chat_message_list",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "actionId": "stop_response",
+      "blockedReasonRef": "runtime_stream_not_started",
+      "enabled": false,
+      "groupId": "runtime_actions",
+      "label": "stop response",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "sideEffectPolicy": "no_stop_signal",
+      "sourceRef": "chat_response_stream",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "actionId": "attach_context",
+      "blockedReasonRef": "attachment_boundary_absent",
+      "enabled": false,
+      "groupId": "attachment_actions",
+      "label": "attach context",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "sideEffectPolicy": "no_file_or_artifact_read",
+      "sourceRef": "chat_composer",
+      "state": "disabled",
+      "visible": true
+    }
+  ],
+  "actionGroups": [
+    {
+      "enabled": false,
+      "groupId": "conversation_actions",
+      "label": "conversation actions",
+      "state": "blocked",
+      "summary": "New, clear, and session actions remain disabled.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "groupId": "message_actions",
+      "label": "message actions",
+      "state": "disabled",
+      "summary": "Retry and copy actions remain unavailable because no message content is present.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "groupId": "transcript_actions",
+      "label": "transcript actions",
+      "state": "not_configured",
+      "summary": "Export and transcript controls remain disabled until a reviewed local store exists.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "groupId": "runtime_actions",
+      "label": "runtime actions",
+      "state": "not_started",
+      "summary": "Stop and retry controls remain disabled because no local response stream exists.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "groupId": "attachment_actions",
+      "label": "attachment actions",
+      "state": "planned",
+      "summary": "Attachment controls require a separate reviewed artifact input boundary.",
+      "visible": true
+    }
+  ],
+  "actionPolicy": {
+    "contentPolicy": "action metadata only; no message bodies, prompt text, response text, transcript text, or session titles are included",
+    "interactionPolicy": "all conversation actions remain disabled until reviewed runtime, session-store, transcript, clipboard, and attachment boundaries exist",
+    "persistencePolicy": "no session creation, clear, export, copy, retry, stop, attachment, transcript, or artifact write",
+    "renderMode": "future_local_chat_action_bar",
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no session store, transcript, prompt, response, summary, file, clipboard, or model path is read",
+    "state": "placeholder"
+  },
+  "attachmentState": "disabled",
+  "blockedReasons": [
+    {
+      "reasonId": "session_lifecycle_not_enabled",
+      "requiredBefore": "new_chat_enabled",
+      "state": "blocked",
+      "summary": "Session creation and lifecycle actions remain disabled."
+    },
+    {
+      "reasonId": "transcript_store_not_configured",
+      "requiredBefore": "clear_conversation_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed transcript store or retention rule exists."
+    },
+    {
+      "reasonId": "transcript_export_not_reviewed",
+      "requiredBefore": "export_transcript_enabled",
+      "state": "not_configured",
+      "summary": "Transcript export needs explicit storage and redaction boundaries."
+    },
+    {
+      "reasonId": "message_content_absent",
+      "requiredBefore": "copy_or_retry_enabled",
+      "state": "empty_not_captured",
+      "summary": "No prompt, response, transcript, or message body content is present."
+    },
+    {
+      "reasonId": "response_stream_blocked",
+      "requiredBefore": "retry_response_enabled",
+      "state": "blocked",
+      "summary": "The checked response-stream boundary reports no generated chunks."
+    },
+    {
+      "reasonId": "runtime_stream_not_started",
+      "requiredBefore": "stop_response_enabled",
+      "state": "not_started",
+      "summary": "No local response stream exists, so stop cannot send a signal."
+    },
+    {
+      "reasonId": "attachment_boundary_absent",
+      "requiredBefore": "attach_context_enabled",
+      "state": "planned",
+      "summary": "No reviewed local artifact input boundary exists for attachments."
+    }
+  ],
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatMessageListRef": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "chatResponseStreamRef": "chat_response_stream_gemma3n_e4b_kv260_placeholder",
+  "chatSendResultRef": "chat_send_result_gemma3n_e4b_kv260_placeholder",
+  "chatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "clipboardState": "disabled",
+  "conversationState": "inactive",
+  "exportState": "disabled",
+  "fixtureVersion": "chat-action-bar.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "inactive",
+      "summary": "Session state is consumed as local metadata only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "state": "blocked",
+      "summary": "Session lifecycle actions remain disabled or blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness data keeps action controls disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer data keeps attach and send-adjacent actions disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_send_result",
+      "schemaVersion": "pccx.chatSendResult.v0",
+      "state": "blocked",
+      "summary": "Blocked send-result data prevents retry actions."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-response-stream.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_response_stream",
+      "schemaVersion": "pccx.chatResponseStream.v0",
+      "state": "blocked",
+      "summary": "Blocked stream data prevents stop and retry controls."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "empty_not_captured",
+      "summary": "Empty message-list data prevents copy actions."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain unavailable."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_action_bar_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat action-bar fixture; no prompt, response, transcript, summary, session title, model path, runtime log, file, or clipboard content is read or written.",
+    "New chat, clear, export, retry, copy, stop, and attach controls remain disabled, blocked, unavailable, or planned.",
+    "No session store, transcript, message bodies, attachments, artifacts, private paths, secrets, tokens, logs, or hardware dumps are read or written.",
+    "No send attempt, retry, stop signal, response stream, model load, runtime execution, provider call, network call, or KV260 hardware access is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, or runtime implementation."
+  ],
+  "responseState": "not_generated",
+  "safetyFlags": {
+    "actionBarDisplayOnly": true,
+    "actionMetadataOnly": true,
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "conversationCleared": false,
+    "conversationCreated": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "messageDeleted": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "readsTranscript": false,
+    "responseChunksEmitted": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "retryAttempted": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "sendAttempted": false,
+    "sessionPersistence": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "stopSignalSent": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptExport": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatActionBar.v0",
+  "selectionState": "disabled",
+  "stopControlState": "disabled",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "transcriptState": "not_started"
+}

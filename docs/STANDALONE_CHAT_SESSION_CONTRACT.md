@@ -22,6 +22,7 @@ The implementation lives in:
 - `contracts/chat_audit_event_contract.py`
 - `contracts/chat_error_taxonomy_contract.py`
 - `contracts/chat_message_list_contract.py`
+- `contracts/chat_action_bar_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
@@ -36,6 +37,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-audit-event.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-error-taxonomy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
@@ -50,6 +52,7 @@ The implementation lives in:
 - `scripts/chat-audit-event-stub.sh`
 - `scripts/chat-error-taxonomy-stub.sh`
 - `scripts/chat-message-list-stub.sh`
+- `scripts/chat-action-bar-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -65,6 +68,7 @@ The implementation lives in:
 - `scripts/tests/chat_audit_event_contract_test.py`
 - `scripts/tests/chat_error_taxonomy_contract_test.py`
 - `scripts/tests/chat_message_list_contract_test.py`
+- `scripts/tests/chat_action_bar_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
@@ -79,6 +83,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-error-taxonomy.sh`
 - `scripts/tests/status-chat-response-stream.sh`
 - `scripts/tests/status-chat-message-list.sh`
+- `scripts/tests/status-chat-action-bar.sh`
 
 ## What Is Implemented
 
@@ -107,6 +112,8 @@ The chat/session contract records:
   stop-control, and assistant response placeholders
 - empty chat message-list metadata for the conversation viewport without
   message bodies or transcript reads
+- disabled action-bar metadata for new, clear, export, retry, copy, stop,
+  and attach controls without side effects
 
 The checked fixture is deterministic JSON. The stub command prints that
 JSON for the supported model and target pair:
@@ -269,6 +276,21 @@ It keeps the message list as empty local data: no session store or
 transcript is read, no message bodies are included, no prompt or
 response content is displayed, no response stream is appended, no model
 or runtime path is started, and no transcript or artifact is written.
+
+The chat action-bar fixture records the disabled conversation action
+controls used by the planned standalone chat surface:
+
+```bash
+bash scripts/chat-action-bar-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-action-bar
+```
+
+It keeps action controls as local metadata: new chat, clear, export,
+retry, copy, stop, and attach controls remain disabled, blocked,
+unavailable, or planned. No session store or transcript is read, no
+message body is included, no transcript is exported, no clipboard or file
+operation is performed, no stop signal is sent, no model or runtime path
+is started, and no artifact is written.
 
 The chat transcript policy fixture records the retention, export,
 storage, and privacy policy shape for future transcript UI surfaces:
@@ -451,6 +473,26 @@ content, token data, runtime transport, and transcript storage:
 - `unavailable`: token counts, stream completion, or response content
   are unavailable
 
+The action-bar states keep user-visible conversation controls separate
+from session storage, transcripts, clipboard access, file access, runtime
+transport, and message content:
+
+- `available_as_data`: checked action metadata is available without
+  executing anything
+- `blocked`: a required lifecycle, transcript, send-result, or stream
+  boundary is missing
+- `disabled`: a visible control is intentionally unavailable
+- `empty_not_captured`: no prompt, response, transcript, or message body
+  content is present
+- `inactive`: no launcher-owned chat session exists
+- `not_configured`: no local store, retention rule, or export/redaction
+  boundary exists
+- `not_generated`: no assistant response exists for copy or retry
+- `not_started`: no local response stream exists
+- `planned`: described for a future reviewed boundary
+- `placeholder`: deterministic local action-bar metadata only
+- `unavailable`: action output is unavailable
+
 The transcript policy states keep retention and export rules separate
 from message content:
 
@@ -548,6 +590,11 @@ without prompt capture, response content, transcript content, provider
 configuration reads, model asset reads, session-store reads, artifact
 reads, artifact writes, runtime execution, model loading, provider calls,
 or target access.
+The action-bar contract adds a reviewable disabled control shape without
+session creation, conversation clearing, transcript export, clipboard
+writes, attachment reads, retry attempts, stop signals, runtime
+execution, model loading, provider calls, artifact writes, or target
+access.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -565,6 +612,9 @@ This chat/session surface does not add:
   persistence
 - response streaming, response chunk generation, token counting, stop
   signal delivery, or stream transport behavior
+- action-bar execution, session creation, conversation clearing,
+  transcript export, clipboard writes, retry attempts, stop signals, file
+  attachment reads, or action persistence
 - transcript retention, transcript export, local transcript storage,
   transcript summaries, or transcript message content
 - audit logging, audit persistence, actor identifiers, event timestamps,
