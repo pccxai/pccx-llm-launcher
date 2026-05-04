@@ -125,7 +125,7 @@ def test_contract_shape_and_status_values() -> None:
     assert "device/session status placeholder" in operation_labels
     assert "pccx-lab diagnostics handoff placeholder" in operation_labels
     assert "future editor bridge consumer" in operation_labels
-    assert "local coding-assistant mode consumer" in operation_labels
+    assert "local workflow mode consumer" in operation_labels
 
     operation_states = {operation["state"] for operation in contract["supportedOperations"]}
     assert operation_states <= {"planned", "placeholder"}
