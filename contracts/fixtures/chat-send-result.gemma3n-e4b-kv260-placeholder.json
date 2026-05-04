@@ -1,0 +1,182 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "composer_send_disabled",
+      "requiredBefore": "send_attempt_recorded",
+      "state": "disabled",
+      "summary": "The composer send control remains disabled."
+    },
+    {
+      "reasonId": "readiness_blocked",
+      "requiredBefore": "send_message_enabled",
+      "state": "blocked",
+      "summary": "Chat readiness has not advanced beyond the blocked checklist state."
+    },
+    {
+      "reasonId": "runtime_not_started",
+      "requiredBefore": "assistant_response_available",
+      "state": "not_started",
+      "summary": "No local chat runtime has been implemented or started."
+    },
+    {
+      "reasonId": "model_not_loaded",
+      "requiredBefore": "model_execution_enabled",
+      "state": "not_loaded",
+      "summary": "Model assets are not configured or loaded by this fixture."
+    },
+    {
+      "reasonId": "session_store_not_configured",
+      "requiredBefore": "result_or_transcript_persistence_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed local session store or retention rule exists."
+    }
+  ],
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "displayMessages": [
+    {
+      "contentPolicy": "no_prompt_response_or_transcript_content",
+      "diagnosticHint": "Review the chat readiness and composer fixtures before enabling send.",
+      "messageId": "send_disabled",
+      "severity": "blocked",
+      "state": "disabled",
+      "userMessage": "Send is disabled until local chat readiness evidence exists."
+    },
+    {
+      "contentPolicy": "no_generated_response_content",
+      "diagnosticHint": "A future reviewed runtime boundary is required before responses can exist.",
+      "messageId": "response_unavailable",
+      "severity": "info",
+      "state": "not_generated",
+      "userMessage": "Assistant response output is unavailable in this fixture."
+    }
+  ],
+  "errorState": "blocked",
+  "fixtureVersion": "chat-send-result.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "available_as_data",
+      "summary": "Base chat/session state is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer send controls remain disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Chat readiness keeps message send unavailable."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "available_as_data",
+      "summary": "Model status display is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "state": "blocked",
+      "summary": "Session lifecycle operations remain disabled or blocked."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_send_result_boundary_2026-05-04",
+  "limitations": [
+    "Data-only blocked chat send-result fixture; no prompt text is read, accepted, echoed, stored, or persisted.",
+    "No assistant response, transcript, summary, model path, generated artifact, private path, secret, or token is read or written.",
+    "No KV260 hardware access, serial access, SSH execution, network call, provider call, telemetry, upload, or write-back is performed.",
+    "The send result remains blocked until chat readiness, runtime, model-load, device-session, and local session evidence are available.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "modelState": "not_loaded",
+  "parentChatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "promptHandlingState": "empty_not_captured",
+  "responseState": "not_generated",
+  "resultEnvelope": {
+    "contentPolicy": "fixture carries blocked result metadata only; no prompt or response body is stored",
+    "envelopeId": "blocked_send_result_gemma3n_e4b_kv260_placeholder",
+    "exitCode": null,
+    "inputAccepted": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "schemaVersion": "pccx.chatSendResultEnvelope.v0",
+    "sendAttempted": false,
+    "sideEffectPolicy": "no_runtime_execution_no_write",
+    "state": "blocked",
+    "summary": "Send is disabled because readiness, runtime, model, and session evidence are missing."
+  },
+  "resultState": "blocked",
+  "runtimeState": "not_started",
+  "safetyFlags": {
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathsIncluded": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "secretsIncluded": false,
+    "sendAttempted": false,
+    "sendResultDisplayOnly": true,
+    "sessionPersistence": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatSendResult.v0",
+  "sendAttemptState": "disabled",
+  "sendResultId": "chat_send_result_gemma3n_e4b_kv260_placeholder",
+  "sessionState": "inactive",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "userVisibleState": "available_as_data"
+}
