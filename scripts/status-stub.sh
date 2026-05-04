@@ -13,6 +13,9 @@
 # Chat/session status and lifecycle plan (explicit opt-in, read-only local data):
 #   --include-chat-session
 #
+# Chat session index/sidebar plan (explicit opt-in, read-only local data):
+#   --include-chat-session-index
+#
 # Chat model status display plan (explicit opt-in, read-only local data):
 #   --include-chat-model-status
 #
@@ -49,12 +52,120 @@ BACKEND=""
 INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
+INCLUDE_CHAT_SESSION_INDEX="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
 INCLUDE_CHAT_COMPOSER="0"
 INCLUDE_CHAT_SEND_RESULT="0"
 INCLUDE_CHAT_TRANSCRIPT_POLICY="0"
 INCLUDE_CHAT_AUDIT_EVENT="0"
+
+print_chat_session_index_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_SESSION_INDEX_STUB="$ROOT_DIR/scripts/chat-session-index-stub.sh"
+
+    if [ ! -f "$CHAT_SESSION_INDEX_STUB" ]; then
+        ERROR "chat session index stub not found: $CHAT_SESSION_INDEX_STUB"
+        return 1
+    fi
+
+    if ! CHAT_SESSION_INDEX_JSON="$(bash "$CHAT_SESSION_INDEX_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat session index stub failed"
+        printf '%s\n' "$CHAT_SESSION_INDEX_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_SESSION_INDEX_SUMMARY="$(
+        printf '%s\n' "$CHAT_SESSION_INDEX_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["indexPolicy"]
+empty = data["emptyState"]
+controls = " ".join(
+    "{}={}".format(control["controlId"], control["state"])
+    for control in data["indexControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-session-index-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no session-store/transcript/prompt/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  index      : {}".format(data["indexState"]))
+print("[INFO]  store      : {}".format(data["sessionStoreState"]))
+print("[INFO]  manifest   : {}".format(data["manifestState"]))
+print("[INFO]  selection  : {}".format(data["selectionState"]))
+print("[INFO]  restore    : {}".format(data["restoreState"]))
+print("[INFO]  content    : {}".format(data["contentState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  index-policy : {} localStoreConfigured={} "
+    "manifestReadEnabled={} transcriptReadEnabled={}".format(
+        policy["state"],
+        b(policy["localStoreConfigured"]),
+        b(policy["manifestReadEnabled"]),
+        b(policy["transcriptReadEnabled"]),
+    )
+)
+print(
+    "[INFO]  empty      : {} itemCount={} displayKind={}".format(
+        empty["state"],
+        empty["itemCount"],
+        empty["displayKind"],
+    )
+)
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "sessionIndexDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "readsSessionManifest={} readsTranscript={} sessionPersistence={} "
+    "transcriptPersistence={} promptContentIncluded={} "
+    "responseContentIncluded={} messageBodiesIncluded={} summaryIncluded={} "
+    "sessionTitleIncluded={} modelExecution={} runtimeExecution={} "
+    "kv260Access={} networkCalls={} providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["sessionIndexDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["readsSessionManifest"]),
+        b(flags["readsTranscript"]),
+        b(flags["sessionPersistence"]),
+        b(flags["transcriptPersistence"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["messageBodiesIncluded"]),
+        b(flags["summaryIncluded"]),
+        b(flags["sessionTitleIncluded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat session index JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat session index"
+    printf '%s\n' "$CHAT_SESSION_INDEX_SUMMARY"
+}
 
 print_chat_audit_event_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -989,6 +1100,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SESSION="1"
             shift
             ;;
+        --include-chat-session-index)
+            INCLUDE_CHAT_SESSION_INDEX="1"
+            shift
+            ;;
         --include-chat-model-status)
             INCLUDE_CHAT_MODEL_STATUS="1"
             shift
@@ -1028,8 +1143,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -1045,6 +1160,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
+    NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
@@ -1055,6 +1171,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; then
         if ! print_chat_audit_event_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ]; then
+        if ! print_chat_session_index_summary; then
             exit 1
         fi
     fi

@@ -11,6 +11,7 @@ The implementation lives in:
 - `contracts/chat_session_contract.py`
 - `contracts/chat_model_status_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
+- `contracts/chat_session_index_contract.py`
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
 - `contracts/chat_send_result_contract.py`
@@ -19,6 +20,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json`
@@ -27,6 +29,7 @@ The implementation lives in:
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
+- `scripts/chat-session-index-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
 - `scripts/chat-send-result-stub.sh`
@@ -36,6 +39,7 @@ The implementation lives in:
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
+- `scripts/tests/chat_session_index_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
 - `scripts/tests/chat_send_result_contract_test.py`
@@ -43,6 +47,7 @@ The implementation lives in:
 - `scripts/tests/chat_audit_event_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
+- `scripts/tests/status-chat-session-index.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
 - `scripts/tests/status-chat-send-result.sh`
@@ -57,6 +62,8 @@ The chat/session contract records:
 - chat surface, model-load, input, send, and session states
 - disabled session controls for new session, model status, send,
   clear, and export actions
+- an empty session index/list surface with disabled refresh, selection,
+  restore, rename, and delete controls
 - a message envelope vocabulary without prompt or response content
 - links to the runtime readiness and device/session status fixtures
 - blocked reasons that explain what must exist before send controls can
@@ -94,6 +101,21 @@ until runtime readiness, model-load evidence, a reviewed local session
 store, and explicit export/redaction rules exist. The fixture does not
 read or write manifests, transcripts, summaries, prompts, responses, or
 model paths.
+
+The chat session index fixture records the list/sidebar boundary for
+future local chat sessions:
+
+```bash
+bash scripts/chat-session-index-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-session-index
+```
+
+It reports an empty, not-configured session index and keeps refresh,
+selection, restore, rename, and delete actions disabled, inactive,
+unavailable, or blocked. The fixture does not read a session store,
+session manifest, session title, transcript, summary, prompt, response,
+model path, private path, or raw log, and it does not write, delete,
+refresh, import, export, or persist artifacts.
 
 The chat readiness fixture records the checklist and recovery-action
 boundary used to decide whether the standalone chat surface can move
@@ -214,6 +236,26 @@ content:
 - `unavailable`: no prior local session can be restored
 - `available_as_data`: referenced local fixture shape is available as data only
 
+The session-index states keep list/sidebar display separate from local
+session storage and transcript content:
+
+- `available_as_data`: the empty index surface can be rendered from
+  checked fixture data
+- `blocked`: a required local store or manifest boundary is missing
+- `disabled`: selection or title-changing controls are intentionally
+  unavailable
+- `empty_not_captured`: no session titles, summaries, prompts, or
+  responses are captured
+- `inactive`: no launcher-owned local chat session is active or
+  selectable
+- `not_configured`: no local session store or index refresh source
+  exists
+- `planned`: described for a future reviewed boundary
+- `requires_evidence`: a future artifact-read path needs evidence and
+  tests first
+- `summary_only`: privacy state contains metadata only
+- `unavailable`: restore output or indexed sessions are unavailable
+
 The readiness states keep send-control gating separate from model-status
 display and lifecycle operations:
 
@@ -295,6 +337,9 @@ calls, persistence, target access, artifact reads, or artifact writes.
 The readiness contract ties those display and lifecycle states into a
 single checklist and recovery-action view without enabling any send,
 load, restore, or export action.
+The session-index contract adds a reviewable empty list/sidebar boundary
+without enabling manifest reads, transcript reads, title capture,
+restore, rename, delete, refresh, persistence, or artifact writes.
 The composer contract adds a reviewable input-control and validation
 shape without prompt capture, prompt echo, prompt persistence, attachment
 reads, clipboard access, or send enablement.
