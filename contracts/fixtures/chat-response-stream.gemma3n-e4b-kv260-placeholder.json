@@ -1,0 +1,257 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "send_result_blocked",
+      "requiredBefore": "response_stream_started",
+      "state": "blocked",
+      "summary": "The checked send-result boundary reports no send attempt."
+    },
+    {
+      "reasonId": "runtime_not_started",
+      "requiredBefore": "stream_transport_opened",
+      "state": "not_started",
+      "summary": "No local chat runtime has been implemented or started."
+    },
+    {
+      "reasonId": "model_not_loaded",
+      "requiredBefore": "response_chunks_emitted",
+      "state": "not_loaded",
+      "summary": "Model assets are not configured or loaded by this fixture."
+    },
+    {
+      "reasonId": "session_inactive",
+      "requiredBefore": "response_display_appended",
+      "state": "inactive",
+      "summary": "No launcher-owned chat session exists for streamed output."
+    },
+    {
+      "reasonId": "transcript_policy_disabled",
+      "requiredBefore": "stream_result_persisted",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain disabled."
+    }
+  ],
+  "cancelState": "disabled",
+  "chatModelStatusRef": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "chatSendResultRef": "chat_send_result_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "displaySlots": [
+    {
+      "contentPolicy": "no_response_content",
+      "displayPolicy": "show unavailable response state only",
+      "enabled": false,
+      "label": "assistant response placeholder",
+      "slotId": "assistant_response_placeholder",
+      "sourceRef": "chat_send_result",
+      "state": "available_as_data",
+      "visible": true
+    },
+    {
+      "contentPolicy": "metadata_only",
+      "displayPolicy": "show disabled progress state without runtime activity",
+      "enabled": false,
+      "label": "stream progress indicator",
+      "slotId": "stream_progress_indicator",
+      "sourceRef": "chat_readiness",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_token_counts_or_token_text",
+      "displayPolicy": "hide until a reviewed runtime boundary exposes counts",
+      "enabled": false,
+      "label": "token counter",
+      "slotId": "token_counter",
+      "sourceRef": "chat_model_status",
+      "state": "unavailable",
+      "visible": false
+    },
+    {
+      "contentPolicy": "no_runtime_signal_payload",
+      "displayPolicy": "show disabled stop control only",
+      "enabled": false,
+      "label": "stop generation control",
+      "slotId": "stop_generation_control",
+      "sourceRef": "chat_response_stream",
+      "state": "disabled",
+      "visible": true
+    }
+  ],
+  "fixtureVersion": "chat-response-stream.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_send_result",
+      "schemaVersion": "pccx.chatSendResult.v0",
+      "state": "blocked",
+      "summary": "Blocked send-result data is consumed before stream display state."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness data keeps response streaming disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "available_as_data",
+      "summary": "Model status is consumed as descriptor metadata only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript persistence remains unavailable for streamed output."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_response_stream_boundary_2026-05-04",
+  "limitations": [
+    "Data-only blocked chat response-stream fixture; no prompt, token, response, transcript, summary, or runtime log content is read or written.",
+    "No stream transport is opened, no response chunks are generated, no token counts are measured, and no stop signal is sent.",
+    "No model assets, model paths, private paths, secrets, tokens, stores, logs, or artifacts are read.",
+    "No KV260 hardware access, serial access, SSH execution, network call, provider call, telemetry, upload, or write-back is performed.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "modelState": "not_loaded",
+  "progressState": "disabled",
+  "responseState": "not_generated",
+  "runtimeState": "not_started",
+  "safetyFlags": {
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseChunkContentIncluded": false,
+    "responseChunksEmitted": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "responseStreamDisplayOnly": true,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "sendAttempted": false,
+    "sessionPersistence": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "streamCancellationAttempted": false,
+    "streamStarted": false,
+    "streamTransportOpened": false,
+    "telemetry": false,
+    "tokenContentIncluded": false,
+    "tokenCountMeasured": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatResponseStream.v0",
+  "sessionState": "inactive",
+  "streamEnvelope": {
+    "chunksEmitted": false,
+    "contentPolicy": "fixture carries response stream metadata only; no prompt, token, or response body is stored",
+    "envelopeId": "blocked_response_stream_gemma3n_e4b_kv260_placeholder",
+    "responseContentIncluded": false,
+    "schemaVersion": "pccx.chatResponseStreamEnvelope.v0",
+    "sideEffectPolicy": "no_runtime_execution_no_stream_transport_no_write",
+    "state": "blocked",
+    "stopSignalSent": false,
+    "streamStarted": false,
+    "summary": "Assistant response streaming is blocked because send, runtime, model, and session evidence are missing.",
+    "tokenContentIncluded": false,
+    "tokenCount": null,
+    "transportOpened": false
+  },
+  "streamId": "chat_response_stream_gemma3n_e4b_kv260_placeholder",
+  "streamPhases": [
+    {
+      "contentPolicy": "no_prompt_or_response_content",
+      "enabled": false,
+      "label": "wait for send result",
+      "phaseId": "wait_for_send_result",
+      "requiredBefore": "stream_transport_opened",
+      "state": "blocked",
+      "summary": "No send attempt exists, so no response stream can start.",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_runtime_log_or_transport_payload_content",
+      "enabled": false,
+      "label": "open stream transport",
+      "phaseId": "open_stream_transport",
+      "requiredBefore": "response_chunks_emitted",
+      "state": "not_started",
+      "summary": "No local runtime transport is implemented or opened.",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_generated_response_content",
+      "enabled": false,
+      "label": "emit response chunks",
+      "phaseId": "emit_response_chunks",
+      "requiredBefore": "assistant_message_available",
+      "state": "not_generated",
+      "summary": "No assistant response chunks are produced in this fixture.",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_transcript_or_summary_content",
+      "enabled": false,
+      "label": "complete stream",
+      "phaseId": "complete_stream",
+      "requiredBefore": "transcript_append_enabled",
+      "state": "unavailable",
+      "summary": "No stream completion event exists because no stream starts.",
+      "visible": true
+    }
+  ],
+  "streamState": "blocked",
+  "streamTransportState": "not_started",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "tokenState": "unavailable"
+}

@@ -73,6 +73,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-transcript-policy.sh`
 - `scripts/tests/status-chat-audit-event.sh`
 - `scripts/tests/status-chat-error-taxonomy.sh`
+- `scripts/tests/status-chat-response-stream.sh`
 
 ## What Is Implemented
 
@@ -97,6 +98,8 @@ The chat/session contract records:
   be enabled
 - safety flags for the read-only boundary
 - grouped chat error taxonomy metadata for future banners and status rows
+- blocked chat response stream metadata for disabled progress, token,
+  stop-control, and assistant response placeholders
 
 The checked fixture is deterministic JSON. The stub command prints that
 JSON for the supported model and target pair:
@@ -233,6 +236,19 @@ It keeps the attempted-send result in blocked local data: no prompt is
 accepted, captured, echoed, stored, or persisted; no assistant response
 is generated; no model/runtime handoff is attempted; and no transcript
 or artifact is written.
+
+The chat response stream fixture records the disabled assistant response
+stream/progress shape shown after the blocked send-result boundary:
+
+```bash
+bash scripts/chat-response-stream-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-response-stream
+```
+
+It keeps response streaming as blocked local data: no stream transport
+is opened, no response chunks are generated, no token counts are
+measured, no stop signal is sent, no prompt or response content is read,
+and no transcript or artifact is written.
 
 The chat transcript policy fixture records the retention, export,
 storage, and privacy policy shape for future transcript UI surfaces:
@@ -397,6 +413,24 @@ content and assistant output:
 - `not_loaded`: model assets are not loaded
 - `not_started`: no local chat runtime has started
 
+The response-stream states keep progress display separate from response
+content, token data, runtime transport, and transcript storage:
+
+- `available_as_data`: checked placeholder display data is available
+  without executing anything
+- `blocked`: a required send-result or runtime boundary is missing
+- `disabled`: progress or cancellation controls are intentionally
+  unavailable
+- `inactive`: no launcher-owned session exists
+- `not_configured`: no transcript/session store exists
+- `not_generated`: no assistant response chunks have been produced
+- `not_loaded`: model assets are not loaded
+- `not_started`: no runtime transport or stream has started
+- `requires_evidence`: future enablement requires evidence first
+- `target_selected`: planned target identity can be displayed
+- `unavailable`: token counts, stream completion, or response content
+  are unavailable
+
 The transcript policy states keep retention and export rules separate
 from message content:
 
@@ -476,6 +510,10 @@ reads, clipboard access, or send enablement.
 The send-result contract adds a reviewable blocked-result display shape
 without prompt acceptance, prompt echo, response generation, runtime
 execution, model loading, persistence, or writes.
+The response-stream contract adds a reviewable disabled stream/progress
+display shape without opening transport, generating response chunks,
+counting tokens, sending cancellation signals, appending transcripts,
+executing runtime code, loading models, provider calls, or target access.
 The transcript policy contract adds a reviewable retention/export
 policy shape without message content, transcript persistence, summary
 generation, artifact reads, artifact writes, runtime execution, model
@@ -505,6 +543,8 @@ This chat/session surface does not add:
   clipboard access
 - send acceptance, prompt echo, response generation, or send-result
   persistence
+- response streaming, response chunk generation, token counting, stop
+  signal delivery, or stream transport behavior
 - transcript retention, transcript export, local transcript storage,
   transcript summaries, or transcript message content
 - audit logging, audit persistence, actor identifiers, event timestamps,

@@ -46,6 +46,9 @@
 # Chat error taxonomy display boundary (explicit opt-in, read-only local data):
 #   --include-chat-error-taxonomy
 #
+# Chat response stream display boundary (explicit opt-in, read-only local data):
+#   --include-chat-response-stream
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -75,6 +78,7 @@ INCLUDE_CHAT_SEND_RESULT="0"
 INCLUDE_CHAT_TRANSCRIPT_POLICY="0"
 INCLUDE_CHAT_AUDIT_EVENT="0"
 INCLUDE_CHAT_ERROR_TAXONOMY="0"
+INCLUDE_CHAT_RESPONSE_STREAM="0"
 
 print_chat_error_taxonomy_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -168,6 +172,120 @@ print(
 
     HEAD "chat error taxonomy"
     printf '%s\n' "$CHAT_ERROR_TAXONOMY_SUMMARY"
+}
+
+print_chat_response_stream_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_RESPONSE_STREAM_STUB="$ROOT_DIR/scripts/chat-response-stream-stub.sh"
+
+    if [ ! -f "$CHAT_RESPONSE_STREAM_STUB" ]; then
+        ERROR "chat response stream stub not found: $CHAT_RESPONSE_STREAM_STUB"
+        return 1
+    fi
+
+    if ! CHAT_RESPONSE_STREAM_JSON="$(bash "$CHAT_RESPONSE_STREAM_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat response stream stub failed"
+        printf '%s\n' "$CHAT_RESPONSE_STREAM_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_RESPONSE_STREAM_SUMMARY="$(
+        printf '%s\n' "$CHAT_RESPONSE_STREAM_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+envelope = data["streamEnvelope"]
+phases = " ".join(
+    "{}={}".format(phase["phaseId"], phase["state"])
+    for phase in data["streamPhases"]
+)
+slots = " ".join(
+    "{}={}".format(slot["slotId"], slot["state"])
+    for slot in data["displaySlots"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+token_count = envelope["tokenCount"]
+token_count_text = "none" if token_count is None else str(token_count)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-response-stream-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/response stream/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  stream     : {}".format(data["streamState"]))
+print("[INFO]  response   : {}".format(data["responseState"]))
+print("[INFO]  transport  : {}".format(data["streamTransportState"]))
+print("[INFO]  tokens     : {}".format(data["tokenState"]))
+print("[INFO]  progress   : {}".format(data["progressState"]))
+print("[INFO]  cancel     : {}".format(data["cancelState"]))
+print(
+    "[INFO]  envelope   : {} streamStarted={} transportOpened={} "
+    "chunksEmitted={} tokenContentIncluded={} responseContentIncluded={} "
+    "tokenCount={} stopSignalSent={}".format(
+        envelope["state"],
+        b(envelope["streamStarted"]),
+        b(envelope["transportOpened"]),
+        b(envelope["chunksEmitted"]),
+        b(envelope["tokenContentIncluded"]),
+        b(envelope["responseContentIncluded"]),
+        token_count_text,
+        b(envelope["stopSignalSent"]),
+    )
+)
+print("[INFO]  phases     : {}".format(phases))
+print("[INFO]  slots      : {}".format(slots))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "responseStreamDisplayOnly={} promptContentIncluded={} "
+    "responseContentIncluded={} responseGenerated={} "
+    "responseChunksEmitted={} tokenContentIncluded={} "
+    "tokenCountMeasured={} streamStarted={} streamTransportOpened={} "
+    "streamCancellationAttempted={} sessionStoreRead={} "
+    "modelAssetRead={} modelLoadAttempted={} modelExecution={} "
+    "runtimeExecution={} kv260Access={} hardwareAccess={} "
+    "networkCalls={} providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["responseStreamDisplayOnly"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["responseGenerated"]),
+        b(flags["responseChunksEmitted"]),
+        b(flags["tokenContentIncluded"]),
+        b(flags["tokenCountMeasured"]),
+        b(flags["streamStarted"]),
+        b(flags["streamTransportOpened"]),
+        b(flags["streamCancellationAttempted"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat response stream JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat response stream"
+    printf '%s\n' "$CHAT_RESPONSE_STREAM_SUMMARY"
 }
 
 print_chat_local_only_policy_summary() {
@@ -1561,6 +1679,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_ERROR_TAXONOMY="1"
             shift
             ;;
+        --include-chat-response-stream)
+            INCLUDE_CHAT_RESPONSE_STREAM="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -1576,8 +1698,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, and --include-chat-error-taxonomy are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, and --include-chat-response-stream are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -1604,10 +1726,17 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat transcript: opt-in via --include-chat-transcript-policy (read-only retention/export policy data)"
     NOTE "chat audit    : opt-in via --include-chat-audit-event (read-only blocked audit metadata)"
     NOTE "chat errors   : opt-in via --include-chat-error-taxonomy (read-only error taxonomy data)"
+    NOTE "chat stream   : opt-in via --include-chat-response-stream (read-only response stream data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
 
     if [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ]; then
         if ! print_chat_error_taxonomy_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ]; then
+        if ! print_chat_response_stream_summary; then
             exit 1
         fi
     fi
