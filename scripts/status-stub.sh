@@ -13,6 +13,9 @@
 # Chat/session status and lifecycle plan (explicit opt-in, read-only local data):
 #   --include-chat-session
 #
+# Chat surface layout/chrome plan (explicit opt-in, read-only local data):
+#   --include-chat-surface-layout
+#
 # Chat session index/sidebar plan (explicit opt-in, read-only local data):
 #   --include-chat-session-index
 #
@@ -52,6 +55,7 @@ BACKEND=""
 INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
+INCLUDE_CHAT_SURFACE_LAYOUT="0"
 INCLUDE_CHAT_SESSION_INDEX="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
@@ -59,6 +63,109 @@ INCLUDE_CHAT_COMPOSER="0"
 INCLUDE_CHAT_SEND_RESULT="0"
 INCLUDE_CHAT_TRANSCRIPT_POLICY="0"
 INCLUDE_CHAT_AUDIT_EVENT="0"
+
+print_chat_surface_layout_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_SURFACE_LAYOUT_STUB="$ROOT_DIR/scripts/chat-surface-layout-stub.sh"
+
+    if [ ! -f "$CHAT_SURFACE_LAYOUT_STUB" ]; then
+        ERROR "chat surface layout stub not found: $CHAT_SURFACE_LAYOUT_STUB"
+        return 1
+    fi
+
+    if ! CHAT_SURFACE_LAYOUT_JSON="$(bash "$CHAT_SURFACE_LAYOUT_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat surface layout stub failed"
+        printf '%s\n' "$CHAT_SURFACE_LAYOUT_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_SURFACE_LAYOUT_SUMMARY="$(
+        printf '%s\n' "$CHAT_SURFACE_LAYOUT_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["layoutPolicy"]
+regions = " ".join(
+    "{}={}".format(region["regionId"], region["state"])
+    for region in data["surfaceRegions"]
+)
+nav = " ".join(
+    "{}={}".format(item["navId"], item["state"])
+    for item in data["navigationItems"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-surface-layout-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/response/transcript/session-store/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  layout     : {}".format(data["layoutState"]))
+print("[INFO]  shell      : {}".format(data["shellState"]))
+print("[INFO]  navigation : {}".format(data["navigationState"]))
+print("[INFO]  primary    : {}".format(data["primaryRegionState"]))
+print("[INFO]  side       : {}".format(data["sideRegionState"]))
+print("[INFO]  footer     : {}".format(data["footerState"]))
+print("[INFO]  content    : {}".format(data["contentState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  layout-policy : {} renderMode={} sideEffectPolicy={}".format(
+        policy["state"],
+        policy["renderMode"],
+        policy["sideEffectPolicy"],
+    )
+)
+print("[INFO]  regions    : {}".format(regions))
+print("[INFO]  nav        : {}".format(nav))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "surfaceLayoutDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "sessionStoreRead={} promptCapture={} promptContentIncluded={} "
+    "responseContentIncluded={} transcriptContentIncluded={} "
+    "sessionTitleIncluded={} summaryIncluded={} inputAccepted={} "
+    "sendAttempted={} modelExecution={} runtimeExecution={} kv260Access={} "
+    "networkCalls={} providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["surfaceLayoutDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["promptCapture"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["sessionTitleIncluded"]),
+        b(flags["summaryIncluded"]),
+        b(flags["inputAccepted"]),
+        b(flags["sendAttempted"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat surface layout JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat surface layout"
+    printf '%s\n' "$CHAT_SURFACE_LAYOUT_SUMMARY"
+}
 
 print_chat_session_index_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -1100,6 +1207,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SESSION="1"
             shift
             ;;
+        --include-chat-surface-layout)
+            INCLUDE_CHAT_SURFACE_LAYOUT="1"
+            shift
+            ;;
         --include-chat-session-index)
             INCLUDE_CHAT_SESSION_INDEX="1"
             shift
@@ -1143,8 +1254,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -1160,6 +1271,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "runtime ready  : opt-in via --include-runtime-readiness (read-only data)"
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
+    NOTE "chat layout   : opt-in via --include-chat-surface-layout (read-only surface layout data)"
     NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
@@ -1171,6 +1283,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; then
         if ! print_chat_audit_event_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ]; then
+        if ! print_chat_surface_layout_summary; then
             exit 1
         fi
     fi
