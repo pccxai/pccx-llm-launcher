@@ -19,6 +19,9 @@
 # Chat local-only/cloud-block policy (explicit opt-in, read-only local data):
 #   --include-chat-local-only-policy
 #
+# Chat preferences/settings boundary (explicit opt-in, read-only local data):
+#   --include-chat-preferences
+#
 # Chat session index/sidebar plan (explicit opt-in, read-only local data):
 #   --include-chat-session-index
 #
@@ -60,6 +63,7 @@ INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
 INCLUDE_CHAT_SURFACE_LAYOUT="0"
 INCLUDE_CHAT_LOCAL_ONLY_POLICY="0"
+INCLUDE_CHAT_PREFERENCES="0"
 INCLUDE_CHAT_SESSION_INDEX="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
@@ -171,6 +175,105 @@ print(
 
     HEAD "chat local-only policy"
     printf '%s\n' "$CHAT_LOCAL_ONLY_POLICY_SUMMARY"
+}
+
+print_chat_preferences_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_PREFERENCES_STUB="$ROOT_DIR/scripts/chat-preferences-stub.sh"
+
+    if [ ! -f "$CHAT_PREFERENCES_STUB" ]; then
+        ERROR "chat preferences stub not found: $CHAT_PREFERENCES_STUB"
+        return 1
+    fi
+
+    if ! CHAT_PREFERENCES_JSON="$(bash "$CHAT_PREFERENCES_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat preferences stub failed"
+        printf '%s\n' "$CHAT_PREFERENCES_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_PREFERENCES_SUMMARY="$(
+        printf '%s\n' "$CHAT_PREFERENCES_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+panels = " ".join(
+    "{}={}".format(panel["panelId"], panel["state"])
+    for panel in data["preferencePanels"]
+)
+controls = " ".join(
+    "{}={}".format(control["controlId"], control["state"])
+    for control in data["preferenceControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-preferences-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no config/provider/session-store/model path/runtime execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  preferences: {}".format(data["preferencesState"]))
+print("[INFO]  storage    : {}".format(data["storageState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print("[INFO]  panels     : {}".format(panels))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "preferencesDisplayOnly={} preferencePersistence={} "
+    "preferenceWrite={} configRead={} environmentRead={} "
+    "secretsRead={} tokensRead={} providerConfigRead={} "
+    "providerCalls={} cloudCalls={} networkCalls={} modelAssetRead={} "
+    "modelPathIncluded={} sessionStoreRead={} sessionStoreWrite={} "
+    "promptContentIncluded={} responseContentIncluded={} "
+    "transcriptContentIncluded={} transcriptPersistence={} "
+    "transcriptExport={} readsArtifacts={} writesArtifacts={} "
+    "executesPccxLab={} executesSystemverilogIde={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["preferencesDisplayOnly"]),
+        b(flags["preferencePersistence"]),
+        b(flags["preferenceWrite"]),
+        b(flags["configRead"]),
+        b(flags["environmentRead"]),
+        b(flags["secretsRead"]),
+        b(flags["tokensRead"]),
+        b(flags["providerConfigRead"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelPathIncluded"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["sessionStoreWrite"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["transcriptPersistence"]),
+        b(flags["transcriptExport"]),
+        b(flags["readsArtifacts"]),
+        b(flags["writesArtifacts"]),
+        b(flags["executesPccxLab"]),
+        b(flags["executesSystemverilogIde"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat preferences JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat preferences"
+    printf '%s\n' "$CHAT_PREFERENCES_SUMMARY"
 }
 
 print_chat_surface_layout_summary() {
@@ -1324,6 +1427,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_LOCAL_ONLY_POLICY="1"
             shift
             ;;
+        --include-chat-preferences)
+            INCLUDE_CHAT_PREFERENCES="1"
+            shift
+            ;;
         --include-chat-session-index)
             INCLUDE_CHAT_SESSION_INDEX="1"
             shift
@@ -1367,8 +1474,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -1386,6 +1493,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
     NOTE "chat layout   : opt-in via --include-chat-surface-layout (read-only surface layout data)"
     NOTE "chat local    : opt-in via --include-chat-local-only-policy (read-only local-only policy data)"
+    NOTE "chat prefs    : opt-in via --include-chat-preferences (read-only preferences data)"
     NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
@@ -1409,6 +1517,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ]; then
         if ! print_chat_local_only_policy_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_PREFERENCES" = "1" ]; then
+        if ! print_chat_preferences_summary; then
             exit 1
         fi
     fi
