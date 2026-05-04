@@ -10,6 +10,7 @@ The implementation lives in:
 
 - `contracts/chat_session_contract.py`
 - `contracts/chat_model_status_contract.py`
+- `contracts/chat_model_load_request_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_surface_layout_contract.py`
 - `contracts/chat_local_only_policy_contract.py`
@@ -29,6 +30,7 @@ The implementation lives in:
 - `contracts/chat_shortcut_map_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json`
@@ -48,6 +50,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
+- `scripts/chat-model-load-request-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-layout-stub.sh`
 - `scripts/chat-local-only-policy-stub.sh`
@@ -68,6 +71,7 @@ The implementation lives in:
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
+- `scripts/tests/chat_model_load_request_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_layout_contract_test.py`
 - `scripts/tests/chat_local_only_policy_contract_test.py`
@@ -87,6 +91,7 @@ The implementation lives in:
 - `scripts/tests/chat_shortcut_map_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
+- `scripts/tests/status-chat-model-load-request.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
 - `scripts/tests/status-chat-local-only-policy.sh`
 - `scripts/tests/status-chat-preferences.sh`
@@ -111,6 +116,8 @@ The chat/session contract records:
 
 - target model and KV260-class target identity
 - chat surface, model-load, input, send, and session states
+- a disabled model-load request boundary for descriptor selection, asset
+  paths, checksums, runtime preflight, load, warmup, and unload gates
 - disabled session controls for new session, model status, send,
   clear, and export actions
 - planned shell regions and navigation items for the blocked chat
@@ -163,6 +170,22 @@ bash scripts/status-stub.sh --include-chat-model-status
 Model loading stays blocked and disabled. The model-status fixture does
 not read model paths, load weights, start runtimes, generate responses,
 touch hardware, call providers, invoke pccx-lab, or write artifacts.
+
+The chat model-load request fixture records the disabled local load
+boundary for future chat model loading:
+
+```bash
+bash scripts/chat-model-load-request-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-model-load-request
+```
+
+It reports descriptor selection, asset path, checksum, runtime preflight,
+load, warmup, unload, and persistence gates. The fixture does not read
+configuration files, environment values, model paths, asset paths, model
+weights, tokenizer files, checksum manifests, private paths, prompts,
+responses, transcripts, runtime logs, or artifacts, and it does not
+validate, load, unload, warm up, execute, import, export, persist, upload,
+or write model-load request data.
 
 The lifecycle fixture records the session-management boundary for create,
 restore, clear, close, and export-summary operations:
@@ -649,6 +672,12 @@ model-status contract adds reviewable display rows for model-load state.
 The lifecycle contract adds a reviewable session-management shape, but
 these contracts do not add runtime execution, model loading, provider
 calls, persistence, target access, artifact reads, or artifact writes.
+The model-load request contract adds a reviewable disabled load-request
+shape without configuration reads, environment reads, model path reads,
+asset path reads, weight reads, tokenizer reads, checksum manifest reads,
+runtime preflight, model loading, model unloading, model warmup, model
+execution, provider calls, hardware access, persistence, or artifact
+access.
 The readiness contract ties those display and lifecycle states into a
 single checklist and recovery-action view without enabling any send,
 load, restore, or export action.
@@ -727,6 +756,10 @@ This chat/session surface does not add:
   runtime traces, raw logs, or audit export behavior
 - error recovery execution, provider/config reads, model asset reads, or
   taxonomy persistence
+- model-load request execution, configuration reads, environment reads,
+  model path reads, asset path reads, weight reads, tokenizer reads,
+  checksum manifest reads, runtime preflight, model loading, model
+  unloading, model warmup, model execution, or load-request persistence
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes
