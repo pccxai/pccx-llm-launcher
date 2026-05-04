@@ -87,7 +87,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-action-bar`, adds read-only disabled chat action-bar data. With `--include-chat-attachment-policy`, adds read-only disabled chat attachment-policy data. With `--include-chat-shortcut-map`, adds read-only disabled chat shortcut-map data. With `--include-chat-message-list`, adds read-only empty chat message-list data. With `--include-chat-response-stream`, adds read-only blocked chat response stream data. With `--include-chat-error-taxonomy`, adds read-only chat error taxonomy data. With `--include-chat-audit-event`, adds read-only blocked chat audit-event metadata. With `--include-chat-surface-layout`, adds read-only chat surface layout data. With `--include-chat-local-only-policy`, adds read-only local-only/cloud-block policy data. With `--include-chat-preferences`, adds read-only chat preferences/settings data. With `--include-chat-session-index`, adds read-only empty chat session index data. With `--include-chat-session-store-policy`, adds read-only disabled chat session-store policy data. With `--include-chat-session-title-policy`, adds read-only placeholder session-title policy data. With `--include-chat-transcript-policy`, adds read-only chat transcript retention/export policy data. With `--include-chat-send-result`, adds read-only blocked chat send-result data. With `--include-chat-composer`, adds read-only chat composer/input-control data. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-chat-readiness`, adds read-only chat readiness checks and recovery actions. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-action-bar`, adds read-only disabled chat action-bar data. With `--include-chat-attachment-policy`, adds read-only disabled chat attachment-policy data. With `--include-chat-shortcut-map`, adds read-only disabled chat shortcut-map data. With `--include-chat-message-list`, adds read-only empty chat message-list data. With `--include-chat-response-stream`, adds read-only blocked chat response stream data. With `--include-chat-error-taxonomy`, adds read-only chat error taxonomy data. With `--include-chat-audit-event`, adds read-only blocked chat audit-event metadata. With `--include-chat-surface-layout`, adds read-only chat surface layout data. With `--include-chat-local-only-policy`, adds read-only local-only/cloud-block policy data. With `--include-chat-preferences`, adds read-only chat preferences/settings data. With `--include-chat-session-index`, adds read-only empty chat session index data. With `--include-chat-session-store-policy`, adds read-only disabled chat session-store policy data. With `--include-chat-session-title-policy`, adds read-only placeholder session-title policy data. With `--include-chat-transcript-policy`, adds read-only chat transcript retention/export policy data. With `--include-chat-send-result`, adds read-only blocked chat send-result data. With `--include-chat-composer`, adds read-only chat composer/input-control data. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-model-load-request`, adds read-only disabled chat model-load request data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-chat-readiness`, adds read-only chat readiness checks and recovery actions. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/chat-session-stub.sh`](./scripts/chat-session-stub.sh) | Data-only standalone chat/session JSON for the Gemma 3N E4B + KV260 target. Reports disabled send controls, inactive session state, no prompt/response persistence, and readiness handoff references. |
@@ -99,6 +99,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/chat-session-store-policy-stub.sh`](./scripts/chat-session-store-policy-stub.sh) | Data-only chat session-store policy JSON for the Gemma 3N E4B + KV260 target. Reports disabled store configuration, path, manifest, read, write, delete, retention, and migration gates without reading config, paths, manifests, session records, transcripts, titles, prompts, responses, summaries, model paths, runtime logs, or artifacts. |
 | [`scripts/chat-session-title-policy-stub.sh`](./scripts/chat-session-title-policy-stub.sh) | Data-only chat session-title policy JSON for the Gemma 3N E4B + KV260 target. Reports static placeholder display names and disabled title read, generation, rename, and persistence controls without reading stores, transcripts, prompts, responses, summaries, titles, or paths. |
 | [`scripts/chat-model-status-stub.sh`](./scripts/chat-model-status-stub.sh) | Data-only chat model-status JSON for the Gemma 3N E4B + KV260 target. Reports descriptor, asset, load, runtime, context, and response display rows as blocked, disabled, or unavailable. |
+| [`scripts/chat-model-load-request-stub.sh`](./scripts/chat-model-load-request-stub.sh) | Data-only chat model-load request JSON for the Gemma 3N E4B + KV260 target. Reports disabled model asset path, validation, runtime preflight, load, warmup, unload, and persistence gates without reading config, environment values, model paths, asset paths, weights, tokenizers, checksum manifests, prompts, responses, transcripts, runtime logs, or artifacts. |
 | [`scripts/chat-readiness-stub.sh`](./scripts/chat-readiness-stub.sh) | Data-only chat readiness JSON for the Gemma 3N E4B + KV260 target. Reports readiness checks, error categories, and recovery actions as blocked, disabled, or local data only. |
 | [`scripts/chat-composer-stub.sh`](./scripts/chat-composer-stub.sh) | Data-only chat composer JSON for the Gemma 3N E4B + KV260 target. Reports input buffer, send, attachment, validation, and privacy states without reading, echoing, storing, or persisting prompt text. |
 | [`scripts/chat-send-result-stub.sh`](./scripts/chat-send-result-stub.sh) | Data-only blocked chat send-result JSON for the Gemma 3N E4B + KV260 target. Reports disabled send state, no accepted input, no prompt echo, no generated response, and no runtime/model handoff. |
@@ -120,6 +121,7 @@ bash scripts/check-device-stub.sh
 bash scripts/install-stub.sh
 bash scripts/status-stub.sh
 bash scripts/status-stub.sh --include-chat-model-status
+bash scripts/status-stub.sh --include-chat-model-load-request
 bash scripts/status-stub.sh --include-chat-session
 bash scripts/status-stub.sh --include-chat-surface-layout
 bash scripts/status-stub.sh --include-chat-local-only-policy
@@ -143,6 +145,7 @@ bash scripts/status-stub.sh --include-runtime-readiness
 bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-model-load-request-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-layout-stub.sh --model gemma3n-e4b --target kv260
@@ -328,6 +331,7 @@ the planned local chat entry point:
 ```bash
 python3 contracts/chat_session_contract.py --model gemma3n-e4b --target kv260
 python3 contracts/chat_model_status_contract.py --model gemma3n-e4b --target kv260
+python3 contracts/chat_model_load_request_contract.py --model gemma3n-e4b --target kv260
 python3 contracts/chat_readiness_contract.py --model gemma3n-e4b --target kv260
 python3 contracts/chat_audit_event_contract.py --model gemma3n-e4b --target kv260
 python3 contracts/chat_error_taxonomy_contract.py --model gemma3n-e4b --target kv260
@@ -338,6 +342,7 @@ python3 contracts/chat_session_store_policy_contract.py --model gemma3n-e4b --ta
 python3 contracts/chat_shortcut_map_contract.py --model gemma3n-e4b --target kv260
 python3 contracts/chat_session_title_policy_contract.py --model gemma3n-e4b --target kv260
 bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-model-load-request-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-store-policy-stub.sh --model gemma3n-e4b --target kv260
@@ -351,6 +356,7 @@ bash scripts/chat-attachment-policy-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-shortcut-map-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
 bash scripts/status-stub.sh --include-chat-model-status
+bash scripts/status-stub.sh --include-chat-model-load-request
 bash scripts/status-stub.sh --include-chat-session
 bash scripts/status-stub.sh --include-chat-readiness
 bash scripts/status-stub.sh --include-chat-audit-event
@@ -363,6 +369,7 @@ bash scripts/status-stub.sh --include-chat-shortcut-map
 bash scripts/status-stub.sh --include-chat-session-title-policy
 python3 scripts/tests/chat_session_contract_test.py
 python3 scripts/tests/chat_model_status_contract_test.py
+python3 scripts/tests/chat_model_load_request_contract_test.py
 python3 scripts/tests/chat_session_lifecycle_contract_test.py
 python3 scripts/tests/chat_session_title_policy_contract_test.py
 python3 scripts/tests/chat_readiness_contract_test.py
@@ -375,6 +382,7 @@ python3 scripts/tests/chat_session_store_policy_contract_test.py
 python3 scripts/tests/chat_shortcut_map_contract_test.py
 python3 scripts/tests/chat_surface_preview_test.py
 bash scripts/tests/status-chat-model-status.sh
+bash scripts/tests/status-chat-model-load-request.sh
 bash scripts/tests/status-chat-session.sh
 bash scripts/tests/status-chat-readiness.sh
 bash scripts/tests/status-chat-audit-event.sh
@@ -458,6 +466,13 @@ store path, manifest, read, write, delete, retention, and migration gates
 without reading configuration, paths, manifests, session records,
 transcripts, titles, prompts, responses, summaries, model paths, runtime
 logs, or artifacts.
+
+The chat model-load request fixture defines the disabled local model-load
+boundary for the planned chat surface. It records descriptor selection,
+asset path, checksum, runtime preflight, load, warmup, unload, and
+persistence gates without reading configuration, environment values,
+model paths, asset paths, weights, tokenizers, checksum manifests,
+prompts, responses, transcripts, runtime logs, or artifacts.
 
 The preview command renders that same contract as a deterministic
 terminal chat surface sketch with disabled controls, blocked reasons, and

@@ -1,0 +1,357 @@
+{
+  "assetInputState": "blocked",
+  "assetPathState": "not_configured",
+  "blockedReasons": [
+    {
+      "reasonId": "model_asset_input_boundary_absent",
+      "requiredBefore": "configure_asset_path_enabled",
+      "state": "blocked",
+      "summary": "No reviewed local model asset input boundary exists."
+    },
+    {
+      "reasonId": "model_asset_path_boundary_absent",
+      "requiredBefore": "asset_paths_available",
+      "state": "not_configured",
+      "summary": "No reviewed config/path boundary exists for model asset locations."
+    },
+    {
+      "reasonId": "model_integrity_evidence_absent",
+      "requiredBefore": "validate_assets_enabled",
+      "state": "requires_evidence",
+      "summary": "Checksum, size, format, and provenance evidence are absent."
+    },
+    {
+      "reasonId": "runtime_readiness_blocked",
+      "requiredBefore": "runtime_preflight_enabled",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked and not evidence-backed."
+    },
+    {
+      "reasonId": "device_session_inactive",
+      "requiredBefore": "load_model_enabled",
+      "state": "inactive",
+      "summary": "No KV260 target session exists for model load handoff."
+    },
+    {
+      "reasonId": "model_load_executor_absent",
+      "requiredBefore": "load_model_enabled",
+      "state": "disabled",
+      "summary": "No reviewed model-load executor or runtime lifecycle exists."
+    },
+    {
+      "reasonId": "unload_policy_absent",
+      "requiredBefore": "unload_model_enabled",
+      "state": "planned",
+      "summary": "Unload, cleanup, and rollback policy needs a reviewed runtime lifecycle."
+    },
+    {
+      "reasonId": "local_only_policy_required",
+      "requiredBefore": "load_request_review_complete",
+      "state": "planned",
+      "summary": "Local-only policy must continue blocking provider and cloud fallback paths."
+    }
+  ],
+  "chatLocalOnlyPolicyRef": "chat_local_only_policy_gemma3n_e4b_kv260_placeholder",
+  "chatModelStatusRef": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "checksumState": "not_configured",
+  "descriptorState": "available_as_data",
+  "deviceSessionState": "inactive",
+  "deviceSessionStatusRef": "device_session_status_gemma3n_e4b_kv260",
+  "fixtureVersion": "chat-model-load-request.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "blocked",
+      "summary": "Model status display keeps model loading blocked and disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "refId": "runtime_readiness",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked and local-data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json",
+      "refId": "device_session_status",
+      "schemaVersion": "pccx.deviceSessionStatus.v0",
+      "state": "inactive",
+      "summary": "Device/session status reports no active target session."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Chat readiness keeps send and recovery actions blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "blocked",
+      "summary": "Local-only policy keeps provider, cloud, and fallback paths blocked."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_load_request_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat model-load request fixture; no model asset path is configured, read, resolved, or emitted.",
+    "No model weights, tokenizer files, checksum manifests, configuration files, environment values, prompts, responses, transcripts, runtime logs, private paths, secrets, or tokens are read.",
+    "No model asset validation, checksum computation, runtime preflight, model load, model unload, model warmup, response generation, persistence, import, export, upload, telemetry, or artifact write is performed.",
+    "No KV260 hardware access, serial access, network call, provider call, pccx-lab invocation, or systemverilog-ide invocation is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model-loader, provider, storage, or hardware implementation."
+  ],
+  "loadControls": [
+    {
+      "blockedReasonRef": "model_load_executor_absent",
+      "controlId": "select_model_descriptor",
+      "enabled": false,
+      "label": "select model descriptor",
+      "launcherAction": "Render descriptor metadata from checked fixtures only.",
+      "sideEffectPolicy": "local_render_only",
+      "state": "target_selected",
+      "userAction": "Review the target model descriptor in the future chat UI."
+    },
+    {
+      "blockedReasonRef": "model_asset_input_boundary_absent",
+      "controlId": "configure_asset_path",
+      "enabled": false,
+      "label": "configure asset path",
+      "launcherAction": "Keep asset path configuration disabled and do not read config or paths.",
+      "sideEffectPolicy": "no_config_or_path_read",
+      "state": "blocked",
+      "userAction": "Configure local assets only after a reviewed model-asset input boundary exists."
+    },
+    {
+      "blockedReasonRef": "model_integrity_evidence_absent",
+      "controlId": "validate_assets",
+      "enabled": false,
+      "label": "validate assets",
+      "launcherAction": "Refuse asset validation and do not open model files or manifests.",
+      "sideEffectPolicy": "no_model_asset_read",
+      "state": "blocked",
+      "userAction": "Validate assets only after integrity and redaction rules are reviewed."
+    },
+    {
+      "blockedReasonRef": "runtime_readiness_blocked",
+      "controlId": "build_load_plan",
+      "enabled": false,
+      "label": "build load plan",
+      "launcherAction": "Render blocked load-plan metadata only.",
+      "sideEffectPolicy": "no_runtime_preflight",
+      "state": "blocked",
+      "userAction": "Build a load plan only after asset, runtime, and target-session evidence exists."
+    },
+    {
+      "blockedReasonRef": "runtime_readiness_blocked",
+      "controlId": "start_runtime",
+      "enabled": false,
+      "label": "start runtime",
+      "launcherAction": "Keep runtime start disabled.",
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "disabled",
+      "userAction": "Start runtime only after evidence-backed runtime and target-session readiness."
+    },
+    {
+      "blockedReasonRef": "model_load_executor_absent",
+      "controlId": "load_model",
+      "enabled": false,
+      "label": "load model",
+      "launcherAction": "Refuse model load and do not touch model assets or hardware.",
+      "sideEffectPolicy": "no_model_load",
+      "state": "disabled",
+      "userAction": "Load model only after assets, integrity, runtime, and device evidence are reviewed."
+    },
+    {
+      "blockedReasonRef": "model_load_executor_absent",
+      "controlId": "warmup_model",
+      "enabled": false,
+      "label": "warm up model",
+      "launcherAction": "Keep warmup disabled and do not execute inference.",
+      "sideEffectPolicy": "no_model_execution",
+      "state": "disabled",
+      "userAction": "Warm up only after a model is loaded by a reviewed runtime path."
+    },
+    {
+      "blockedReasonRef": "unload_policy_absent",
+      "controlId": "unload_model",
+      "enabled": false,
+      "label": "unload model",
+      "launcherAction": "Keep unload disabled because no model is loaded.",
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "disabled",
+      "userAction": "Unload only after a reviewed runtime lifecycle exists."
+    },
+    {
+      "blockedReasonRef": "model_asset_path_boundary_absent",
+      "controlId": "persist_load_request",
+      "enabled": false,
+      "label": "persist load request",
+      "launcherAction": "Do not write policy, request, preference, or config files.",
+      "sideEffectPolicy": "no_policy_write",
+      "state": "disabled",
+      "userAction": "Persist load requests only after local configuration storage is reviewed."
+    }
+  ],
+  "loadInputs": [
+    {
+      "contentPolicy": "descriptor_id_and_target_label_only",
+      "enabled": false,
+      "inputId": "model_descriptor",
+      "label": "model descriptor",
+      "sideEffectPolicy": "fixture_metadata_only",
+      "state": "available_as_data",
+      "summary": "Gemma 3N E4B is represented by the checked descriptor fixture only."
+    },
+    {
+      "contentPolicy": "no_model_asset_path_or_private_path",
+      "enabled": false,
+      "inputId": "local_asset_path",
+      "label": "local asset path",
+      "sideEffectPolicy": "no_config_or_path_read",
+      "state": "not_configured",
+      "summary": "No reviewed local model asset path is configured, resolved, read, or emitted."
+    },
+    {
+      "contentPolicy": "no_weight_filename_path_or_bytes",
+      "enabled": false,
+      "inputId": "model_weight_file",
+      "label": "model weight file",
+      "sideEffectPolicy": "no_model_asset_read",
+      "state": "blocked",
+      "summary": "Model weight files are not discovered, opened, validated, or loaded."
+    },
+    {
+      "contentPolicy": "no_tokenizer_filename_path_or_bytes",
+      "enabled": false,
+      "inputId": "tokenizer_asset",
+      "label": "tokenizer asset",
+      "sideEffectPolicy": "no_tokenizer_read",
+      "state": "blocked",
+      "summary": "Tokenizer assets are not discovered, opened, validated, or loaded."
+    },
+    {
+      "contentPolicy": "no_checksum_values_or_manifest_body",
+      "enabled": false,
+      "inputId": "checksum_manifest",
+      "label": "checksum manifest",
+      "sideEffectPolicy": "no_manifest_read",
+      "state": "not_configured",
+      "summary": "No checksum manifest schema or local integrity evidence is configured."
+    },
+    {
+      "contentPolicy": "profile_metadata_only",
+      "enabled": false,
+      "inputId": "runtime_profile",
+      "label": "runtime profile",
+      "sideEffectPolicy": "no_runtime_preflight",
+      "state": "blocked",
+      "summary": "Runtime profile selection is blocked until runtime readiness is evidence-backed."
+    },
+    {
+      "contentPolicy": "inactive_status_only",
+      "enabled": false,
+      "inputId": "device_session",
+      "label": "device session",
+      "sideEffectPolicy": "no_hardware_probe",
+      "state": "inactive",
+      "summary": "No target device session exists and no board runtime state is measured."
+    }
+  ],
+  "loadPlanState": "blocked",
+  "loadRequestId": "chat_model_load_request_gemma3n_e4b_kv260_placeholder",
+  "loadRequestPolicy": {
+    "assetPathsConfigured": false,
+    "checksumsAvailable": false,
+    "contentPolicy": "model-load request metadata only; no model path, asset path, file name, checksum value, manifest body, prompt text, response text, transcript text, runtime log, or private path is included",
+    "descriptorSelected": true,
+    "deviceSessionReady": false,
+    "loadEnabled": false,
+    "mode": "disabled_until_reviewed_model_load_boundary_exists",
+    "modelAssetsConfigured": false,
+    "runtimeReady": false,
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no config, environment, model path, asset path, weight file, tokenizer file, checksum manifest, prompt, response, transcript, artifact, or runtime log is read",
+    "state": "blocked",
+    "unloadEnabled": false,
+    "warmupEnabled": false
+  },
+  "loadRequestState": "blocked",
+  "privacyState": "summary_only",
+  "runtimePreflightState": "blocked",
+  "runtimeReadinessRef": "runtime_readiness_gemma3n_e4b_kv260",
+  "safetyFlags": {
+    "artifactReads": false,
+    "artifactWrites": false,
+    "automaticUpload": false,
+    "checksumManifestRead": false,
+    "checksumValuesIncluded": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "configWrite": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "loadRequestDisplayOnly": true,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathsConfigured": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelAssetsConfigured": false,
+    "modelDescriptorMetadataOnly": true,
+    "modelExecution": false,
+    "modelIntegrityChecked": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelUnloadAttempted": false,
+    "modelWeightPathsIncluded": false,
+    "modelWeightRead": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "runtimePreflightExecuted": false,
+    "runtimeStarted": false,
+    "secretsIncluded": false,
+    "sessionPersistence": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokenizerRead": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "warmupAttempted": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatModelLoadRequest.v0",
+  "selectedModelState": "target_selected",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "unloadState": "disabled",
+  "warmupState": "disabled"
+}
