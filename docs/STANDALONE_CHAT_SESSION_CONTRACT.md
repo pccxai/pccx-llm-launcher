@@ -15,6 +15,7 @@ The implementation lives in:
 - `contracts/chat_composer_contract.py`
 - `contracts/chat_send_result_contract.py`
 - `contracts/chat_transcript_policy_contract.py`
+- `contracts/chat_audit_event_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
@@ -22,6 +23,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-audit-event.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
@@ -29,6 +31,7 @@ The implementation lives in:
 - `scripts/chat-composer-stub.sh`
 - `scripts/chat-send-result-stub.sh`
 - `scripts/chat-transcript-policy-stub.sh`
+- `scripts/chat-audit-event-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -37,12 +40,14 @@ The implementation lives in:
 - `scripts/tests/chat_composer_contract_test.py`
 - `scripts/tests/chat_send_result_contract_test.py`
 - `scripts/tests/chat_transcript_policy_contract_test.py`
+- `scripts/tests/chat_audit_event_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
 - `scripts/tests/status-chat-send-result.sh`
 - `scripts/tests/status-chat-transcript-policy.sh`
+- `scripts/tests/status-chat-audit-event.sh`
 
 ## What Is Implemented
 
@@ -147,6 +152,21 @@ stored, or persisted; no reviewed local store or retention period is
 configured; and export remains disabled until an explicit user-action
 and redaction boundary exists.
 
+The chat audit-event fixture records a blocked audit metadata shape for
+future chat UI events:
+
+```bash
+bash scripts/chat-audit-event-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-audit-event
+```
+
+It keeps audit handling as summary-only local data: event ids, event
+states, blocked reason ids, redaction policy, and fixture references can
+be rendered, but no prompt, response, transcript, actor identifier,
+runtime trace, raw log, model path, private path, or artifact content is
+read, logged, exported, stored, or persisted. Audit logging and local
+audit history remain disabled and not configured.
+
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
 
@@ -244,6 +264,26 @@ from message content:
 - `planned`: described for a future reviewed boundary
 - `summary_only`: future summaries must stay separate from raw content
 
+The audit-event states keep blocked event metadata separate from
+message content, identity data, runtime traces, and persistence:
+
+- `available_as_data`: checked audit metadata is available without
+  executing anything
+- `blocked`: a required readiness, logging, or storage boundary is
+  missing
+- `disabled`: audit persistence or transcript persistence is
+  intentionally unavailable
+- `empty_not_captured`: no prompt or message body is captured or stored
+- `not_configured`: no audit logger, local store, or retention rule
+  exists
+- `not_generated`: no response content or event timestamp exists
+- `not_started`: no local chat runtime has started
+- `placeholder`: deterministic local fixture state only
+- `redacted`: actor identifiers stay outside checked fixture data
+- `summary_only`: audit data is limited to metadata and references
+- `target_selected`: planned target identity can be displayed as local
+  data only
+
 ## Coordination Boundary
 
 The standalone chat surface depends on the existing launcher model
@@ -265,6 +305,11 @@ The transcript policy contract adds a reviewable retention/export
 policy shape without message content, transcript persistence, summary
 generation, artifact reads, artifact writes, runtime execution, model
 loading, provider calls, or target access.
+The audit-event contract adds a reviewable blocked event metadata shape
+without prompt capture, prompt echo, response content, transcript
+content, actor identifiers, runtime traces, audit persistence, artifact
+reads, artifact writes, runtime execution, model loading, provider
+calls, or target access.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -282,6 +327,8 @@ This chat/session surface does not add:
   persistence
 - transcript retention, transcript export, local transcript storage,
   transcript summaries, or transcript message content
+- audit logging, audit persistence, actor identifiers, event timestamps,
+  runtime traces, raw logs, or audit export behavior
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes

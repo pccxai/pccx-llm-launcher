@@ -119,6 +119,7 @@ jobs:
                    scripts/chat-composer-stub.sh \
                    scripts/chat-send-result-stub.sh \
                    scripts/chat-transcript-policy-stub.sh \
+                   scripts/chat-audit-event-stub.sh \
                    scripts/chat-surface-preview.sh \
                    scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
@@ -183,6 +184,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-transcript-policy
       - name: run scripts/chat-transcript-policy-stub.sh
         run: ./scripts/chat-transcript-policy-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat audit event
+        run: ./scripts/status-stub.sh --include-chat-audit-event
+      - name: run scripts/chat-audit-event-stub.sh
+        run: ./scripts/chat-audit-event-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-surface-preview.sh
         run: ./scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
@@ -219,6 +224,8 @@ jobs:
         run: python3 scripts/tests/chat_send_result_contract_test.py
       - name: run chat transcript policy contract tests
         run: python3 scripts/tests/chat_transcript_policy_contract_test.py
+      - name: run chat audit-event contract tests
+        run: python3 scripts/tests/chat_audit_event_contract_test.py
       - name: run chat surface preview tests
         run: python3 scripts/tests/chat_surface_preview_test.py
 
@@ -238,6 +245,7 @@ jobs:
           chmod +x scripts/chat-composer-stub.sh
           chmod +x scripts/chat-send-result-stub.sh
           chmod +x scripts/chat-transcript-policy-stub.sh
+          chmod +x scripts/chat-audit-event-stub.sh
           chmod +x scripts/launch-stub.sh
           chmod +x scripts/tests/status-backend.sh
           chmod +x scripts/tests/status-device-session.sh
@@ -248,6 +256,7 @@ jobs:
           chmod +x scripts/tests/status-chat-composer.sh
           chmod +x scripts/tests/status-chat-send-result.sh
           chmod +x scripts/tests/status-chat-transcript-policy.sh
+          chmod +x scripts/tests/status-chat-audit-event.sh
       - name: shellcheck status-stub and test script
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q shellcheck
@@ -261,6 +270,7 @@ jobs:
           shellcheck scripts/tests/status-chat-composer.sh
           shellcheck scripts/tests/status-chat-send-result.sh
           shellcheck scripts/tests/status-chat-transcript-policy.sh
+          shellcheck scripts/tests/status-chat-audit-event.sh
       - name: run status-backend tests
         run: bash scripts/tests/status-backend.sh scripts/status-stub.sh
       - name: run status-device-session tests
@@ -279,3 +289,5 @@ jobs:
         run: bash scripts/tests/status-chat-send-result.sh scripts/status-stub.sh
       - name: run status-chat-transcript-policy tests
         run: bash scripts/tests/status-chat-transcript-policy.sh scripts/status-stub.sh
+      - name: run status-chat-audit-event tests
+        run: bash scripts/tests/status-chat-audit-event.sh scripts/status-stub.sh
