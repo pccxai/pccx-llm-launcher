@@ -23,6 +23,7 @@ The implementation lives in:
 - `contracts/chat_error_taxonomy_contract.py`
 - `contracts/chat_message_list_contract.py`
 - `contracts/chat_action_bar_contract.py`
+- `contracts/chat_shortcut_map_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
@@ -38,6 +39,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-error-taxonomy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
@@ -53,6 +55,7 @@ The implementation lives in:
 - `scripts/chat-error-taxonomy-stub.sh`
 - `scripts/chat-message-list-stub.sh`
 - `scripts/chat-action-bar-stub.sh`
+- `scripts/chat-shortcut-map-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -69,6 +72,7 @@ The implementation lives in:
 - `scripts/tests/chat_error_taxonomy_contract_test.py`
 - `scripts/tests/chat_message_list_contract_test.py`
 - `scripts/tests/chat_action_bar_contract_test.py`
+- `scripts/tests/chat_shortcut_map_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
@@ -84,6 +88,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-response-stream.sh`
 - `scripts/tests/status-chat-message-list.sh`
 - `scripts/tests/status-chat-action-bar.sh`
+- `scripts/tests/status-chat-shortcut-map.sh`
 
 ## What Is Implemented
 
@@ -114,6 +119,9 @@ The chat/session contract records:
   message bodies or transcript reads
 - disabled action-bar metadata for new, clear, export, retry, copy, stop,
   and attach controls without side effects
+- disabled shortcut-map metadata for planned keyboard accelerators,
+  focus, and navigation without listeners, capture, dispatch, or side
+  effects
 
 The checked fixture is deterministic JSON. The stub command prints that
 JSON for the supported model and target pair:
@@ -291,6 +299,22 @@ unavailable, or planned. No session store or transcript is read, no
 message body is included, no transcript is exported, no clipboard or file
 operation is performed, no stop signal is sent, no model or runtime path
 is started, and no artifact is written.
+
+The chat shortcut-map fixture records the disabled keyboard shortcut map
+for the planned standalone chat surface:
+
+```bash
+bash scripts/chat-shortcut-map-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-shortcut-map
+```
+
+It keeps shortcuts as local metadata: focus composer, submit, stop, copy,
+new chat, clear, export, attach, and message navigation bindings remain
+disabled, blocked, inactive, unavailable, or planned. No keyboard
+listener is installed, no key event is captured, no command is
+dispatched, no focus change occurs, no prompt, session, transcript,
+message, clipboard, or file content is read or written, no model/runtime
+path is started, and no artifact is written.
 
 The chat transcript policy fixture records the retention, export,
 storage, and privacy policy shape for future transcript UI surfaces:

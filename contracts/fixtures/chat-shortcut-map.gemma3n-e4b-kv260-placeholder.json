@@ -1,0 +1,373 @@
+{
+  "actionExecutionState": "not_invoked",
+  "blockedReasons": [
+    {
+      "reasonId": "keyboard_listener_not_installed",
+      "requiredBefore": "keyboard_shortcuts_enabled",
+      "state": "not_installed",
+      "summary": "No keyboard listener or focus manager exists in this boundary."
+    },
+    {
+      "reasonId": "send_boundary_blocked",
+      "requiredBefore": "submit_message_enabled",
+      "state": "blocked",
+      "summary": "The send-result boundary remains blocked and no prompt can be accepted."
+    },
+    {
+      "reasonId": "response_stream_not_started",
+      "requiredBefore": "stop_response_enabled",
+      "state": "not_started",
+      "summary": "No local response stream exists, so stop controls have no target."
+    },
+    {
+      "reasonId": "message_content_absent",
+      "requiredBefore": "message_shortcuts_enabled",
+      "state": "empty_not_captured",
+      "summary": "The message-list boundary contains no message bodies or response content."
+    },
+    {
+      "reasonId": "session_lifecycle_not_enabled",
+      "requiredBefore": "session_shortcuts_enabled",
+      "state": "blocked",
+      "summary": "Session create/restore/clear operations remain disabled."
+    },
+    {
+      "reasonId": "transcript_store_not_configured",
+      "requiredBefore": "clear_conversation_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed local transcript store exists."
+    },
+    {
+      "reasonId": "transcript_export_not_reviewed",
+      "requiredBefore": "export_transcript_enabled",
+      "state": "not_configured",
+      "summary": "Transcript export requires a separate reviewed storage and redaction boundary."
+    },
+    {
+      "reasonId": "attachment_boundary_absent",
+      "requiredBefore": "attach_context_enabled",
+      "state": "planned",
+      "summary": "Attachment shortcuts require a separate reviewed file/artifact input boundary."
+    },
+    {
+      "reasonId": "message_list_empty",
+      "requiredBefore": "message_navigation_enabled",
+      "state": "empty_not_captured",
+      "summary": "Message navigation has no message rows to select."
+    }
+  ],
+  "chatActionBarRef": "chat_action_bar_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatMessageListRef": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "chatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "commandDispatchState": "blocked",
+  "fixtureVersion": "chat-shortcut-map.gemma3n-e4b-kv260.2026-05-04",
+  "focusState": "inactive",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "available_as_data",
+      "summary": "Blocked standalone chat/session state."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "available_as_data",
+      "summary": "Disabled composer and prompt-capture boundary."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "available_as_data",
+      "summary": "Empty message-list display boundary."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_action_bar",
+      "schemaVersion": "pccx.chatActionBar.v0",
+      "state": "available_as_data",
+      "summary": "Disabled conversation action-bar boundary."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "available_as_data",
+      "summary": "Transcript retention/export policy boundary."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "keyboardCaptureState": "not_installed",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_shortcut_map_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat shortcut-map fixture; no keyboard listener, focus manager, prompt, response, transcript, message body, session title, model path, runtime log, file, or clipboard content is read or written.",
+    "Shortcut bindings remain disabled, blocked, inactive, unavailable, or planned until reviewed UI input and command-dispatch boundaries exist.",
+    "No focus change, send attempt, retry, stop signal, session creation, conversation clear, transcript export, clipboard write, attachment read, or file upload is performed.",
+    "No model load, runtime execution, provider call, network call, pccx-lab call, editor call, KV260 hardware access, telemetry, artifact read, or artifact write is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, or runtime implementation."
+  ],
+  "safetyFlags": {
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "commandDispatchEnabled": false,
+    "configRead": false,
+    "conversationCleared": false,
+    "conversationCreated": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileUpload": false,
+    "focusChanged": false,
+    "hardwareAccess": false,
+    "inputAccepted": false,
+    "keyboardCaptureEnabled": false,
+    "keyboardListenerInstalled": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "marketplaceClaim": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "networkCalls": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsMessages": false,
+    "readsPrompt": false,
+    "readsSessionStore": false,
+    "readsTranscript": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "retryAttempted": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "sendAttempted": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "shortcutExecuted": false,
+    "shortcutMapDisplayOnly": true,
+    "shortcutMetadataOnly": true,
+    "shortcutPersistence": false,
+    "stableApiAbiClaim": false,
+    "stopSignalSent": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "transcriptExport": false,
+    "writeBack": false,
+    "writesArtifacts": false,
+    "writesPrompt": false
+  },
+  "schemaVersion": "pccx.chatShortcutMap.v0",
+  "shortcutBindings": [
+    {
+      "blockedReasonRef": "keyboard_listener_not_installed",
+      "enabled": false,
+      "keyChord": "Ctrl+L",
+      "label": "focus composer",
+      "requiresExplicitUserAction": true,
+      "resultState": "not_invoked",
+      "scopeId": "composer_focus",
+      "shortcutId": "focus_composer",
+      "sideEffectPolicy": "no_focus_change",
+      "sourceRef": "chat_composer",
+      "state": "inactive",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "send_boundary_blocked",
+      "enabled": false,
+      "keyChord": "Ctrl+Enter",
+      "label": "submit message",
+      "requiresExplicitUserAction": true,
+      "resultState": "not_invoked",
+      "scopeId": "composer_focus",
+      "shortcutId": "submit_message",
+      "sideEffectPolicy": "no_send_attempt",
+      "sourceRef": "chat_send_result",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "response_stream_not_started",
+      "enabled": false,
+      "keyChord": "Esc",
+      "label": "stop response",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "action_bar",
+      "shortcutId": "stop_response",
+      "sideEffectPolicy": "no_stop_signal",
+      "sourceRef": "chat_action_bar",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "message_content_absent",
+      "enabled": false,
+      "keyChord": "Ctrl+Shift+C",
+      "label": "copy response",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "message_list",
+      "shortcutId": "copy_response",
+      "sideEffectPolicy": "no_clipboard_write",
+      "sourceRef": "chat_message_list",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "session_lifecycle_not_enabled",
+      "enabled": false,
+      "keyChord": "Ctrl+N",
+      "label": "new chat",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "global_chat_shell",
+      "shortcutId": "new_chat",
+      "sideEffectPolicy": "no_session_create",
+      "sourceRef": "chat_session_lifecycle",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "transcript_store_not_configured",
+      "enabled": false,
+      "keyChord": "Ctrl+Shift+Backspace",
+      "label": "clear conversation",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "action_bar",
+      "shortcutId": "clear_conversation",
+      "sideEffectPolicy": "no_transcript_delete",
+      "sourceRef": "chat_transcript_policy",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "transcript_export_not_reviewed",
+      "enabled": false,
+      "keyChord": "Ctrl+Shift+E",
+      "label": "export transcript",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "action_bar",
+      "shortcutId": "export_transcript",
+      "sideEffectPolicy": "no_transcript_export",
+      "sourceRef": "chat_transcript_policy",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "attachment_boundary_absent",
+      "enabled": false,
+      "keyChord": "Ctrl+Shift+A",
+      "label": "attach context",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "action_bar",
+      "shortcutId": "attach_context",
+      "sideEffectPolicy": "no_file_or_artifact_read",
+      "sourceRef": "chat_action_bar",
+      "state": "planned",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "message_list_empty",
+      "enabled": false,
+      "keyChord": "Alt+Down",
+      "label": "next message",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "message_list",
+      "shortcutId": "next_message",
+      "sideEffectPolicy": "no_message_selection",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "message_list_empty",
+      "enabled": false,
+      "keyChord": "Alt+Up",
+      "label": "previous message",
+      "requiresExplicitUserAction": true,
+      "resultState": "unavailable",
+      "scopeId": "message_list",
+      "shortcutId": "previous_message",
+      "sideEffectPolicy": "no_message_selection",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "visible": true
+    }
+  ],
+  "shortcutMapId": "chat_shortcut_map_gemma3n_e4b_kv260_placeholder",
+  "shortcutMapState": "blocked",
+  "shortcutPolicy": {
+    "contentPolicy": "shortcut metadata only; no key-event stream, prompt text, response text, message body, transcript text, or session title is included",
+    "dispatchPolicy": "no command dispatch, focus change, send attempt, retry, stop signal, copy, attach, session creation, clear, or export action is performed",
+    "keyboardPolicy": "all key chords are display metadata until a reviewed UI input boundary exists",
+    "persistencePolicy": "no shortcut settings, key events, prompts, responses, transcripts, clipboard data, attachments, or artifacts are read or written",
+    "renderMode": "future_local_chat_shortcut_map",
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no keyboard listener, session store, transcript, prompt, response, clipboard, file, or model path is read",
+    "state": "planned"
+  },
+  "shortcutScopes": [
+    {
+      "enabled": false,
+      "label": "global chat shell",
+      "scopeId": "global_chat_shell",
+      "state": "blocked",
+      "summary": "Global chat-shell shortcuts remain disabled until the standalone surface has a reviewed input boundary.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "label": "composer focus",
+      "scopeId": "composer_focus",
+      "state": "inactive",
+      "summary": "Composer focus shortcuts remain inactive because prompt capture is disabled.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "label": "message list",
+      "scopeId": "message_list",
+      "state": "empty_not_captured",
+      "summary": "Message navigation shortcuts remain disabled because no messages are present.",
+      "visible": true
+    },
+    {
+      "enabled": false,
+      "label": "action bar",
+      "scopeId": "action_bar",
+      "state": "disabled",
+      "summary": "Action-bar shortcuts mirror disabled conversation controls.",
+      "visible": true
+    }
+  ],
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}
