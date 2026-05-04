@@ -25,6 +25,9 @@
 # Chat send-result display boundary (explicit opt-in, read-only local data):
 #   --include-chat-send-result
 #
+# Chat transcript retention/export policy (explicit opt-in, read-only local data):
+#   --include-chat-transcript-policy
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -47,6 +50,7 @@ INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
 INCLUDE_CHAT_COMPOSER="0"
 INCLUDE_CHAT_SEND_RESULT="0"
+INCLUDE_CHAT_TRANSCRIPT_POLICY="0"
 
 print_chat_send_result_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -155,6 +159,140 @@ print(
 
     HEAD "chat send result"
     printf '%s\n' "$CHAT_SEND_RESULT_SUMMARY"
+}
+
+print_chat_transcript_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_TRANSCRIPT_POLICY_STUB="$ROOT_DIR/scripts/chat-transcript-policy-stub.sh"
+
+    if [ ! -f "$CHAT_TRANSCRIPT_POLICY_STUB" ]; then
+        ERROR "chat transcript policy stub not found: $CHAT_TRANSCRIPT_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_TRANSCRIPT_POLICY_JSON="$(bash "$CHAT_TRANSCRIPT_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat transcript policy stub failed"
+        printf '%s\n' "$CHAT_TRANSCRIPT_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_TRANSCRIPT_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_TRANSCRIPT_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+retention = data["retentionPolicy"]
+content = data["contentPolicy"]
+export = data["exportPolicy"]
+formats = ",".join(export["exportFormats"]) or "none"
+retention_days = retention["retentionDays"]
+retention_days_text = "none" if retention_days is None else str(retention_days)
+surfaces = " ".join(
+    "{}={}".format(surface["surfaceId"], surface["state"])
+    for surface in data["uiSurfaces"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-transcript-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/response/transcript content/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  transcript : {}".format(data["transcriptState"]))
+print("[INFO]  message    : {}".format(data["messageContentState"]))
+print("[INFO]  retention  : {}".format(data["retentionState"]))
+print("[INFO]  export     : {}".format(data["exportState"]))
+print("[INFO]  storage    : {}".format(data["storageState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  retention-policy : {} localStoreConfigured={} "
+    "sessionPersistence={} transcriptPersistence={} retentionDays={}".format(
+        retention["state"],
+        b(retention["localStoreConfigured"]),
+        b(retention["sessionPersistence"]),
+        b(retention["transcriptPersistence"]),
+        retention_days_text,
+    )
+)
+print(
+    "[INFO]  content-policy   : {} contentIncluded={} "
+    "promptContentIncluded={} responseContentIncluded={} "
+    "messageBodiesIncluded={} summaryIncluded={}".format(
+        content["state"],
+        b(content["contentIncluded"]),
+        b(content["promptContentIncluded"]),
+        b(content["responseContentIncluded"]),
+        b(content["messageBodiesIncluded"]),
+        b(content["summaryIncluded"]),
+    )
+)
+print(
+    "[INFO]  export-policy    : {} exportEnabled={} "
+    "summaryExportState={} contentExportState={} formats={}".format(
+        export["state"],
+        b(export["exportEnabled"]),
+        export["summaryExportState"],
+        export["contentExportState"],
+        formats,
+    )
+)
+print("[INFO]  surfaces   : {}".format(surfaces))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "transcriptPolicyDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "attachmentReads={} fileUpload={} clipboardRead={} clipboardWrite={} "
+    "promptCapture={} promptContentIncluded={} promptEchoed={} "
+    "promptPersistence={} responseContentIncluded={} responseGenerated={} "
+    "messageBodiesIncluded={} summaryGenerated={} transcriptPersistence={} "
+    "transcriptExport={} localStoreConfigured={} modelExecution={} "
+    "runtimeExecution={} kv260Access={} networkCalls={} providerCalls={} "
+    "executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["transcriptPolicyDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["attachmentReads"]),
+        b(flags["fileUpload"]),
+        b(flags["clipboardRead"]),
+        b(flags["clipboardWrite"]),
+        b(flags["promptCapture"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["promptEchoed"]),
+        b(flags["promptPersistence"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["responseGenerated"]),
+        b(flags["messageBodiesIncluded"]),
+        b(flags["summaryGenerated"]),
+        b(flags["transcriptPersistence"]),
+        b(flags["transcriptExport"]),
+        b(flags["localStoreConfigured"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat transcript policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat transcript policy"
+    printf '%s\n' "$CHAT_TRANSCRIPT_POLICY_SUMMARY"
 }
 
 print_chat_composer_summary() {
@@ -715,6 +853,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SEND_RESULT="1"
             shift
             ;;
+        --include-chat-transcript-policy)
+            INCLUDE_CHAT_TRANSCRIPT_POLICY="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -730,8 +872,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, and --include-chat-send-result are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, and --include-chat-transcript-policy are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -751,7 +893,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
     NOTE "chat send     : opt-in via --include-chat-send-result (read-only blocked send-result data)"
+    NOTE "chat transcript: opt-in via --include-chat-transcript-policy (read-only retention/export policy data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ]; then
+        if ! print_chat_transcript_policy_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ]; then
         if ! print_chat_send_result_summary; then
