@@ -1,0 +1,360 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "store_not_configured",
+      "requiredBefore": "session_store_available",
+      "state": "not_configured",
+      "summary": "No reviewed local chat session store is configured."
+    },
+    {
+      "reasonId": "store_path_boundary_absent",
+      "requiredBefore": "store_path_available",
+      "state": "planned",
+      "summary": "No reviewed config/path boundary exists for locating a local store."
+    },
+    {
+      "reasonId": "manifest_schema_absent",
+      "requiredBefore": "manifest_read_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed manifest schema, version, or migration policy exists."
+    },
+    {
+      "reasonId": "session_store_read_boundary_absent",
+      "requiredBefore": "read_session_record_enabled",
+      "state": "blocked",
+      "summary": "Session reads require reviewed manifest, redaction, and content policy."
+    },
+    {
+      "reasonId": "session_store_write_boundary_absent",
+      "requiredBefore": "write_session_record_enabled",
+      "state": "disabled",
+      "summary": "Session writes require explicit local persistence and rollback policy."
+    },
+    {
+      "reasonId": "deletion_retention_policy_absent",
+      "requiredBefore": "delete_session_record_enabled",
+      "state": "requires_evidence",
+      "summary": "Deletion needs retention, confirmation, and recovery rules."
+    },
+    {
+      "reasonId": "migration_policy_absent",
+      "requiredBefore": "migrate_store_enabled",
+      "state": "not_configured",
+      "summary": "No versioned schema migration or rollback policy exists."
+    },
+    {
+      "reasonId": "redaction_policy_absent",
+      "requiredBefore": "stored_content_allowed",
+      "state": "planned",
+      "summary": "Stored content would require prompt, response, transcript, title, and summary redaction rules."
+    }
+  ],
+  "chatPreferencesRef": "chat_preferences_gemma3n_e4b_kv260_placeholder",
+  "chatSessionIndexRef": "chat_session_index_gemma3n_e4b_kv260_placeholder",
+  "chatSessionLifecycleRef": "chat_session_lifecycle_gemma3n_e4b_kv260_placeholder",
+  "chatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "chatSessionTitlePolicyRef": "chat_session_title_policy_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "deleteState": "disabled",
+  "fixtureVersion": "chat-session-store-policy.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "inactive",
+      "summary": "Base chat session remains inactive and does not persist state."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_index",
+      "schemaVersion": "pccx.chatSessionIndex.v0",
+      "state": "not_configured",
+      "summary": "Session index remains empty and does not read a store."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "state": "blocked",
+      "summary": "Lifecycle create, restore, clear, close, and export actions remain disabled or blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-title-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_title_policy",
+      "schemaVersion": "pccx.chatSessionTitlePolicy.v0",
+      "state": "blocked",
+      "summary": "Stored title reads, generation, rename, and persistence remain disabled or blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-preferences.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_preferences",
+      "schemaVersion": "pccx.chatPreferences.v0",
+      "state": "blocked",
+      "summary": "Preferences do not read or write store paths."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_store_policy_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat session-store policy fixture; no real local session store is configured or read.",
+    "No store path, private path, manifest body, session record, stored title, transcript, prompt, response, summary, model path, runtime log, secret, or token content is included.",
+    "No configuration file, environment value, session store, manifest, transcript, title, prompt, response, summary, attachment, artifact, model asset, private path, raw log, or hardware dump is read.",
+    "No session, transcript, title, policy, config, preference, artifact, or store file is written, deleted, migrated, persisted, imported, exported, compacted, or rolled back.",
+    "No model load, runtime execution, provider call, network call, pccx-lab invocation, systemverilog-ide invocation, or KV260 hardware access is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model, session-store, migration, or storage implementation."
+  ],
+  "manifestState": "not_configured",
+  "migrationState": "disabled",
+  "privacyState": "summary_only",
+  "readState": "blocked",
+  "retentionState": "not_configured",
+  "safetyFlags": {
+    "artifactReads": false,
+    "artifactWrites": false,
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "configWrite": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "manifestContentIncluded": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "migrationAttempted": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionManifest": false,
+    "readsSessionStore": false,
+    "readsSessionTitle": false,
+    "readsTranscript": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "retentionPolicyActive": false,
+    "rollbackAttempted": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "sessionDeletion": false,
+    "sessionPersistence": false,
+    "sessionRecordIncluded": false,
+    "sessionStorePolicyDisplayOnly": true,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "sessionTitleIncluded": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "storeConfigured": false,
+    "storeMetadataOnly": true,
+    "storePathConfigured": false,
+    "storePathIncluded": false,
+    "summaryGenerated": false,
+    "summaryIncluded": false,
+    "telemetry": false,
+    "titleContentIncluded": false,
+    "titlePersistence": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptExport": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatSessionStorePolicy.v0",
+  "sessionStorePolicy": {
+    "contentPolicy": "session-store policy metadata only; no store path, manifest body, session record, transcript text, title text, prompt text, response text, summary text, or model path is included",
+    "deleteEnabled": false,
+    "manifestSchemaConfigured": false,
+    "migrationEnabled": false,
+    "mode": "disabled_until_reviewed_local_session_store_boundary_exists",
+    "readEnabled": false,
+    "retentionEnabled": false,
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no config, environment, path, manifest, transcript, title, prompt, response, summary, artifact, model path, or runtime log is read",
+    "state": "blocked",
+    "storeConfigured": false,
+    "storePathConfigured": false,
+    "writeEnabled": false
+  },
+  "sessionStorePolicyId": "chat_session_store_policy_gemma3n_e4b_kv260_placeholder",
+  "sessionStorePolicyState": "blocked",
+  "storeControls": [
+    {
+      "blockedReasonRef": "store_path_boundary_absent",
+      "controlId": "configure_store",
+      "enabled": false,
+      "label": "configure store",
+      "launcherAction": "Keep store configuration disabled and do not read or write config.",
+      "sideEffectPolicy": "no_config_read_or_write",
+      "state": "disabled",
+      "userAction": "Configure a local store only after explicit storage, path, and privacy review."
+    },
+    {
+      "blockedReasonRef": "store_path_boundary_absent",
+      "controlId": "read_store_path",
+      "enabled": false,
+      "label": "read store path",
+      "launcherAction": "Refuse path reads because no config/path boundary exists.",
+      "sideEffectPolicy": "no_config_or_path_read",
+      "state": "blocked",
+      "userAction": "Read a configured store path only after explicit local path review."
+    },
+    {
+      "blockedReasonRef": "manifest_schema_absent",
+      "controlId": "read_manifest",
+      "enabled": false,
+      "label": "read manifest",
+      "launcherAction": "Refuse manifest reads because no session-store boundary exists.",
+      "sideEffectPolicy": "no_manifest_read",
+      "state": "blocked",
+      "userAction": "Read a manifest only after schema, redaction, and migration rules are reviewed."
+    },
+    {
+      "blockedReasonRef": "session_store_read_boundary_absent",
+      "controlId": "read_session_record",
+      "enabled": false,
+      "label": "read session record",
+      "launcherAction": "Refuse session-record reads.",
+      "sideEffectPolicy": "no_session_store_read",
+      "state": "blocked",
+      "userAction": "Read session records only after local store and content redaction review."
+    },
+    {
+      "blockedReasonRef": "session_store_write_boundary_absent",
+      "controlId": "write_session_record",
+      "enabled": false,
+      "label": "write session record",
+      "launcherAction": "Refuse session writes and do not create store files.",
+      "sideEffectPolicy": "no_session_store_write",
+      "state": "disabled",
+      "userAction": "Persist sessions only after a reviewed write, retention, and rollback policy exists."
+    },
+    {
+      "blockedReasonRef": "deletion_retention_policy_absent",
+      "controlId": "delete_session_record",
+      "enabled": false,
+      "label": "delete session record",
+      "launcherAction": "Keep deletion disabled and do not mutate a store.",
+      "sideEffectPolicy": "no_delete_no_write",
+      "state": "disabled",
+      "userAction": "Delete records only after retention, confirmation, and rollback rules exist."
+    },
+    {
+      "blockedReasonRef": "migration_policy_absent",
+      "controlId": "migrate_store",
+      "enabled": false,
+      "label": "migrate store",
+      "launcherAction": "Keep migration disabled and do not inspect or rewrite store files.",
+      "sideEffectPolicy": "no_migration_no_store_read",
+      "state": "disabled",
+      "userAction": "Migrate a store only after versioned schema and rollback review."
+    },
+    {
+      "blockedReasonRef": "session_store_write_boundary_absent",
+      "controlId": "persist_store_policy",
+      "enabled": false,
+      "label": "persist store policy",
+      "launcherAction": "Do not write policy, preference, or config files.",
+      "sideEffectPolicy": "no_policy_write",
+      "state": "disabled",
+      "userAction": "Persist policy only after configuration storage is reviewed."
+    }
+  ],
+  "storePathState": "not_configured",
+  "storeState": "not_configured",
+  "storeSurfaces": [
+    {
+      "contentPolicy": "no_store_path_or_private_path",
+      "enabled": false,
+      "label": "local store path",
+      "sideEffectPolicy": "no_config_or_path_read",
+      "state": "not_configured",
+      "summary": "No local session-store path is configured, read, resolved, or emitted.",
+      "surfaceId": "local_store_path"
+    },
+    {
+      "contentPolicy": "no_manifest_body_or_session_ids",
+      "enabled": false,
+      "label": "session manifest",
+      "sideEffectPolicy": "no_manifest_read",
+      "state": "not_configured",
+      "summary": "No manifest schema is configured and no manifest is read.",
+      "surfaceId": "session_manifest"
+    },
+    {
+      "contentPolicy": "no_session_record_or_message_content",
+      "enabled": false,
+      "label": "session record",
+      "sideEffectPolicy": "no_session_store_read",
+      "state": "blocked",
+      "summary": "Session records stay unavailable until a reviewed read/write boundary exists.",
+      "surfaceId": "session_record"
+    },
+    {
+      "contentPolicy": "no_session_title_content",
+      "enabled": false,
+      "label": "title record",
+      "sideEffectPolicy": "no_session_title_read",
+      "state": "blocked",
+      "summary": "Stored titles remain unavailable because no title-read boundary exists.",
+      "surfaceId": "title_record"
+    },
+    {
+      "contentPolicy": "no_transcript_content",
+      "enabled": false,
+      "label": "transcript record",
+      "sideEffectPolicy": "no_transcript_read_or_persistence",
+      "state": "disabled",
+      "summary": "Transcript records are not retained or read.",
+      "surfaceId": "transcript_record"
+    },
+    {
+      "contentPolicy": "retention_metadata_only",
+      "enabled": false,
+      "label": "retention rule",
+      "sideEffectPolicy": "no_retention_write",
+      "state": "not_configured",
+      "summary": "No retention period, deletion rule, or migration rule is configured.",
+      "surfaceId": "retention_rule"
+    }
+  ],
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "writeState": "disabled"
+}
