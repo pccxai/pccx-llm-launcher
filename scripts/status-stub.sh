@@ -25,6 +25,9 @@
 # Chat session index/sidebar plan (explicit opt-in, read-only local data):
 #   --include-chat-session-index
 #
+# Chat session-title display policy (explicit opt-in, read-only local data):
+#   --include-chat-session-title-policy
+#
 # Chat model status display plan (explicit opt-in, read-only local data):
 #   --include-chat-model-status
 #
@@ -80,6 +83,7 @@ INCLUDE_CHAT_SURFACE_LAYOUT="0"
 INCLUDE_CHAT_LOCAL_ONLY_POLICY="0"
 INCLUDE_CHAT_PREFERENCES="0"
 INCLUDE_CHAT_SESSION_INDEX="0"
+INCLUDE_CHAT_SESSION_TITLE_POLICY="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
 INCLUDE_CHAT_COMPOSER="0"
@@ -1019,6 +1023,120 @@ print(
 
     HEAD "chat session index"
     printf '%s\n' "$CHAT_SESSION_INDEX_SUMMARY"
+}
+
+print_chat_session_title_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_SESSION_TITLE_POLICY_STUB="$ROOT_DIR/scripts/chat-session-title-policy-stub.sh"
+
+    if [ ! -f "$CHAT_SESSION_TITLE_POLICY_STUB" ]; then
+        ERROR "chat session title-policy stub not found: $CHAT_SESSION_TITLE_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_SESSION_TITLE_POLICY_JSON="$(bash "$CHAT_SESSION_TITLE_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat session title-policy stub failed"
+        printf '%s\n' "$CHAT_SESSION_TITLE_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_SESSION_TITLE_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_SESSION_TITLE_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["titlePolicy"]
+placeholder = data["placeholderTitle"]
+controls = " ".join(
+    "{}={}".format(control["controlId"], control["state"])
+    for control in data["titleControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-session-title-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no session-store/title/transcript/prompt/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  title      : {}".format(data["titlePolicyState"]))
+print("[INFO]  source     : {}".format(data["titleSourceState"]))
+print("[INFO]  display    : {}".format(data["titleDisplayState"]))
+print("[INFO]  generation : {}".format(data["generationState"]))
+print("[INFO]  rename     : {}".format(data["renameState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  title-policy : {} displayMode={} titleReadEnabled={} "
+    "titleGenerationEnabled={} titleRenameEnabled={} "
+    "titlePersistenceEnabled={} summaryReadEnabled={}".format(
+        policy["state"],
+        policy["displayMode"],
+        b(policy["titleReadEnabled"]),
+        b(policy["titleGenerationEnabled"]),
+        b(policy["titleRenameEnabled"]),
+        b(policy["titlePersistenceEnabled"]),
+        b(policy["summaryReadEnabled"]),
+    )
+)
+print(
+    "[INFO]  placeholder : {} displayKind={} contentIncluded={}".format(
+        placeholder["state"],
+        placeholder["displayKind"],
+        b(placeholder["contentIncluded"]),
+    )
+)
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "sessionTitlePolicyDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "readsSessionManifest={} readsSessionTitle={} readsTranscript={} "
+    "sessionStoreRead={} titleContentIncluded={} sessionTitleIncluded={} "
+    "sessionTitleGenerated={} titleRenameImplemented={} titlePersistence={} "
+    "summaryIncluded={} promptContentIncluded={} responseContentIncluded={} "
+    "modelExecution={} runtimeExecution={} kv260Access={} networkCalls={} "
+    "providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["sessionTitlePolicyDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["readsSessionManifest"]),
+        b(flags["readsSessionTitle"]),
+        b(flags["readsTranscript"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["titleContentIncluded"]),
+        b(flags["sessionTitleIncluded"]),
+        b(flags["sessionTitleGenerated"]),
+        b(flags["titleRenameImplemented"]),
+        b(flags["titlePersistence"]),
+        b(flags["summaryIncluded"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat session title-policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat session title policy"
+    printf '%s\n' "$CHAT_SESSION_TITLE_POLICY_SUMMARY"
 }
 
 print_chat_audit_event_summary() {
@@ -1970,6 +2088,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SESSION_INDEX="1"
             shift
             ;;
+        --include-chat-session-title-policy)
+            INCLUDE_CHAT_SESSION_TITLE_POLICY="1"
+            shift
+            ;;
         --include-chat-model-status)
             INCLUDE_CHAT_MODEL_STATUS="1"
             shift
@@ -2029,8 +2151,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -2050,6 +2172,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat local    : opt-in via --include-chat-local-only-policy (read-only local-only policy data)"
     NOTE "chat prefs    : opt-in via --include-chat-preferences (read-only preferences data)"
     NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
+    NOTE "chat titles   : opt-in via --include-chat-session-title-policy (read-only title policy data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
@@ -2119,6 +2242,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ]; then
         if ! print_chat_session_index_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ]; then
+        if ! print_chat_session_title_policy_summary; then
             exit 1
         fi
     fi

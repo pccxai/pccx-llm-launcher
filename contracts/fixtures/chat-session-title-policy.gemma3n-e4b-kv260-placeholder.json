@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "pccx.chatSessionTitlePolicy.v0",
+  "titlePolicyId": "chat_session_title_policy_gemma3n_e4b_kv260_placeholder",
+  "fixtureVersion": "chat-session-title-policy.gemma3n-e4b-kv260.2026-05-04",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_title_policy_boundary_2026-05-04",
+  "targetDevice": "kv260",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetModel": "gemma3n-e4b",
+  "titlePolicyState": "available_as_data",
+  "titleSourceState": "not_configured",
+  "titleDisplayState": "placeholder",
+  "generationState": "blocked",
+  "renameState": "disabled",
+  "privacyState": "summary_only",
+  "parentChatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "chatSessionIndexRef": "chat_session_index_gemma3n_e4b_kv260_placeholder",
+  "chatSessionLifecycleRef": "chat_session_lifecycle_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "titlePolicy": {
+    "state": "available_as_data",
+    "displayMode": "placeholder_only",
+    "placeholderSource": "deterministic_fixture_label",
+    "titleReadEnabled": false,
+    "titleGenerationEnabled": false,
+    "titleRenameEnabled": false,
+    "titlePersistenceEnabled": false,
+    "summaryReadEnabled": false,
+    "sideEffectPolicy": "local_render_only",
+    "contentPolicy": "no_stored_titles_summaries_prompts_responses_or_transcripts"
+  },
+  "placeholderTitle": {
+    "state": "placeholder",
+    "placeholderId": "untitled_local_chat_placeholder",
+    "displayKind": "static_placeholder_label",
+    "labelTemplate": "Untitled local chat",
+    "source": "fixture_static_value_not_session_store",
+    "contentIncluded": false,
+    "userVisibleSummary": "Render a deterministic placeholder label without reading a session title.",
+    "sideEffectPolicy": "local_render_only"
+  },
+  "titleControls": [
+    {
+      "controlId": "render_placeholder_title",
+      "label": "render placeholder title",
+      "state": "available_as_data",
+      "enabled": true,
+      "userAction": "Open the chat surface or session sidebar.",
+      "launcherAction": "Render the static placeholder label from checked fixture data.",
+      "sideEffectPolicy": "local_render_only",
+      "contentPolicy": "static_placeholder_only"
+    },
+    {
+      "controlId": "read_stored_title",
+      "label": "read stored title",
+      "state": "blocked",
+      "enabled": false,
+      "userAction": "Read stored titles only after a reviewed local session-store boundary exists.",
+      "launcherAction": "Refuse session-title reads because no manifest/title boundary exists.",
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "contentPolicy": "no_title_summary_or_transcript_content"
+    },
+    {
+      "controlId": "generate_title",
+      "label": "generate title",
+      "state": "blocked",
+      "enabled": false,
+      "userAction": "Generate a title only after prompt/response redaction and model boundaries are reviewed.",
+      "launcherAction": "Refuse title generation because no prompt, response, summary, or model path may be read.",
+      "sideEffectPolicy": "no_model_or_runtime_execution",
+      "contentPolicy": "no_prompt_response_summary_or_title_generation"
+    },
+    {
+      "controlId": "rename_title",
+      "label": "rename title",
+      "state": "disabled",
+      "enabled": false,
+      "userAction": "Rename only after explicit local store and write policy review.",
+      "launcherAction": "Keep rename disabled because no write boundary exists.",
+      "sideEffectPolicy": "no_write",
+      "contentPolicy": "no_title_capture_or_persistence"
+    },
+    {
+      "controlId": "persist_title",
+      "label": "persist title",
+      "state": "disabled",
+      "enabled": false,
+      "userAction": "Persist only a reviewed title value after a local session-store boundary exists.",
+      "launcherAction": "Refuse persistence because no session-store write boundary exists.",
+      "sideEffectPolicy": "no_artifact_write",
+      "contentPolicy": "no_title_storage"
+    }
+  ],
+  "blockedReasons": [
+    {
+      "reasonId": "session_store_not_configured",
+      "state": "not_configured",
+      "summary": "No reviewed local chat session store exists.",
+      "requiredBefore": "stored_session_title_available"
+    },
+    {
+      "reasonId": "session_title_read_boundary_absent",
+      "state": "planned",
+      "summary": "A checked session-title read shape is required before stored display names can be shown.",
+      "requiredBefore": "read_stored_title_enabled"
+    },
+    {
+      "reasonId": "title_generation_not_reviewed",
+      "state": "blocked",
+      "summary": "Title generation would require prompt/response redaction, model, runtime, and persistence review.",
+      "requiredBefore": "generate_title_enabled"
+    },
+    {
+      "reasonId": "rename_write_boundary_absent",
+      "state": "requires_evidence",
+      "summary": "Renaming needs an explicit local write boundary, validation, and rollback policy.",
+      "requiredBefore": "rename_title_enabled"
+    },
+    {
+      "reasonId": "summary_content_unavailable",
+      "state": "empty_not_captured",
+      "summary": "No prompt, response, transcript, or summary content is available for title derivation.",
+      "requiredBefore": "title_summary_source_available"
+    }
+  ],
+  "handoffRefs": [
+    {
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "state": "available_as_data",
+      "summary": "Base chat/session surface is referenced without message content."
+    },
+    {
+      "refId": "chat_session_index",
+      "schemaVersion": "pccx.chatSessionIndex.v0",
+      "fixturePath": "contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json",
+      "state": "not_configured",
+      "summary": "Session index remains empty and does not read stored titles."
+    },
+    {
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "state": "blocked",
+      "summary": "Lifecycle create, restore, clear, close, and export actions remain disabled or blocked."
+    },
+    {
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain disabled."
+    },
+    {
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "state": "blocked",
+      "summary": "Readiness remains separate from title display policy."
+    }
+  ],
+  "safetyFlags": {
+    "dataOnly": true,
+    "readOnly": true,
+    "deterministic": true,
+    "sessionTitlePolicyDisplayOnly": true,
+    "writesArtifacts": false,
+    "readsArtifacts": false,
+    "readsSessionManifest": false,
+    "readsSessionTitle": false,
+    "readsTranscript": false,
+    "sessionStoreRead": false,
+    "sessionPersistence": false,
+    "titleContentIncluded": false,
+    "sessionTitleIncluded": false,
+    "sessionTitleGenerated": false,
+    "titleRenameImplemented": false,
+    "titlePersistence": false,
+    "transcriptPersistence": false,
+    "transcriptExport": false,
+    "messageBodiesIncluded": false,
+    "summaryIncluded": false,
+    "summaryGenerated": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "attachmentReads": false,
+    "fileUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "modelAssetPathsIncluded": false,
+    "modelWeightPathsIncluded": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelExecution": false,
+    "runtimeExecution": false,
+    "touchesHardware": false,
+    "kv260Access": false,
+    "opensSerialPort": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "sshExecution": false,
+    "providerCalls": false,
+    "cloudCalls": false,
+    "privatePathsIncluded": false,
+    "secretsIncluded": false,
+    "tokensIncluded": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "telemetry": false,
+    "automaticUpload": false,
+    "writeBack": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "mcpServerImplemented": false,
+    "lspImplemented": false,
+    "stableApiAbiClaim": false
+  },
+  "limitations": [
+    "Data-only chat session-title policy fixture; no real session store is configured or read.",
+    "Only a static placeholder label is present; no stored title, generated title, summary, prompt, response, transcript, manifest, model path, private path, secret, or token content is included.",
+    "No title is generated, renamed, persisted, imported, exported, refreshed, or written.",
+    "No artifacts are read, written, deleted, or persisted.",
+    "No KV260 hardware access, serial access, network call, provider call, telemetry, upload, or write-back is performed.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model, or session-store implementation."
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ]
+}

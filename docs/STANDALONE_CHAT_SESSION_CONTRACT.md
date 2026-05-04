@@ -15,6 +15,7 @@ The implementation lives in:
 - `contracts/chat_local_only_policy_contract.py`
 - `contracts/chat_preferences_contract.py`
 - `contracts/chat_session_index_contract.py`
+- `contracts/chat_session_title_policy_contract.py`
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
 - `contracts/chat_send_result_contract.py`
@@ -31,6 +32,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-preferences.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-session-title-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json`
@@ -47,6 +49,7 @@ The implementation lives in:
 - `scripts/chat-local-only-policy-stub.sh`
 - `scripts/chat-preferences-stub.sh`
 - `scripts/chat-session-index-stub.sh`
+- `scripts/chat-session-title-policy-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
 - `scripts/chat-send-result-stub.sh`
@@ -64,6 +67,7 @@ The implementation lives in:
 - `scripts/tests/chat_local_only_policy_contract_test.py`
 - `scripts/tests/chat_preferences_contract_test.py`
 - `scripts/tests/chat_session_index_contract_test.py`
+- `scripts/tests/chat_session_title_policy_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
 - `scripts/tests/chat_send_result_contract_test.py`
@@ -79,6 +83,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-local-only-policy.sh`
 - `scripts/tests/status-chat-preferences.sh`
 - `scripts/tests/status-chat-session-index.sh`
+- `scripts/tests/status-chat-session-title-policy.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
 - `scripts/tests/status-chat-send-result.sh`
@@ -107,6 +112,9 @@ The chat/session contract records:
   configuration reads or preference writes
 - an empty session index/list surface with disabled refresh, selection,
   restore, rename, and delete controls
+- a chat session-title policy with static placeholder display names and
+  disabled stored-title read, title generation, rename, and persistence
+  controls
 - a message envelope vocabulary without prompt or response content
 - links to the runtime readiness and device/session status fixtures
 - blocked reasons that explain what must exist before send controls can
@@ -215,6 +223,21 @@ unavailable, or blocked. The fixture does not read a session store,
 session manifest, session title, transcript, summary, prompt, response,
 model path, private path, or raw log, and it does not write, delete,
 refresh, import, export, or persist artifacts.
+
+The chat session-title policy fixture records the display-name boundary
+for future local chat sessions:
+
+```bash
+bash scripts/chat-session-title-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-session-title-policy
+```
+
+It reports a static placeholder title label and keeps stored-title reads,
+title generation, rename, and persistence disabled or blocked. The
+fixture does not read session stores, manifests, stored titles,
+transcripts, summaries, prompts, responses, model paths, private paths,
+or raw logs, and it does not generate, rename, persist, import, export,
+refresh, read, or write title artifacts.
 
 The chat readiness fixture records the checklist and recovery-action
 boundary used to decide whether the standalone chat surface can move
