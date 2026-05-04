@@ -7,8 +7,8 @@ an editor.
 
 The later-track plan for JetBrains and generic editor adapters is tracked in
 [`OTHER_EDITOR_BRIDGE_PLAN.md`](./OTHER_EDITOR_BRIDGE_PLAN.md).
-The later-track plan for local coding-assistant mode is tracked in
-[`LOCAL_CODING_ASSISTANT_MODE_PLAN.md`](./LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
+The later-track plan for local workflow mode is tracked in
+[`LOCAL_WORKFLOW_MODE_PLAN.md`](./LOCAL_WORKFLOW_MODE_PLAN.md).
 The later-track plan for multi-model and multi-device support is tracked in
 [`MULTI_MODEL_DEVICE_SUPPORT_PLAN.md`](./MULTI_MODEL_DEVICE_SUPPORT_PLAN.md).
 
@@ -54,7 +54,7 @@ The planned mapping is:
 | `device.session.status` | Show device/session status placeholder. |
 | `pccxlab.diagnostics.handoff` | Prepare read-only diagnostics handoff for pccx-lab. |
 | `editor.bridge.consumer` | Prepare editor bridge status. |
-| `local.coding.assistant.consumer` | Prepare local coding-assistant status, disabled by default. |
+| `local.workflow.consumer` | Prepare local workflow status, disabled by default. |
 
 Future multi-model and multi-device views should consume descriptor and
 readiness data through these boundaries first. This contract does not add a
@@ -118,7 +118,7 @@ This PR also does not add:
 - packaging or publisher flow
 - JetBrains plugin implementation
 - generic editor adapter implementation
-- local coding-assistant runtime implementation
+- local workflow runtime implementation
 - multi-model selector or device manager implementation
 - model weights or generated blobs
 

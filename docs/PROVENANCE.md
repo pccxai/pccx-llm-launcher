@@ -74,5 +74,5 @@ end-to-end path (RTL bring-up, simulation evidence, timing closure).
 ---
 
 *See also*:
-[AI-assisted engineering discipline](https://github.com/pccxai/pccxai/blob/main/docs/AI_ASSISTED_ENGINEERING.md) —
+[Engineering discipline](https://github.com/pccxai/pccxai/blob/main/docs/ENGINEERING_DISCIPLINE.md) —
 org-level evidence-first release rules that apply to launcher and device bridge work.

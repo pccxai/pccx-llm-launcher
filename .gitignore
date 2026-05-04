@@ -32,18 +32,6 @@ native/build/
 build/
 
 # ----------------------------------------------------------------------
-# Personal AI / IDE prompt files (must NEVER be committed in any repo).
-# Mirrors the global pre-commit hook.
-# ----------------------------------------------------------------------
-CLAUDE.md
-AGENTS.md
-GEMINI.md
-.claude/
-.gemini/
-.cursor/
-.codex/
-
-# ----------------------------------------------------------------------
 # Editor / IDE clutter
 # ----------------------------------------------------------------------
 .VSCodeCounter/

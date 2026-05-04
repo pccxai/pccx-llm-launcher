@@ -55,7 +55,7 @@ A future model selection UI should:
 1. Read model catalog data.
 2. Show target model identity, asset policy, and evidence state.
 3. Filter compatible runtime and device descriptors using descriptor data only.
-4. Keep launch, chat, and coding-assistant controls disabled when readiness or
+4. Keep launch, chat, and local workflow controls disabled when readiness or
    evidence is blocked.
 5. Explain missing evidence without silently falling back to a different model
    or provider.

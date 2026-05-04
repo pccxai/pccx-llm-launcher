@@ -69,7 +69,7 @@ Editor bridges must not:
 
 - execute launcher runtime code without a separately reviewed path
 - load model weights or include model weight paths
-- claim KV260 inference works or measured throughput exists
+- state current KV260 inference success or measured throughput
 - probe hardware, open serial ports, scan networks, or attempt authentication
 - invoke pccx-lab except through an explicitly reviewed CLI/core boundary
 - implement MCP, LSP, package publishing, marketplace distribution, telemetry,

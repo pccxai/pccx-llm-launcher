@@ -1,10 +1,10 @@
-# Local Coding-Assistant Mode Plan
+# Local Workflow Mode Plan
 
 ## Status
 
-This is a later-track launcher-side plan for a local coding-assistant mode in
+This is a later-track launcher-side plan for a local workflow mode in
 PCCX workflows. It records the user flow, context boundaries, and safety gates
-needed before the launcher can expose coding help through a local model.
+needed before the launcher can expose reviewed local workflow help.
 
 This plan does not implement a chat runtime, execute a model, call providers,
 capture prompts, store transcripts, invoke pccx-lab, invoke
@@ -12,7 +12,7 @@ systemverilog-ide, access hardware, or write project files.
 
 ## Goal
 
-Local coding-assistant mode should provide reviewed, context-aware help for
+Local workflow mode should provide reviewed, context-aware help for
 PCCX projects while keeping users in control of all execution and file
 changes.
 
@@ -57,7 +57,7 @@ raw hardware logs.
 The planned flow is:
 
 1. Launcher shows local readiness, device/session, and chat/session state.
-2. User opens a coding-assistant surface only when the status data allows it.
+2. User opens a local workflow surface only when the status data allows it.
 3. User chooses bounded context from editor or pccx-lab summaries.
 4. Assistant output is presented as suggestions, explanations, or proposal
    seeds.
@@ -70,7 +70,7 @@ of silently falling back to another backend.
 
 ## Safety Boundary
 
-Local coding-assistant mode must not add:
+Local workflow mode must not add:
 
 - model execution before a separately reviewed local runtime path exists
 - provider or network calls
@@ -90,7 +90,7 @@ unsupported claims.
 
 Before adding runtime behavior, the launcher should have:
 
-- a narrowed context-envelope shape for local coding-assistant input
+- a narrowed context-envelope shape for local workflow input
 - checked fixtures that prove prompt and transcript bodies are absent
 - explicit disabled/blocked state mapping for readiness, device/session, and
   chat/session data
@@ -103,5 +103,5 @@ Before adding runtime behavior, the launcher should have:
 
 This plan addresses
 [`pccx-llm-launcher#12`](https://github.com/pccxai/pccx-llm-launcher/issues/12)
-by recording the local coding-assistant mode direction while keeping the
+by recording the local workflow mode direction while keeping the
 current launcher work data-only and evidence-gated.
