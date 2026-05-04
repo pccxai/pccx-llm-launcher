@@ -66,8 +66,8 @@ _CONTRACT = {
             "futureConsumerCommand": "pccxLauncher.prepareEditorBridgeStatus",
         },
         {
-            "id": "local.coding.assistant.consumer",
-            "label": "local coding-assistant mode consumer",
+            "id": "local.workflow.consumer",
+            "label": "local workflow mode consumer",
             "state": "planned",
             "execution": "disabled_by_default",
             "futureConsumerCommand": "pccxLauncher.prepareLocalCodingAssistantStatus",
@@ -102,7 +102,7 @@ _CONTRACT = {
     "futureConsumers": [
         "pccx-systemverilog-ide",
         "future editor integration consumer",
-        "local coding-assistant mode, planned",
+        "local workflow mode, planned",
     ],
     "limitations": [
         "No launcher runtime call is performed by this contract.",

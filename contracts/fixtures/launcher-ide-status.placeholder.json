@@ -17,7 +17,7 @@
   "futureConsumers": [
     "pccx-systemverilog-ide",
     "future editor integration consumer",
-    "local coding-assistant mode, planned"
+    "local workflow mode, planned"
   ],
   "issueRefs": [
     "pccxai/pccx-llm-launcher#4",
@@ -95,8 +95,8 @@
     {
       "execution": "disabled_by_default",
       "futureConsumerCommand": "pccxLauncher.prepareLocalCodingAssistantStatus",
-      "id": "local.coding.assistant.consumer",
-      "label": "local coding-assistant mode consumer",
+      "id": "local.workflow.consumer",
+      "label": "local workflow mode consumer",
       "state": "planned"
     }
   ],
