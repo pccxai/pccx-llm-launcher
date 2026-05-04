@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "pccx.chatSessionIndex.v0",
+  "sessionIndexId": "chat_session_index_gemma3n_e4b_kv260_placeholder",
+  "fixtureVersion": "chat-session-index.gemma3n-e4b-kv260.2026-05-04",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_index_boundary_2026-05-04",
+  "targetDevice": "kv260",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetModel": "gemma3n-e4b",
+  "indexState": "not_configured",
+  "sessionStoreState": "not_configured",
+  "manifestState": "unavailable",
+  "selectionState": "disabled",
+  "restoreState": "unavailable",
+  "contentState": "empty_not_captured",
+  "privacyState": "summary_only",
+  "parentChatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "chatSessionLifecycleRef": "chat_session_lifecycle_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "indexPolicy": {
+    "state": "not_configured",
+    "localStoreConfigured": false,
+    "manifestReadEnabled": false,
+    "transcriptReadEnabled": false,
+    "titlePolicy": "session titles are not read, generated, summarized, or emitted by this fixture",
+    "pathPolicy": "no session-store, transcript, model, user, or workspace paths are configured, read, or emitted",
+    "refreshPolicy": "future refresh requires an explicit reviewed local session-store boundary",
+    "sideEffectPolicy": "local_render_only"
+  },
+  "emptyState": {
+    "state": "placeholder",
+    "itemCount": 0,
+    "displayKind": "no_sessions_available",
+    "userVisibleSummary": "Show an empty local session index without reading a store.",
+    "sideEffectPolicy": "local_render_only",
+    "contentPolicy": "no_session_titles_summaries_prompts_responses_or_transcripts"
+  },
+  "indexControls": [
+    {
+      "controlId": "open_session_index",
+      "label": "open session index",
+      "state": "available_as_data",
+      "enabled": true,
+      "userAction": "Open the local chat session list surface.",
+      "launcherAction": "Render deterministic empty index state from checked fixture data.",
+      "sideEffectPolicy": "local_render_only",
+      "contentPolicy": "metadata_only_no_session_content"
+    },
+    {
+      "controlId": "refresh_session_index",
+      "label": "refresh session index",
+      "state": "blocked",
+      "enabled": false,
+      "userAction": "Refresh only after a reviewed local session-store boundary exists.",
+      "launcherAction": "Refuse refresh because no manifest read boundary exists.",
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "contentPolicy": "no_manifest_title_or_transcript_content"
+    },
+    {
+      "controlId": "select_session",
+      "label": "select session",
+      "state": "disabled",
+      "enabled": false,
+      "userAction": "Select only a future indexed local session.",
+      "launcherAction": "Keep selection disabled because the index is empty.",
+      "sideEffectPolicy": "local_render_only",
+      "contentPolicy": "no_session_identifier_from_user_store"
+    },
+    {
+      "controlId": "restore_selected_session",
+      "label": "restore selected session",
+      "state": "unavailable",
+      "enabled": false,
+      "userAction": "Restore only after a session manifest boundary exists.",
+      "launcherAction": "Refuse restore because no indexed session exists.",
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "contentPolicy": "no_session_manifest_or_transcript_content"
+    },
+    {
+      "controlId": "rename_session",
+      "label": "rename session",
+      "state": "disabled",
+      "enabled": false,
+      "userAction": "Rename only after explicit local store and title policy review.",
+      "launcherAction": "Keep rename disabled because no session title exists.",
+      "sideEffectPolicy": "no_write",
+      "contentPolicy": "no_title_capture_or_generation"
+    },
+    {
+      "controlId": "delete_session",
+      "label": "delete session",
+      "state": "inactive",
+      "enabled": false,
+      "userAction": "Delete only a future launcher-owned local session.",
+      "launcherAction": "No-op because no indexed session or local store exists.",
+      "sideEffectPolicy": "no_artifact_delete",
+      "contentPolicy": "no_transcript_mutation"
+    }
+  ],
+  "blockedReasons": [
+    {
+      "reasonId": "session_store_not_configured",
+      "state": "not_configured",
+      "summary": "No reviewed local chat session store exists.",
+      "requiredBefore": "session_index_refresh_enabled"
+    },
+    {
+      "reasonId": "session_manifest_boundary_absent",
+      "state": "planned",
+      "summary": "A checked session manifest shape is required before list items can be read.",
+      "requiredBefore": "session_list_items_available"
+    },
+    {
+      "reasonId": "session_titles_not_captured",
+      "state": "empty_not_captured",
+      "summary": "Session titles, summaries, prompts, and responses remain outside checked fixture data.",
+      "requiredBefore": "session_display_names_available"
+    },
+    {
+      "reasonId": "active_session_absent",
+      "state": "inactive",
+      "summary": "No launcher-owned local chat session is active or selectable.",
+      "requiredBefore": "selection_or_restore_enabled"
+    },
+    {
+      "reasonId": "artifact_read_boundary_absent",
+      "state": "requires_evidence",
+      "summary": "Refreshing a real index requires an explicit artifact-read boundary and tests.",
+      "requiredBefore": "refresh_session_index_enabled"
+    }
+  ],
+  "handoffRefs": [
+    {
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "state": "available_as_data",
+      "summary": "Base chat/session surface is referenced without message content."
+    },
+    {
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "state": "blocked",
+      "summary": "Lifecycle restore, clear, close, and export actions remain disabled or blocked."
+    },
+    {
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain disabled."
+    },
+    {
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "state": "blocked",
+      "summary": "Readiness gates stay separate from index display state."
+    }
+  ],
+  "safetyFlags": {
+    "dataOnly": true,
+    "readOnly": true,
+    "deterministic": true,
+    "sessionIndexDisplayOnly": true,
+    "writesArtifacts": false,
+    "readsArtifacts": false,
+    "readsSessionManifest": false,
+    "readsTranscript": false,
+    "sessionPersistence": false,
+    "transcriptPersistence": false,
+    "transcriptExport": false,
+    "sessionRestoreImplemented": false,
+    "sessionDeleteImplemented": false,
+    "sessionRenameImplemented": false,
+    "localStoreConfigured": false,
+    "sessionTitleIncluded": false,
+    "sessionTitleGenerated": false,
+    "messageBodiesIncluded": false,
+    "summaryIncluded": false,
+    "summaryGenerated": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "attachmentReads": false,
+    "fileUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "modelAssetPathsIncluded": false,
+    "modelWeightPathsIncluded": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelExecution": false,
+    "runtimeExecution": false,
+    "touchesHardware": false,
+    "kv260Access": false,
+    "opensSerialPort": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "sshExecution": false,
+    "providerCalls": false,
+    "cloudCalls": false,
+    "privatePathsIncluded": false,
+    "secretsIncluded": false,
+    "tokensIncluded": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "telemetry": false,
+    "automaticUpload": false,
+    "writeBack": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "mcpServerImplemented": false,
+    "lspImplemented": false,
+    "stableApiAbiClaim": false
+  },
+  "limitations": [
+    "Data-only chat session index fixture; no real session store is configured or read.",
+    "No session titles, summaries, prompts, responses, transcripts, manifests, model paths, generated artifacts, private paths, secrets, or tokens are stored.",
+    "No artifacts are read, written, deleted, refreshed, imported, exported, or persisted.",
+    "No KV260 hardware access, serial access, network call, provider call, telemetry, upload, or write-back is performed.",
+    "Selection, restore, rename, delete, and refresh controls remain disabled, unavailable, inactive, or blocked until explicit evidence and reviewed boundaries exist.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, or session-store implementation."
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ]
+}
