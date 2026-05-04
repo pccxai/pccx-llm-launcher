@@ -1,0 +1,222 @@
+{
+  "attachmentState": "disabled",
+  "blockedReasons": [
+    {
+      "reasonId": "send_readiness_blocked",
+      "requiredBefore": "send_message_enabled",
+      "state": "blocked",
+      "summary": "Chat readiness keeps send controls disabled."
+    },
+    {
+      "reasonId": "draft_capture_not_reviewed",
+      "requiredBefore": "input_capture_enabled",
+      "state": "not_configured",
+      "summary": "No prompt capture, echo, persistence, or retention policy exists."
+    },
+    {
+      "reasonId": "attachment_boundary_absent",
+      "requiredBefore": "attach_context_enabled",
+      "state": "planned",
+      "summary": "No reviewed local artifact input boundary exists for composer attachments."
+    },
+    {
+      "reasonId": "runtime_not_started",
+      "requiredBefore": "assistant_response_available",
+      "state": "not_started",
+      "summary": "No local chat runtime has been implemented or started."
+    }
+  ],
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "composerControls": [
+    {
+      "controlId": "focus_input",
+      "enabled": false,
+      "label": "focus input",
+      "launcherAction": "Render placeholder input state without reading text.",
+      "sideEffectPolicy": "local_render_only",
+      "state": "placeholder",
+      "userAction": "Focus the composer only after a reviewed local chat UI exists."
+    },
+    {
+      "controlId": "attach_context",
+      "enabled": false,
+      "label": "attach context",
+      "launcherAction": "Keep attachments disabled and do not read files.",
+      "sideEffectPolicy": "no_artifact_read",
+      "state": "disabled",
+      "userAction": "Attach local context only after an explicit artifact input boundary exists."
+    },
+    {
+      "controlId": "send_message",
+      "enabled": false,
+      "label": "send message",
+      "launcherAction": "Keep send disabled while readiness is blocked.",
+      "sideEffectPolicy": "no_runtime_execution",
+      "state": "disabled",
+      "userAction": "Send only after runtime, model, session, and retention evidence exists."
+    },
+    {
+      "controlId": "clear_draft",
+      "enabled": false,
+      "label": "clear draft",
+      "launcherAction": "No-op because no draft is captured by this fixture.",
+      "sideEffectPolicy": "no_write",
+      "state": "inactive",
+      "userAction": "Clear only future in-memory draft text owned by the launcher UI."
+    }
+  ],
+  "composerId": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "composerState": "blocked",
+  "fixtureVersion": "chat-composer.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "available_as_data",
+      "summary": "Base chat/session state is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Chat readiness keeps send controls disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "available_as_data",
+      "summary": "Model status display is consumed as local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_lifecycle",
+      "schemaVersion": "pccx.chatSessionLifecycle.v0",
+      "state": "blocked",
+      "summary": "Session lifecycle remains disabled or blocked."
+    }
+  ],
+  "inputBufferState": "empty_not_captured",
+  "inputPolicy": {
+    "contentIncluded": false,
+    "draftStorage": "not_configured",
+    "maxDraftChars": 0,
+    "promptCapture": "disabled",
+    "promptEcho": "disabled",
+    "promptPersistence": "disabled",
+    "redactionPolicy": "prompt text stays outside checked fixtures and status summaries",
+    "state": "planned",
+    "summary": "Composer fixture carries input control state only; no draft text is stored."
+  },
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_composer_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat composer fixture; no prompt text is read, echoed, stored, or persisted.",
+    "No attachments, manifests, transcripts, summaries, model paths, generated artifacts, private paths, secrets, or tokens are read or written.",
+    "No KV260 hardware access, serial access, SSH execution, network call, provider call, telemetry, upload, or write-back is performed.",
+    "Composer send controls remain disabled until chat readiness, runtime, model-load, device-session, and local session evidence are available.",
+    "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation."
+  ],
+  "parentChatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "privacyState": "available_as_data",
+  "safetyFlags": {
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "composerDisplayOnly": true,
+    "dataOnly": true,
+    "deterministic": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathsIncluded": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "secretsIncluded": false,
+    "sessionPersistence": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatComposer.v0",
+  "sendControlState": "disabled",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "validationRules": [
+    {
+      "requiredBefore": "composer_fixture_checked",
+      "ruleId": "no_prompt_content_in_fixture",
+      "severity": "info",
+      "state": "available_as_data",
+      "summary": "Composer fixtures and status summaries must not include prompt text."
+    },
+    {
+      "requiredBefore": "send_message_enabled",
+      "ruleId": "runtime_readiness_required",
+      "severity": "blocked",
+      "state": "blocked",
+      "summary": "Runtime readiness remains blocked and not yet evidence-backed."
+    },
+    {
+      "requiredBefore": "send_message_enabled",
+      "ruleId": "model_load_required",
+      "severity": "blocked",
+      "state": "not_loaded",
+      "summary": "Model assets are not configured or loaded by this fixture."
+    },
+    {
+      "requiredBefore": "draft_or_transcript_persistence_enabled",
+      "ruleId": "session_store_required",
+      "severity": "blocked",
+      "state": "not_configured",
+      "summary": "No reviewed local session store or retention rule exists."
+    },
+    {
+      "requiredBefore": "attach_context_enabled",
+      "ruleId": "attachment_boundary_required",
+      "severity": "blocked",
+      "state": "planned",
+      "summary": "Attachments require a separate reviewed local artifact input boundary."
+    },
+    {
+      "requiredBefore": "core_chat_available",
+      "ruleId": "provider_mode_disabled",
+      "severity": "info",
+      "state": "not_used",
+      "summary": "External provider state is not used by this local launcher boundary."
+    }
+  ],
+  "validationState": "blocked"
+}

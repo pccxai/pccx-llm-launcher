@@ -116,6 +116,7 @@ jobs:
                    scripts/chat-session-stub.sh \
                    scripts/chat-session-lifecycle-stub.sh \
                    scripts/chat-readiness-stub.sh \
+                   scripts/chat-composer-stub.sh \
                    scripts/chat-surface-preview.sh \
                    scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
@@ -168,6 +169,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-readiness
       - name: run scripts/chat-readiness-stub.sh
         run: ./scripts/chat-readiness-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat composer
+        run: ./scripts/status-stub.sh --include-chat-composer
+      - name: run scripts/chat-composer-stub.sh
+        run: ./scripts/chat-composer-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-surface-preview.sh
         run: ./scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
@@ -198,6 +203,8 @@ jobs:
         run: python3 scripts/tests/chat_session_lifecycle_contract_test.py
       - name: run chat readiness contract tests
         run: python3 scripts/tests/chat_readiness_contract_test.py
+      - name: run chat composer contract tests
+        run: python3 scripts/tests/chat_composer_contract_test.py
       - name: run chat surface preview tests
         run: python3 scripts/tests/chat_surface_preview_test.py
 
@@ -214,6 +221,7 @@ jobs:
           chmod +x scripts/chat-session-stub.sh
           chmod +x scripts/chat-session-lifecycle-stub.sh
           chmod +x scripts/chat-readiness-stub.sh
+          chmod +x scripts/chat-composer-stub.sh
           chmod +x scripts/launch-stub.sh
           chmod +x scripts/tests/status-backend.sh
           chmod +x scripts/tests/status-device-session.sh
@@ -221,6 +229,7 @@ jobs:
           chmod +x scripts/tests/status-chat-model-status.sh
           chmod +x scripts/tests/status-chat-session.sh
           chmod +x scripts/tests/status-chat-readiness.sh
+          chmod +x scripts/tests/status-chat-composer.sh
       - name: shellcheck status-stub and test script
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q shellcheck
@@ -231,6 +240,7 @@ jobs:
           shellcheck scripts/tests/status-chat-model-status.sh
           shellcheck scripts/tests/status-chat-session.sh
           shellcheck scripts/tests/status-chat-readiness.sh
+          shellcheck scripts/tests/status-chat-composer.sh
       - name: run status-backend tests
         run: bash scripts/tests/status-backend.sh scripts/status-stub.sh
       - name: run status-device-session tests
@@ -243,3 +253,5 @@ jobs:
         run: bash scripts/tests/status-chat-session.sh scripts/status-stub.sh
       - name: run status-chat-readiness tests
         run: bash scripts/tests/status-chat-readiness.sh scripts/status-stub.sh
+      - name: run status-chat-composer tests
+        run: bash scripts/tests/status-chat-composer.sh scripts/status-stub.sh

@@ -12,22 +12,27 @@ The implementation lives in:
 - `contracts/chat_model_status_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_readiness_contract.py`
+- `contracts/chat_composer_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-readiness-stub.sh`
+- `scripts/chat-composer-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
+- `scripts/tests/chat_composer_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-readiness.sh`
+- `scripts/tests/status-chat-composer.sh`
 
 ## What Is Implemented
 
@@ -91,6 +96,20 @@ blocked, planned, or local data only. The fixture does not read prompts,
 model assets, paths, manifests, transcripts, summaries, logs, device
 state, or provider configuration.
 
+The chat composer fixture records the input-control and validation shape
+for the standalone chat surface:
+
+```bash
+bash scripts/chat-composer-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-composer
+```
+
+It keeps prompt capture, prompt echo, prompt persistence, attachment
+reads, clipboard access, model execution, runtime startup, provider
+calls, hardware access, pccx-lab invocation, and artifact writes out of
+scope. Send controls remain disabled until the reviewed runtime,
+session-store, model-load, and attachment boundaries exist.
+
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
 
@@ -122,6 +141,7 @@ The chat/session states are deliberately narrow:
 - `not_used`: no external provider state is used
 - `unavailable`: output is not available
 - `available_as_data`: local fixture shape is available as data only
+- `empty_not_captured`: no prompt draft is captured or stored
 
 The lifecycle states keep session management separate from chat message
 content:
@@ -166,6 +186,9 @@ calls, persistence, target access, artifact reads, or artifact writes.
 The readiness contract ties those display and lifecycle states into a
 single checklist and recovery-action view without enabling any send,
 load, restore, or export action.
+The composer contract adds a reviewable input-control and validation
+shape without prompt capture, prompt echo, prompt persistence, attachment
+reads, clipboard access, or send enablement.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -177,6 +200,8 @@ This chat/session surface does not add:
 
 - model execution or generated responses
 - prompt, response, or transcript persistence
+- composer prompt capture, echo, persistence, attachment reads, or
+  clipboard access
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes
