@@ -25,6 +25,9 @@
 # Chat session index/sidebar plan (explicit opt-in, read-only local data):
 #   --include-chat-session-index
 #
+# Chat session-store policy (explicit opt-in, read-only local data):
+#   --include-chat-session-store-policy
+#
 # Chat session-title display policy (explicit opt-in, read-only local data):
 #   --include-chat-session-title-policy
 #
@@ -86,6 +89,7 @@ INCLUDE_CHAT_SURFACE_LAYOUT="0"
 INCLUDE_CHAT_LOCAL_ONLY_POLICY="0"
 INCLUDE_CHAT_PREFERENCES="0"
 INCLUDE_CHAT_SESSION_INDEX="0"
+INCLUDE_CHAT_SESSION_STORE_POLICY="0"
 INCLUDE_CHAT_SESSION_TITLE_POLICY="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
@@ -1160,6 +1164,140 @@ print(
     printf '%s\n' "$CHAT_SESSION_INDEX_SUMMARY"
 }
 
+print_chat_session_store_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_SESSION_STORE_POLICY_STUB="$ROOT_DIR/scripts/chat-session-store-policy-stub.sh"
+
+    if [ ! -f "$CHAT_SESSION_STORE_POLICY_STUB" ]; then
+        ERROR "chat session-store policy stub not found: $CHAT_SESSION_STORE_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_SESSION_STORE_POLICY_JSON="$(bash "$CHAT_SESSION_STORE_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat session-store policy stub failed"
+        printf '%s\n' "$CHAT_SESSION_STORE_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_SESSION_STORE_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_SESSION_STORE_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["sessionStorePolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+surfaces = " ".join(
+    "{}={}:{}".format(surface["surfaceId"], surface["state"], b(surface["enabled"]))
+    for surface in data["storeSurfaces"]
+)
+controls = " ".join(
+    "{}={}:{}".format(control["controlId"], control["state"], b(control["enabled"]))
+    for control in data["storeControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-session-store-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no config/path/manifest/session-store/transcript/title/prompt/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  policy     : {}".format(data["sessionStorePolicyState"]))
+print("[INFO]  store      : {}".format(data["storeState"]))
+print("[INFO]  path       : {}".format(data["storePathState"]))
+print("[INFO]  manifest   : {}".format(data["manifestState"]))
+print("[INFO]  read       : {}".format(data["readState"]))
+print("[INFO]  write      : {}".format(data["writeState"]))
+print("[INFO]  delete     : {}".format(data["deleteState"]))
+print("[INFO]  retention  : {}".format(data["retentionState"]))
+print("[INFO]  migration  : {}".format(data["migrationState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  session-store-policy : {} mode={} storeConfigured={} "
+    "storePathConfigured={} manifestSchemaConfigured={} readEnabled={} "
+    "writeEnabled={} deleteEnabled={} retentionEnabled={} "
+    "migrationEnabled={}".format(
+        policy["state"],
+        policy["mode"],
+        b(policy["storeConfigured"]),
+        b(policy["storePathConfigured"]),
+        b(policy["manifestSchemaConfigured"]),
+        b(policy["readEnabled"]),
+        b(policy["writeEnabled"]),
+        b(policy["deleteEnabled"]),
+        b(policy["retentionEnabled"]),
+        b(policy["migrationEnabled"]),
+    )
+)
+print("[INFO]  surfaces   : {}".format(surfaces))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "sessionStorePolicyDisplayOnly={} storeMetadataOnly={} "
+    "storeConfigured={} storePathConfigured={} storePathIncluded={} "
+    "configRead={} configWrite={} readsSessionStore={} "
+    "sessionStoreRead={} sessionStoreWrite={} readsSessionManifest={} "
+    "manifestContentIncluded={} sessionRecordIncluded={} "
+    "sessionPersistence={} sessionDeletion={} retentionPolicyActive={} "
+    "migrationAttempted={} readsSessionTitle={} sessionTitleIncluded={} "
+    "readsTranscript={} promptContentIncluded={} responseContentIncluded={} "
+    "writesArtifacts={} readsArtifacts={} modelExecution={} "
+    "runtimeExecution={} kv260Access={} hardwareAccess={} networkCalls={} "
+    "providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["sessionStorePolicyDisplayOnly"]),
+        b(flags["storeMetadataOnly"]),
+        b(flags["storeConfigured"]),
+        b(flags["storePathConfigured"]),
+        b(flags["storePathIncluded"]),
+        b(flags["configRead"]),
+        b(flags["configWrite"]),
+        b(flags["readsSessionStore"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["sessionStoreWrite"]),
+        b(flags["readsSessionManifest"]),
+        b(flags["manifestContentIncluded"]),
+        b(flags["sessionRecordIncluded"]),
+        b(flags["sessionPersistence"]),
+        b(flags["sessionDeletion"]),
+        b(flags["retentionPolicyActive"]),
+        b(flags["migrationAttempted"]),
+        b(flags["readsSessionTitle"]),
+        b(flags["sessionTitleIncluded"]),
+        b(flags["readsTranscript"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat session-store policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat session store policy"
+    printf '%s\n' "$CHAT_SESSION_STORE_POLICY_SUMMARY"
+}
+
 print_chat_session_title_policy_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
     ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
@@ -2223,6 +2361,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SESSION_INDEX="1"
             shift
             ;;
+        --include-chat-session-store-policy)
+            INCLUDE_CHAT_SESSION_STORE_POLICY="1"
+            shift
+            ;;
         --include-chat-session-title-policy)
             INCLUDE_CHAT_SESSION_TITLE_POLICY="1"
             shift
@@ -2290,8 +2432,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -2311,6 +2453,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat local    : opt-in via --include-chat-local-only-policy (read-only local-only policy data)"
     NOTE "chat prefs    : opt-in via --include-chat-preferences (read-only preferences data)"
     NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
+    NOTE "chat store    : opt-in via --include-chat-session-store-policy (read-only session-store policy data)"
     NOTE "chat titles   : opt-in via --include-chat-session-title-policy (read-only title policy data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
@@ -2388,6 +2531,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ]; then
         if ! print_chat_session_index_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ]; then
+        if ! print_chat_session_store_policy_summary; then
             exit 1
         fi
     fi

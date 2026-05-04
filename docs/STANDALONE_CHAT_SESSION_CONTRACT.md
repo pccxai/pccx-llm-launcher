@@ -15,6 +15,7 @@ The implementation lives in:
 - `contracts/chat_local_only_policy_contract.py`
 - `contracts/chat_preferences_contract.py`
 - `contracts/chat_session_index_contract.py`
+- `contracts/chat_session_store_policy_contract.py`
 - `contracts/chat_session_title_policy_contract.py`
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
@@ -33,6 +34,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-preferences.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-title-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
@@ -51,6 +53,7 @@ The implementation lives in:
 - `scripts/chat-local-only-policy-stub.sh`
 - `scripts/chat-preferences-stub.sh`
 - `scripts/chat-session-index-stub.sh`
+- `scripts/chat-session-store-policy-stub.sh`
 - `scripts/chat-session-title-policy-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
@@ -70,6 +73,7 @@ The implementation lives in:
 - `scripts/tests/chat_local_only_policy_contract_test.py`
 - `scripts/tests/chat_preferences_contract_test.py`
 - `scripts/tests/chat_session_index_contract_test.py`
+- `scripts/tests/chat_session_store_policy_contract_test.py`
 - `scripts/tests/chat_session_title_policy_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
@@ -87,6 +91,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-local-only-policy.sh`
 - `scripts/tests/status-chat-preferences.sh`
 - `scripts/tests/status-chat-session-index.sh`
+- `scripts/tests/status-chat-session-store-policy.sh`
 - `scripts/tests/status-chat-session-title-policy.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
@@ -117,6 +122,8 @@ The chat/session contract records:
   configuration reads or preference writes
 - an empty session index/list surface with disabled refresh, selection,
   restore, rename, and delete controls
+- a chat session-store policy with disabled store configuration, path,
+  manifest, read, write, delete, retention, and migration gates
 - a chat session-title policy with static placeholder display names and
   disabled stored-title read, title generation, rename, and persistence
   controls
@@ -230,6 +237,21 @@ unavailable, or blocked. The fixture does not read a session store,
 session manifest, session title, transcript, summary, prompt, response,
 model path, private path, or raw log, and it does not write, delete,
 refresh, import, export, or persist artifacts.
+
+The chat session-store policy fixture records the local storage boundary
+for future chat sessions:
+
+```bash
+bash scripts/chat-session-store-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-session-store-policy
+```
+
+It reports disabled store configuration, store path, manifest, read,
+write, delete, retention, and migration gates. The fixture does not read
+configuration files, environment values, store paths, private paths,
+manifests, session records, transcripts, titles, prompts, responses,
+summaries, model paths, runtime logs, or artifacts, and it does not write,
+delete, migrate, import, export, persist, compact, or roll back any store.
 
 The chat session-title policy fixture records the display-name boundary
 for future local chat sessions:
@@ -636,6 +658,11 @@ the composer, or enabling runtime/model/store actions.
 The session-index contract adds a reviewable empty list/sidebar boundary
 without enabling manifest reads, transcript reads, title capture,
 restore, rename, delete, refresh, persistence, or artifact writes.
+The session-store policy contract adds a reviewable disabled local store
+policy shape without configuration reads, path reads, manifest reads,
+session record reads, transcript reads, title reads, prompt/response reads,
+store writes, deletion, migration, retention activation, artifact access,
+runtime execution, model loading, provider calls, or target access.
 The composer contract adds a reviewable input-control and validation
 shape without prompt capture, prompt echo, prompt persistence, attachment
 reads, clipboard access, or send enablement.
@@ -703,6 +730,8 @@ This chat/session surface does not add:
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes
+- session-store configuration, path, manifest, record, read, write,
+  delete, retention, migration, compaction, rollback, import, or export
 - model loading or model weight paths
 - KV260 runtime execution
 - serial, SSH, or network target access

@@ -119,6 +119,7 @@ jobs:
                    scripts/chat-local-only-policy-stub.sh \
                    scripts/chat-preferences-stub.sh \
                    scripts/chat-session-index-stub.sh \
+                   scripts/chat-session-store-policy-stub.sh \
                    scripts/chat-session-title-policy-stub.sh \
                    scripts/chat-readiness-stub.sh \
                    scripts/chat-composer-stub.sh \
@@ -195,6 +196,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-session-index
       - name: run scripts/chat-session-index-stub.sh
         run: ./scripts/chat-session-index-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat session-store policy
+        run: ./scripts/status-stub.sh --include-chat-session-store-policy
+      - name: run scripts/chat-session-store-policy-stub.sh
+        run: ./scripts/chat-session-store-policy-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/status-stub.sh with chat session title policy
         run: ./scripts/status-stub.sh --include-chat-session-title-policy
       - name: run scripts/chat-session-title-policy-stub.sh
@@ -279,6 +284,8 @@ jobs:
         run: python3 scripts/tests/chat_preferences_contract_test.py
       - name: run chat session-index contract tests
         run: python3 scripts/tests/chat_session_index_contract_test.py
+      - name: run chat session-store policy contract tests
+        run: python3 scripts/tests/chat_session_store_policy_contract_test.py
       - name: run chat session-title policy contract tests
         run: python3 scripts/tests/chat_session_title_policy_contract_test.py
       - name: run chat readiness contract tests
@@ -322,6 +329,7 @@ jobs:
           chmod +x scripts/chat-local-only-policy-stub.sh
           chmod +x scripts/chat-preferences-stub.sh
           chmod +x scripts/chat-session-index-stub.sh
+          chmod +x scripts/chat-session-store-policy-stub.sh
           chmod +x scripts/chat-session-title-policy-stub.sh
           chmod +x scripts/chat-readiness-stub.sh
           chmod +x scripts/chat-composer-stub.sh
@@ -344,6 +352,7 @@ jobs:
           chmod +x scripts/tests/status-chat-local-only-policy.sh
           chmod +x scripts/tests/status-chat-preferences.sh
           chmod +x scripts/tests/status-chat-session-index.sh
+          chmod +x scripts/tests/status-chat-session-store-policy.sh
           chmod +x scripts/tests/status-chat-session-title-policy.sh
           chmod +x scripts/tests/status-chat-readiness.sh
           chmod +x scripts/tests/status-chat-composer.sh
@@ -369,6 +378,7 @@ jobs:
           shellcheck scripts/tests/status-chat-local-only-policy.sh
           shellcheck scripts/tests/status-chat-preferences.sh
           shellcheck scripts/tests/status-chat-session-index.sh
+          shellcheck scripts/tests/status-chat-session-store-policy.sh
           shellcheck scripts/tests/status-chat-session-title-policy.sh
           shellcheck scripts/tests/status-chat-readiness.sh
           shellcheck scripts/tests/status-chat-composer.sh
@@ -399,6 +409,8 @@ jobs:
         run: bash scripts/tests/status-chat-preferences.sh scripts/status-stub.sh
       - name: run status-chat-session-index tests
         run: bash scripts/tests/status-chat-session-index.sh scripts/status-stub.sh
+      - name: run status-chat-session-store-policy tests
+        run: bash scripts/tests/status-chat-session-store-policy.sh scripts/status-stub.sh
       - name: run status-chat-session-title-policy tests
         run: bash scripts/tests/status-chat-session-title-policy.sh scripts/status-stub.sh
       - name: run status-chat-readiness tests
