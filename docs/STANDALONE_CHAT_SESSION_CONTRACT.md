@@ -13,26 +13,31 @@ The implementation lives in:
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
+- `contracts/chat_send_result_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
+- `scripts/chat-send-result-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
+- `scripts/tests/chat_send_result_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
+- `scripts/tests/status-chat-send-result.sh`
 
 ## What Is Implemented
 
@@ -110,6 +115,19 @@ calls, hardware access, pccx-lab invocation, and artifact writes out of
 scope. Send controls remain disabled until the reviewed runtime,
 session-store, model-load, and attachment boundaries exist.
 
+The chat send-result fixture records the blocked result shape shown when
+a send action is unavailable:
+
+```bash
+bash scripts/chat-send-result-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-send-result
+```
+
+It keeps the attempted-send result in blocked local data: no prompt is
+accepted, captured, echoed, stored, or persisted; no assistant response
+is generated; no model/runtime handoff is attempted; and no transcript
+or artifact is written.
+
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
 
@@ -175,6 +193,21 @@ display and lifecycle operations:
 - `target_selected`: target descriptor data can be displayed
 - `unavailable`: output or operation state is unavailable
 
+The send-result states keep blocked UI feedback separate from prompt
+content and assistant output:
+
+- `available_as_data`: checked blocked-result fixture data is available
+  without executing anything
+- `blocked`: a required readiness or execution boundary is missing
+- `disabled`: send controls are intentionally unavailable
+- `empty_not_captured`: no prompt draft is captured or stored
+- `inactive`: no target device, runtime, or launcher-owned chat session
+  exists
+- `not_configured`: no local store or retention policy exists
+- `not_generated`: no assistant response has been produced
+- `not_loaded`: model assets are not loaded
+- `not_started`: no local chat runtime has started
+
 ## Coordination Boundary
 
 The standalone chat surface depends on the existing launcher model
@@ -189,6 +222,9 @@ load, restore, or export action.
 The composer contract adds a reviewable input-control and validation
 shape without prompt capture, prompt echo, prompt persistence, attachment
 reads, clipboard access, or send enablement.
+The send-result contract adds a reviewable blocked-result display shape
+without prompt acceptance, prompt echo, response generation, runtime
+execution, model loading, persistence, or writes.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -202,6 +238,8 @@ This chat/session surface does not add:
 - prompt, response, or transcript persistence
 - composer prompt capture, echo, persistence, attachment reads, or
   clipboard access
+- send acceptance, prompt echo, response generation, or send-result
+  persistence
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes

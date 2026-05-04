@@ -22,6 +22,9 @@
 # Chat composer controls and validation state (explicit opt-in, read-only local data):
 #   --include-chat-composer
 #
+# Chat send-result display boundary (explicit opt-in, read-only local data):
+#   --include-chat-send-result
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -43,6 +46,116 @@ INCLUDE_CHAT_SESSION="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
 INCLUDE_CHAT_COMPOSER="0"
+INCLUDE_CHAT_SEND_RESULT="0"
+
+print_chat_send_result_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_SEND_RESULT_STUB="$ROOT_DIR/scripts/chat-send-result-stub.sh"
+
+    if [ ! -f "$CHAT_SEND_RESULT_STUB" ]; then
+        ERROR "chat send-result stub not found: $CHAT_SEND_RESULT_STUB"
+        return 1
+    fi
+
+    if ! CHAT_SEND_RESULT_JSON="$(bash "$CHAT_SEND_RESULT_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat send-result stub failed"
+        printf '%s\n' "$CHAT_SEND_RESULT_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_SEND_RESULT_SUMMARY="$(
+        printf '%s\n' "$CHAT_SEND_RESULT_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+envelope = data["resultEnvelope"]
+reasons = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+messages = " ".join(
+    "{}={}".format(message["messageId"], message["state"])
+    for message in data["displayMessages"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-send-result-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/response/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  result     : {}".format(data["resultState"]))
+print("[INFO]  attempt    : {}".format(data["sendAttemptState"]))
+print("[INFO]  prompt     : {}".format(data["promptHandlingState"]))
+print("[INFO]  response   : {}".format(data["responseState"]))
+print("[INFO]  runtime    : {}".format(data["runtimeState"]))
+print("[INFO]  model load : {}".format(data["modelState"]))
+print("[INFO]  session    : {}".format(data["sessionState"]))
+print(
+    "[INFO]  envelope   : {} inputAccepted={} sendAttempted={} "
+    "promptContentIncluded={} promptEchoed={} responseGenerated={} "
+    "responseContentIncluded={}".format(
+        envelope["state"],
+        b(envelope["inputAccepted"]),
+        b(envelope["sendAttempted"]),
+        b(envelope["promptContentIncluded"]),
+        b(envelope["promptEchoed"]),
+        b(envelope["responseGenerated"]),
+        b(envelope["responseContentIncluded"]),
+    )
+)
+print("[INFO]  blocked    : {}".format(reasons))
+print("[INFO]  messages   : {}".format(messages))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "sendResultDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "attachmentReads={} fileUpload={} clipboardRead={} clipboardWrite={} "
+    "promptCapture={} promptContentIncluded={} promptEchoed={} "
+    "promptPersistence={} inputAccepted={} sendAttempted={} "
+    "responseContentIncluded={} responseGenerated={} modelLoadAttempted={} "
+    "modelLoaded={} modelExecution={} runtimeExecution={} kv260Access={} "
+    "networkCalls={} providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["sendResultDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["attachmentReads"]),
+        b(flags["fileUpload"]),
+        b(flags["clipboardRead"]),
+        b(flags["clipboardWrite"]),
+        b(flags["promptCapture"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["promptEchoed"]),
+        b(flags["promptPersistence"]),
+        b(flags["inputAccepted"]),
+        b(flags["sendAttempted"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["responseGenerated"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat send-result JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat send result"
+    printf '%s\n' "$CHAT_SEND_RESULT_SUMMARY"
+}
 
 print_chat_composer_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -598,6 +711,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_COMPOSER="1"
             shift
             ;;
+        --include-chat-send-result)
+            INCLUDE_CHAT_SEND_RESULT="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -613,8 +730,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, --include-chat-readiness, and --include-chat-composer are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, and --include-chat-send-result are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -633,7 +750,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
+    NOTE "chat send     : opt-in via --include-chat-send-result (read-only blocked send-result data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ]; then
+        if ! print_chat_send_result_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_CHAT_COMPOSER" = "1" ]; then
         if ! print_chat_composer_summary; then
