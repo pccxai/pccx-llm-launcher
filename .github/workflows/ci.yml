@@ -128,6 +128,7 @@ jobs:
                    scripts/chat-response-stream-stub.sh \
                    scripts/chat-message-list-stub.sh \
                    scripts/chat-action-bar-stub.sh \
+                   scripts/chat-shortcut-map-stub.sh \
                    scripts/chat-surface-preview.sh \
                    scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
@@ -228,6 +229,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-action-bar
       - name: run scripts/chat-action-bar-stub.sh
         run: ./scripts/chat-action-bar-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat shortcut map
+        run: ./scripts/status-stub.sh --include-chat-shortcut-map
+      - name: run scripts/chat-shortcut-map-stub.sh
+        run: ./scripts/chat-shortcut-map-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-surface-preview.sh
         run: ./scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
@@ -282,6 +287,8 @@ jobs:
         run: python3 scripts/tests/chat_message_list_contract_test.py
       - name: run chat action-bar contract tests
         run: python3 scripts/tests/chat_action_bar_contract_test.py
+      - name: run chat shortcut-map contract tests
+        run: python3 scripts/tests/chat_shortcut_map_contract_test.py
       - name: run chat surface preview tests
         run: python3 scripts/tests/chat_surface_preview_test.py
 
@@ -310,6 +317,7 @@ jobs:
           chmod +x scripts/chat-response-stream-stub.sh
           chmod +x scripts/chat-message-list-stub.sh
           chmod +x scripts/chat-action-bar-stub.sh
+          chmod +x scripts/chat-shortcut-map-stub.sh
           chmod +x scripts/launch-stub.sh
           chmod +x scripts/tests/status-backend.sh
           chmod +x scripts/tests/status-device-session.sh
@@ -329,6 +337,7 @@ jobs:
           chmod +x scripts/tests/status-chat-response-stream.sh
           chmod +x scripts/tests/status-chat-message-list.sh
           chmod +x scripts/tests/status-chat-action-bar.sh
+          chmod +x scripts/tests/status-chat-shortcut-map.sh
       - name: shellcheck status-stub and test script
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q shellcheck
@@ -351,6 +360,7 @@ jobs:
           shellcheck scripts/tests/status-chat-response-stream.sh
           shellcheck scripts/tests/status-chat-message-list.sh
           shellcheck scripts/tests/status-chat-action-bar.sh
+          shellcheck scripts/tests/status-chat-shortcut-map.sh
       - name: run status-backend tests
         run: bash scripts/tests/status-backend.sh scripts/status-stub.sh
       - name: run status-device-session tests
@@ -387,3 +397,5 @@ jobs:
         run: bash scripts/tests/status-chat-message-list.sh scripts/status-stub.sh
       - name: run status-chat-action-bar tests
         run: bash scripts/tests/status-chat-action-bar.sh scripts/status-stub.sh
+      - name: run status-chat-shortcut-map tests
+        run: bash scripts/tests/status-chat-shortcut-map.sh scripts/status-stub.sh
