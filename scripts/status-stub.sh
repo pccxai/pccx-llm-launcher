@@ -16,6 +16,9 @@
 # Chat surface layout/chrome plan (explicit opt-in, read-only local data):
 #   --include-chat-surface-layout
 #
+# Chat local-only/cloud-block policy (explicit opt-in, read-only local data):
+#   --include-chat-local-only-policy
+#
 # Chat session index/sidebar plan (explicit opt-in, read-only local data):
 #   --include-chat-session-index
 #
@@ -56,6 +59,7 @@ INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
 INCLUDE_CHAT_SURFACE_LAYOUT="0"
+INCLUDE_CHAT_LOCAL_ONLY_POLICY="0"
 INCLUDE_CHAT_SESSION_INDEX="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
@@ -63,6 +67,111 @@ INCLUDE_CHAT_COMPOSER="0"
 INCLUDE_CHAT_SEND_RESULT="0"
 INCLUDE_CHAT_TRANSCRIPT_POLICY="0"
 INCLUDE_CHAT_AUDIT_EVENT="0"
+
+print_chat_local_only_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_LOCAL_ONLY_POLICY_STUB="$ROOT_DIR/scripts/chat-local-only-policy-stub.sh"
+
+    if [ ! -f "$CHAT_LOCAL_ONLY_POLICY_STUB" ]; then
+        ERROR "chat local-only policy stub not found: $CHAT_LOCAL_ONLY_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_LOCAL_ONLY_POLICY_JSON="$(bash "$CHAT_LOCAL_ONLY_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat local-only policy stub failed"
+        printf '%s\n' "$CHAT_LOCAL_ONLY_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_LOCAL_ONLY_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_LOCAL_ONLY_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+controls = " ".join(
+    "{}={}".format(control["controlId"], control["state"])
+    for control in data["policyControls"]
+)
+checks = " ".join(
+    "{}={}".format(check["checkId"], check["state"])
+    for check in data["dependencyChecks"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-local-only-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no cloud/provider/network/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  policy     : {}".format(data["policyState"]))
+print("[INFO]  local      : {}".format(data["localExecutionState"]))
+print("[INFO]  cloud      : {}".format(data["cloudDependencyState"]))
+print("[INFO]  provider   : {}".format(data["providerState"]))
+print("[INFO]  network    : {}".format(data["networkState"]))
+print("[INFO]  offline    : {}".format(data["offlineModeState"]))
+print("[INFO]  fallback   : {}".format(data["fallbackState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  checks     : {}".format(checks))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "localOnlyPolicyDisplayOnly={} cloudDependency={} "
+    "cloudFallbackEnabled={} providerCalls={} cloudCalls={} "
+    "networkCalls={} providerConfigRead={} environmentRead={} "
+    "secretsRead={} tokensRead={} promptCapture={} "
+    "promptContentIncluded={} responseContentIncluded={} "
+    "transcriptContentIncluded={} modelLoadAttempted={} modelLoaded={} "
+    "modelExecution={} runtimeExecution={} kv260Access={} "
+    "writesArtifacts={} readsArtifacts={} telemetry={} upload={} "
+    "executesPccxLab={} executesSystemverilogIde={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["localOnlyPolicyDisplayOnly"]),
+        b(flags["cloudDependency"]),
+        b(flags["cloudFallbackEnabled"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["providerConfigRead"]),
+        b(flags["environmentRead"]),
+        b(flags["secretsRead"]),
+        b(flags["tokensRead"]),
+        b(flags["promptCapture"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["telemetry"]),
+        b(flags["upload"]),
+        b(flags["executesPccxLab"]),
+        b(flags["executesSystemverilogIde"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat local-only policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat local-only policy"
+    printf '%s\n' "$CHAT_LOCAL_ONLY_POLICY_SUMMARY"
+}
 
 print_chat_surface_layout_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -1211,6 +1320,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SURFACE_LAYOUT="1"
             shift
             ;;
+        --include-chat-local-only-policy)
+            INCLUDE_CHAT_LOCAL_ONLY_POLICY="1"
+            shift
+            ;;
         --include-chat-session-index)
             INCLUDE_CHAT_SESSION_INDEX="1"
             shift
@@ -1254,8 +1367,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, and --include-chat-audit-event are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -1272,6 +1385,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
     NOTE "chat layout   : opt-in via --include-chat-surface-layout (read-only surface layout data)"
+    NOTE "chat local    : opt-in via --include-chat-local-only-policy (read-only local-only policy data)"
     NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
@@ -1289,6 +1403,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ]; then
         if ! print_chat_surface_layout_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ]; then
+        if ! print_chat_local_only_policy_summary; then
             exit 1
         fi
     fi
