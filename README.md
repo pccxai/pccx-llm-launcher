@@ -38,7 +38,7 @@ publishes a verified end-to-end path.
 - Owns or uses a supported edge device such as Xilinx Kria KV260.
 - Wants a guided launcher workflow rather than a hand-built kernel stack.
 - Does not want to work directly on kernel / RTL internals.
-- Wants a path toward local model execution and, later, coding-assistant
+- Wants a path toward local model execution and, later, local assistant
   workflows.
 
 ## v002 target
@@ -51,7 +51,7 @@ publishes a verified end-to-end path.
 
 ## Roadmap
 
-- Coding-assistant mode (AI-assisted local workflow with a controlled
+- Local assistant mode (controlled local workflow with a reviewed
   tool boundary). The later-track plan is tracked in
   [docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
 - VS Code and other editor bridge planning for guided launches and log
@@ -87,11 +87,12 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
-| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-audit-event`, adds read-only blocked chat audit-event metadata. With `--include-chat-session-index`, adds read-only empty chat session index data. With `--include-chat-transcript-policy`, adds read-only chat transcript retention/export policy data. With `--include-chat-send-result`, adds read-only blocked chat send-result data. With `--include-chat-composer`, adds read-only chat composer/input-control data. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-chat-readiness`, adds read-only chat readiness checks and recovery actions. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
+| [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-audit-event`, adds read-only blocked chat audit-event metadata. With `--include-chat-surface-layout`, adds read-only chat surface layout data. With `--include-chat-session-index`, adds read-only empty chat session index data. With `--include-chat-transcript-policy`, adds read-only chat transcript retention/export policy data. With `--include-chat-send-result`, adds read-only blocked chat send-result data. With `--include-chat-composer`, adds read-only chat composer/input-control data. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-chat-readiness`, adds read-only chat readiness checks and recovery actions. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
 | [`scripts/runtime-readiness-stub.sh`](./scripts/runtime-readiness-stub.sh) | Data-only runtime readiness JSON for the Gemma 3N E4B + KV260 target. Reports blocked / not yet evidence-backed. |
 | [`scripts/chat-session-stub.sh`](./scripts/chat-session-stub.sh) | Data-only standalone chat/session JSON for the Gemma 3N E4B + KV260 target. Reports disabled send controls, inactive session state, no prompt/response persistence, and readiness handoff references. |
 | [`scripts/chat-session-lifecycle-stub.sh`](./scripts/chat-session-lifecycle-stub.sh) | Data-only chat session lifecycle JSON for the Gemma 3N E4B + KV260 target. Reports create, restore, clear, close, and export-summary operations as disabled, blocked, inactive, or unavailable. |
+| [`scripts/chat-surface-layout-stub.sh`](./scripts/chat-surface-layout-stub.sh) | Data-only chat surface layout JSON for the Gemma 3N E4B + KV260 target. Reports planned shell regions and navigation items as local metadata without prompt/response/transcript/session-store reads or runtime actions. |
 | [`scripts/chat-session-index-stub.sh`](./scripts/chat-session-index-stub.sh) | Data-only chat session index JSON for the Gemma 3N E4B + KV260 target. Reports an empty, not-configured session list/sidebar boundary without reading a store, session titles, prompts, responses, transcripts, or summaries. |
 | [`scripts/chat-model-status-stub.sh`](./scripts/chat-model-status-stub.sh) | Data-only chat model-status JSON for the Gemma 3N E4B + KV260 target. Reports descriptor, asset, load, runtime, context, and response display rows as blocked, disabled, or unavailable. |
 | [`scripts/chat-readiness-stub.sh`](./scripts/chat-readiness-stub.sh) | Data-only chat readiness JSON for the Gemma 3N E4B + KV260 target. Reports readiness checks, error categories, and recovery actions as blocked, disabled, or local data only. |
@@ -110,6 +111,7 @@ bash scripts/install-stub.sh
 bash scripts/status-stub.sh
 bash scripts/status-stub.sh --include-chat-model-status
 bash scripts/status-stub.sh --include-chat-session
+bash scripts/status-stub.sh --include-chat-surface-layout
 bash scripts/status-stub.sh --include-chat-session-index
 bash scripts/status-stub.sh --include-chat-readiness
 bash scripts/status-stub.sh --include-chat-composer
@@ -123,6 +125,7 @@ bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-model-status-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-lifecycle-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-surface-layout-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-session-index-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-readiness-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-composer-stub.sh --model gemma3n-e4b --target kv260
@@ -187,7 +190,7 @@ promise. See
 [docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md](./docs/LAUNCHER_IDE_BRIDGE_CONTRACT.md).
 The later-track JetBrains and generic editor direction is tracked in
 [docs/OTHER_EDITOR_BRIDGE_PLAN.md](./docs/OTHER_EDITOR_BRIDGE_PLAN.md).
-The later-track local coding-assistant mode direction is tracked in
+The later-track local assistant mode direction is tracked in
 [docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
 
 ### Model / runtime descriptor boundary (planned)

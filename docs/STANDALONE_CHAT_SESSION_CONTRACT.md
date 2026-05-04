@@ -11,6 +11,7 @@ The implementation lives in:
 - `contracts/chat_session_contract.py`
 - `contracts/chat_model_status_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
+- `contracts/chat_surface_layout_contract.py`
 - `contracts/chat_session_index_contract.py`
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
@@ -20,6 +21,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
@@ -29,6 +31,7 @@ The implementation lives in:
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
+- `scripts/chat-surface-layout-stub.sh`
 - `scripts/chat-session-index-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
@@ -39,6 +42,7 @@ The implementation lives in:
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
+- `scripts/tests/chat_surface_layout_contract_test.py`
 - `scripts/tests/chat_session_index_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
@@ -47,6 +51,7 @@ The implementation lives in:
 - `scripts/tests/chat_audit_event_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
+- `scripts/tests/status-chat-surface-layout.sh`
 - `scripts/tests/status-chat-session-index.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
@@ -62,6 +67,8 @@ The chat/session contract records:
 - chat surface, model-load, input, send, and session states
 - disabled session controls for new session, model status, send,
   clear, and export actions
+- planned shell regions and navigation items for the blocked chat
+  surface layout
 - an empty session index/list surface with disabled refresh, selection,
   restore, rename, and delete controls
 - a message envelope vocabulary without prompt or response content
@@ -101,6 +108,21 @@ until runtime readiness, model-load evidence, a reviewed local session
 store, and explicit export/redaction rules exist. The fixture does not
 read or write manifests, transcripts, summaries, prompts, responses, or
 model paths.
+
+The chat surface layout fixture records the shell-region and navigation
+boundary for the planned standalone chat UI:
+
+```bash
+bash scripts/chat-surface-layout-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-surface-layout
+```
+
+It reports local metadata for the session sidebar, model-status header,
+readiness banner, transcript region, composer bar, send-result region,
+and audit footer. The fixture does not implement an app shell, read
+prompt/response/transcript/session-store content, focus the composer,
+start runtime code, load a model, touch hardware, call providers,
+invoke pccx-lab, or write artifacts.
 
 The chat session index fixture records the list/sidebar boundary for
 future local chat sessions:
@@ -256,6 +278,21 @@ session storage and transcript content:
 - `summary_only`: privacy state contains metadata only
 - `unavailable`: restore output or indexed sessions are unavailable
 
+The surface-layout states keep shell chrome separate from runtime,
+message content, and local stores:
+
+- `available_as_data`: layout or navigation metadata can be rendered
+  from checked fixture data
+- `blocked`: runtime readiness or content boundaries are missing
+- `disabled`: composer, model, or readiness actions are intentionally
+  unavailable
+- `empty_not_captured`: transcript/message content is absent
+- `not_configured`: no local session store exists
+- `not_started`: no local chat runtime has started
+- `placeholder`: deterministic local shell-region metadata only
+- `summary_only`: footer/privacy metadata excludes actor and content
+  identifiers
+
 The readiness states keep send-control gating separate from model-status
 display and lifecycle operations:
 
@@ -337,6 +374,9 @@ calls, persistence, target access, artifact reads, or artifact writes.
 The readiness contract ties those display and lifecycle states into a
 single checklist and recovery-action view without enabling any send,
 load, restore, or export action.
+The surface-layout contract adds a reviewable shell-region and
+navigation map without starting an app shell, reading content, focusing
+the composer, or enabling runtime/model/store actions.
 The session-index contract adds a reviewable empty list/sidebar boundary
 without enabling manifest reads, transcript reads, title capture,
 restore, rename, delete, refresh, persistence, or artifact writes.
