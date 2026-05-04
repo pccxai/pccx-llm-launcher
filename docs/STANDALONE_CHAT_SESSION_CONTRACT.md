@@ -24,6 +24,7 @@ The implementation lives in:
 - `contracts/chat_error_taxonomy_contract.py`
 - `contracts/chat_message_list_contract.py`
 - `contracts/chat_action_bar_contract.py`
+- `contracts/chat_attachment_policy_contract.py`
 - `contracts/chat_shortcut_map_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
@@ -41,6 +42,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-error-taxonomy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
@@ -58,6 +60,7 @@ The implementation lives in:
 - `scripts/chat-error-taxonomy-stub.sh`
 - `scripts/chat-message-list-stub.sh`
 - `scripts/chat-action-bar-stub.sh`
+- `scripts/chat-attachment-policy-stub.sh`
 - `scripts/chat-shortcut-map-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
@@ -76,6 +79,7 @@ The implementation lives in:
 - `scripts/tests/chat_error_taxonomy_contract_test.py`
 - `scripts/tests/chat_message_list_contract_test.py`
 - `scripts/tests/chat_action_bar_contract_test.py`
+- `scripts/tests/chat_attachment_policy_contract_test.py`
 - `scripts/tests/chat_shortcut_map_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
@@ -93,6 +97,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-response-stream.sh`
 - `scripts/tests/status-chat-message-list.sh`
 - `scripts/tests/status-chat-action-bar.sh`
+- `scripts/tests/status-chat-attachment-policy.sh`
 - `scripts/tests/status-chat-shortcut-map.sh`
 
 ## What Is Implemented
@@ -127,6 +132,8 @@ The chat/session contract records:
   message bodies or transcript reads
 - disabled action-bar metadata for new, clear, export, retry, copy, stop,
   and attach controls without side effects
+- disabled attachment-policy metadata for file picker, file read, upload,
+  import, preview, and persistence gates without side effects
 - disabled shortcut-map metadata for planned keyboard accelerators,
   focus, and navigation without listeners, capture, dispatch, or side
   effects
@@ -322,6 +329,22 @@ unavailable, or planned. No session store or transcript is read, no
 message body is included, no transcript is exported, no clipboard or file
 operation is performed, no stop signal is sent, no model or runtime path
 is started, and no artifact is written.
+
+The chat attachment-policy fixture records the disabled local attachment
+boundary used by the planned standalone chat surface:
+
+```bash
+bash scripts/chat-attachment-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-attachment-policy
+```
+
+It keeps attachment handling as local metadata: file picker, file
+metadata read, file content read, upload, import, preview, and persistence
+gates remain disabled, blocked, or not configured. No file picker opens,
+no file name, path, metadata, bytes, directory listing, clipboard data,
+transcript, generated artifact, model path, runtime log, or artifact is
+read or written, no upload is attempted, no import/export runs, no model
+or runtime path is started, and no target access occurs.
 
 The chat shortcut-map fixture records the disabled keyboard shortcut map
 for the planned standalone chat surface:
@@ -642,6 +665,12 @@ session creation, conversation clearing, transcript export, clipboard
 writes, attachment reads, retry attempts, stop signals, runtime
 execution, model loading, provider calls, artifact writes, or target
 access.
+The attachment-policy contract adds a reviewable disabled file-input
+policy shape without opening pickers, reading file names, paths, metadata,
+contents, directory listings, clipboard payloads, transcripts, generated
+artifacts, model paths, runtime logs, artifact reads, uploads, imports,
+persistence, runtime execution, model loading, provider calls, or target
+access.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -662,6 +691,9 @@ This chat/session surface does not add:
 - action-bar execution, session creation, conversation clearing,
   transcript export, clipboard writes, retry attempts, stop signals, file
   attachment reads, or action persistence
+- attachment-policy execution, file picker opening, file-name/path reads,
+  file metadata reads, file content reads, directory scans, clipboard
+  attachment reads, uploads, imports, previews, or persistence
 - transcript retention, transcript export, local transcript storage,
   transcript summaries, or transcript message content
 - audit logging, audit persistence, actor identifiers, event timestamps,

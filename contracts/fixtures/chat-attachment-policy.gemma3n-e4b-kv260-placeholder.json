@@ -1,0 +1,328 @@
+{
+  "attachmentControls": [
+    {
+      "blockedReasonRef": "file_picker_boundary_absent",
+      "controlId": "open_file_picker",
+      "enabled": false,
+      "label": "open file picker",
+      "launcherAction": "Keep the picker disabled and do not ask the host for file handles.",
+      "sideEffectPolicy": "no_file_picker",
+      "state": "disabled",
+      "userAction": "Choose files only after a reviewed local file-input boundary exists."
+    },
+    {
+      "blockedReasonRef": "metadata_read_boundary_absent",
+      "controlId": "read_file_metadata",
+      "enabled": false,
+      "label": "read file metadata",
+      "launcherAction": "Refuse metadata reads because file input has not been reviewed.",
+      "sideEffectPolicy": "no_file_metadata_read",
+      "state": "blocked",
+      "userAction": "Read file metadata only after explicit consent, filtering, and redaction policy exists."
+    },
+    {
+      "blockedReasonRef": "file_content_read_boundary_absent",
+      "controlId": "read_file_content",
+      "enabled": false,
+      "label": "read file content",
+      "launcherAction": "Refuse content reads because no attachment ingestion boundary exists.",
+      "sideEffectPolicy": "no_file_content_read",
+      "state": "blocked",
+      "userAction": "Read attachment content only after local parsing and redaction rules are reviewed."
+    },
+    {
+      "blockedReasonRef": "import_export_boundary_absent",
+      "controlId": "import_attachment",
+      "enabled": false,
+      "label": "import attachment",
+      "launcherAction": "Keep import disabled and do not copy, parse, or index any file.",
+      "sideEffectPolicy": "no_import_no_copy_no_parse",
+      "state": "disabled",
+      "userAction": "Import only after type limits, size limits, redaction, and persistence review."
+    },
+    {
+      "blockedReasonRef": "local_only_upload_block",
+      "controlId": "upload_attachment",
+      "enabled": false,
+      "label": "upload attachment",
+      "launcherAction": "Do not upload attachment data or call cloud/provider endpoints.",
+      "sideEffectPolicy": "no_upload_no_network",
+      "state": "disabled",
+      "userAction": "Upload remains unavailable for the local-only chat surface."
+    },
+    {
+      "blockedReasonRef": "file_content_read_boundary_absent",
+      "controlId": "preview_attachment",
+      "enabled": false,
+      "label": "preview attachment",
+      "launcherAction": "Keep preview disabled because no attachment bytes may be read.",
+      "sideEffectPolicy": "no_preview_no_file_read",
+      "state": "disabled",
+      "userAction": "Preview only after file read, rendering, and redaction boundaries exist."
+    },
+    {
+      "blockedReasonRef": "attachment_persistence_boundary_absent",
+      "controlId": "persist_attachment",
+      "enabled": false,
+      "label": "persist attachment",
+      "launcherAction": "Refuse attachment persistence because no storage boundary exists.",
+      "sideEffectPolicy": "no_artifact_write",
+      "state": "disabled",
+      "userAction": "Persist only after a reviewed local store and deletion policy exists."
+    }
+  ],
+  "attachmentInputs": [
+    {
+      "contentPolicy": "no_file_name_path_metadata_or_content",
+      "enabled": false,
+      "inputKind": "local_file",
+      "label": "local file",
+      "sideEffectPolicy": "no_file_picker_no_file_read",
+      "state": "blocked",
+      "summary": "Local file attachments need a reviewed picker, metadata, content, redaction, and persistence boundary."
+    },
+    {
+      "contentPolicy": "no_directory_path_listing_or_content",
+      "enabled": false,
+      "inputKind": "local_directory",
+      "label": "local directory",
+      "sideEffectPolicy": "no_directory_scan",
+      "state": "blocked",
+      "summary": "Directory attachments remain out of scope until recursive discovery and redaction rules are reviewed."
+    },
+    {
+      "contentPolicy": "no_clipboard_content",
+      "enabled": false,
+      "inputKind": "clipboard_payload",
+      "label": "clipboard payload",
+      "sideEffectPolicy": "no_clipboard_read",
+      "state": "disabled",
+      "summary": "Clipboard-backed attachments remain disabled because no clipboard read boundary exists."
+    },
+    {
+      "contentPolicy": "no_artifact_path_metadata_or_content",
+      "enabled": false,
+      "inputKind": "generated_artifact",
+      "label": "generated artifact",
+      "sideEffectPolicy": "no_artifact_read",
+      "state": "blocked",
+      "summary": "Generated artifacts are not read or attached until an artifact input boundary is reviewed."
+    },
+    {
+      "contentPolicy": "no_transcript_content",
+      "enabled": false,
+      "inputKind": "transcript_export",
+      "label": "transcript export",
+      "sideEffectPolicy": "no_transcript_export",
+      "state": "disabled",
+      "summary": "Transcript export as an attachment remains disabled until storage and redaction policy exists."
+    }
+  ],
+  "attachmentPolicy": {
+    "allowedInputKinds": [],
+    "contentPolicy": "attachment policy metadata only; no file names, paths, bytes, previews, manifests, transcript text, prompt text, or response text are included",
+    "fileContentReadEnabled": false,
+    "fileMetadataReadEnabled": false,
+    "filePickerEnabled": false,
+    "importEnabled": false,
+    "maxAttachmentCount": 0,
+    "mode": "disabled_until_reviewed_local_input_boundary_exists",
+    "persistenceEnabled": false,
+    "previewEnabled": false,
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no file picker, path, metadata, content, clipboard, transcript, artifact, model path, or runtime log is read",
+    "state": "blocked",
+    "uploadEnabled": false
+  },
+  "attachmentPolicyId": "chat_attachment_policy_gemma3n_e4b_kv260_placeholder",
+  "attachmentPolicyState": "blocked",
+  "attachmentState": "disabled",
+  "blockedReasons": [
+    {
+      "reasonId": "attachment_runtime_not_reviewed",
+      "requiredBefore": "attachment_enabled",
+      "state": "blocked",
+      "summary": "Attachment ingestion requires separate local parser, redaction, and storage review."
+    },
+    {
+      "reasonId": "file_picker_boundary_absent",
+      "requiredBefore": "open_file_picker_enabled",
+      "state": "planned",
+      "summary": "No reviewed file-picker or explicit user-selection boundary exists."
+    },
+    {
+      "reasonId": "metadata_read_boundary_absent",
+      "requiredBefore": "read_file_metadata_enabled",
+      "state": "planned",
+      "summary": "No reviewed file metadata read boundary exists."
+    },
+    {
+      "reasonId": "file_content_read_boundary_absent",
+      "requiredBefore": "read_file_content_enabled",
+      "state": "planned",
+      "summary": "No reviewed file content read, parser, size-limit, or redaction boundary exists."
+    },
+    {
+      "reasonId": "import_export_boundary_absent",
+      "requiredBefore": "import_attachment_enabled",
+      "state": "not_configured",
+      "summary": "No import, copy, export, or attachment manifest boundary is configured."
+    },
+    {
+      "reasonId": "attachment_persistence_boundary_absent",
+      "requiredBefore": "persist_attachment_enabled",
+      "state": "requires_evidence",
+      "summary": "Attachment persistence needs explicit local store, retention, deletion, and rollback policy."
+    },
+    {
+      "reasonId": "local_only_upload_block",
+      "requiredBefore": "upload_attachment_enabled",
+      "state": "disabled",
+      "summary": "The standalone chat surface keeps upload and cloud/provider attachment handoff disabled."
+    },
+    {
+      "reasonId": "clipboard_boundary_absent",
+      "requiredBefore": "clipboard_attachment_enabled",
+      "state": "not_configured",
+      "summary": "No clipboard-read boundary exists for attachment payloads."
+    }
+  ],
+  "chatActionBarRef": "chat_action_bar_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatLocalOnlyPolicyRef": "chat_local_only_policy_gemma3n_e4b_kv260_placeholder",
+  "chatShortcutMapRef": "chat_shortcut_map_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "filePickerState": "disabled",
+  "fileReadState": "blocked",
+  "fixtureVersion": "chat-attachment-policy.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer attach controls remain disabled and do not read files."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_action_bar",
+      "schemaVersion": "pccx.chatActionBar.v0",
+      "state": "disabled",
+      "summary": "Action-bar attach control remains disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_shortcut_map",
+      "schemaVersion": "pccx.chatShortcutMap.v0",
+      "state": "planned",
+      "summary": "Shortcut-map attach binding remains disabled and dispatch-free."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "available_as_data",
+      "summary": "Local-only policy keeps cloud/provider fallback disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript export and persistence remain disabled."
+    }
+  ],
+  "importState": "disabled",
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_attachment_policy_boundary_2026-05-04",
+  "limitations": [
+    "Data-only chat attachment-policy fixture; no real attachment input boundary is configured or read.",
+    "Attachment controls remain disabled or blocked; no file picker opens and no file name, path, metadata, bytes, preview, transcript, prompt, response, model path, runtime log, private path, secret, or token content is included.",
+    "No local file, directory, clipboard payload, generated artifact, transcript export, or attachment manifest is read, imported, uploaded, copied, parsed, indexed, persisted, deleted, or written.",
+    "No model load, runtime execution, provider call, network call, pccx-lab invocation, systemverilog-ide invocation, or KV260 hardware access is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model, parser, file-input, or storage implementation."
+  ],
+  "persistenceState": "disabled",
+  "previewState": "disabled",
+  "privacyState": "summary_only",
+  "safetyFlags": {
+    "artifactReads": false,
+    "artifactWrites": false,
+    "attachmentListIncluded": false,
+    "attachmentMetadataOnly": true,
+    "attachmentPersistence": false,
+    "attachmentPolicyDisplayOnly": true,
+    "attachmentReads": false,
+    "attachmentsEnabled": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "directoryScan": false,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileBytesIncluded": false,
+    "fileContentRead": false,
+    "fileImport": false,
+    "fileMetadataRead": false,
+    "fileNameIncluded": false,
+    "filePathIncluded": false,
+    "filePickerOpened": false,
+    "filePreview": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "readsTranscript": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "sendAttempted": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptExport": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatAttachmentPolicy.v0",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "uploadState": "disabled"
+}
