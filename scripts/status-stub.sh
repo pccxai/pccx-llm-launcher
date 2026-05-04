@@ -19,6 +19,9 @@
 # Chat readiness checks and recovery actions (explicit opt-in, read-only local data):
 #   --include-chat-readiness
 #
+# Chat composer controls and validation state (explicit opt-in, read-only local data):
+#   --include-chat-composer
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -39,6 +42,101 @@ INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_READINESS="0"
+INCLUDE_CHAT_COMPOSER="0"
+
+print_chat_composer_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_COMPOSER_STUB="$ROOT_DIR/scripts/chat-composer-stub.sh"
+
+    if [ ! -f "$CHAT_COMPOSER_STUB" ]; then
+        ERROR "chat composer stub not found: $CHAT_COMPOSER_STUB"
+        return 1
+    fi
+
+    if ! CHAT_COMPOSER_JSON="$(bash "$CHAT_COMPOSER_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat composer stub failed"
+        printf '%s\n' "$CHAT_COMPOSER_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_COMPOSER_SUMMARY="$(
+        printf '%s\n' "$CHAT_COMPOSER_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+controls = " ".join(
+    "{}={}".format(control["controlId"], control["state"])
+    for control in data["composerControls"]
+)
+rules = " ".join(
+    "{}={}".format(rule["ruleId"], rule["state"])
+    for rule in data["validationRules"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-composer-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/provider/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  composer   : {}".format(data["composerState"]))
+print("[INFO]  input      : {}".format(data["inputBufferState"]))
+print("[INFO]  send       : {}".format(data["sendControlState"]))
+print("[INFO]  attachment : {}".format(data["attachmentState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print("[INFO]  validation : {}".format(data["validationState"]))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  rules      : {}".format(rules))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "composerDisplayOnly={} writesArtifacts={} readsArtifacts={} "
+    "attachmentReads={} fileUpload={} clipboardRead={} clipboardWrite={} "
+    "promptContentIncluded={} promptEchoed={} promptPersistence={} "
+    "responseContentIncluded={} modelLoadAttempted={} modelLoaded={} "
+    "modelExecution={} runtimeExecution={} kv260Access={} networkCalls={} "
+    "providerCalls={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["composerDisplayOnly"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["attachmentReads"]),
+        b(flags["fileUpload"]),
+        b(flags["clipboardRead"]),
+        b(flags["clipboardWrite"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["promptEchoed"]),
+        b(flags["promptPersistence"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat composer JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat composer"
+    printf '%s\n' "$CHAT_COMPOSER_SUMMARY"
+}
 
 print_chat_readiness_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -496,6 +594,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_READINESS="1"
             shift
             ;;
+        --include-chat-composer)
+            INCLUDE_CHAT_COMPOSER="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -511,8 +613,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, and --include-chat-readiness are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-model-status, --include-chat-readiness, and --include-chat-composer are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -530,7 +632,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
+    NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_CHAT_COMPOSER" = "1" ]; then
+        if ! print_chat_composer_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ]; then
         if ! print_chat_model_status_summary; then
