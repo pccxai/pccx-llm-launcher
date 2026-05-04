@@ -10,6 +10,7 @@ The implementation lives in:
 
 - `contracts/chat_session_contract.py`
 - `contracts/chat_model_status_contract.py`
+- `contracts/chat_model_selection_policy_contract.py`
 - `contracts/chat_model_load_request_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_surface_layout_contract.py`
@@ -30,6 +31,7 @@ The implementation lives in:
 - `contracts/chat_shortcut_map_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-model-selection-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json`
@@ -50,6 +52,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
+- `scripts/chat-model-selection-policy-stub.sh`
 - `scripts/chat-model-load-request-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-layout-stub.sh`
@@ -71,6 +74,7 @@ The implementation lives in:
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
+- `scripts/tests/chat_model_selection_policy_contract_test.py`
 - `scripts/tests/chat_model_load_request_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_layout_contract_test.py`
@@ -91,6 +95,7 @@ The implementation lives in:
 - `scripts/tests/chat_shortcut_map_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
+- `scripts/tests/status-chat-model-selection-policy.sh`
 - `scripts/tests/status-chat-model-load-request.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
 - `scripts/tests/status-chat-local-only-policy.sh`
@@ -116,6 +121,9 @@ The chat/session contract records:
 
 - target model and KV260-class target identity
 - chat surface, model-load, input, send, and session states
+- a disabled model-selection policy boundary for static target option,
+  model catalog, picker, asset discovery, provider fallback, persistence,
+  and load-request gates
 - a disabled model-load request boundary for descriptor selection, asset
   paths, checksums, runtime preflight, load, warmup, and unload gates
 - disabled session controls for new session, model status, send,
@@ -170,6 +178,23 @@ bash scripts/status-stub.sh --include-chat-model-status
 Model loading stays blocked and disabled. The model-status fixture does
 not read model paths, load weights, start runtimes, generate responses,
 touch hardware, call providers, invoke pccx-lab, or write artifacts.
+
+The chat model-selection policy fixture records the disabled local picker
+and model catalog boundary for future chat model selection:
+
+```bash
+bash scripts/chat-model-selection-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-model-selection-policy
+```
+
+It reports one static placeholder option plus disabled catalog, picker,
+asset discovery, provider fallback, selection persistence, and
+load-request gates. The fixture does not read configuration files,
+environment values, model catalogs, model paths, asset paths, model
+weights, tokenizer files, checksum manifests, private paths, prompts,
+responses, transcripts, runtime logs, or artifacts, and it does not
+accept or persist model selections, call providers, validate assets,
+load models, start runtimes, or write model-selection data.
 
 The chat model-load request fixture records the disabled local load
 boundary for future chat model loading:
@@ -669,6 +694,10 @@ runtime execution, provider state, local stores, and message content:
 The standalone chat surface depends on the existing launcher model
 descriptor, readiness, and device/session status contracts. The
 model-status contract adds reviewable display rows for model-load state.
+The model-selection policy contract adds a disabled picker/catalog shape
+without configuration reads, model catalog reads, model path reads, asset
+path reads, provider fallback, selection persistence, runtime execution,
+model loading, hardware access, or artifact access.
 The lifecycle contract adds a reviewable session-management shape, but
 these contracts do not add runtime execution, model loading, provider
 calls, persistence, target access, artifact reads, or artifact writes.
@@ -756,6 +785,10 @@ This chat/session surface does not add:
   runtime traces, raw logs, or audit export behavior
 - error recovery execution, provider/config reads, model asset reads, or
   taxonomy persistence
+- model-selection execution, model catalog reads, dynamic catalog
+  discovery, model option reads from configuration, user selection
+  acceptance, selection persistence, provider fallback, model path reads,
+  asset path reads, model asset reads, or load-request handoff execution
 - model-load request execution, configuration reads, environment reads,
   model path reads, asset path reads, weight reads, tokenizer reads,
   checksum manifest reads, runtime preflight, model loading, model
