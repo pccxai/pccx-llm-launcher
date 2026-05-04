@@ -14,18 +14,21 @@ The implementation lives in:
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
 - `contracts/chat_send_result_contract.py`
+- `contracts/chat_transcript_policy_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
 - `scripts/chat-send-result-stub.sh`
+- `scripts/chat-transcript-policy-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -33,11 +36,13 @@ The implementation lives in:
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
 - `scripts/tests/chat_send_result_contract_test.py`
+- `scripts/tests/chat_transcript_policy_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
 - `scripts/tests/status-chat-send-result.sh`
+- `scripts/tests/status-chat-transcript-policy.sh`
 
 ## What Is Implemented
 
@@ -128,6 +133,20 @@ accepted, captured, echoed, stored, or persisted; no assistant response
 is generated; no model/runtime handoff is attempted; and no transcript
 or artifact is written.
 
+The chat transcript policy fixture records the retention, export,
+storage, and privacy policy shape for future transcript UI surfaces:
+
+```bash
+bash scripts/chat-transcript-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-transcript-policy
+```
+
+It keeps transcript handling disabled local data: no prompt, response,
+message, transcript, or summary content is read, generated, exported,
+stored, or persisted; no reviewed local store or retention period is
+configured; and export remains disabled until an explicit user-action
+and redaction boundary exists.
+
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
 
@@ -208,6 +227,23 @@ content and assistant output:
 - `not_loaded`: model assets are not loaded
 - `not_started`: no local chat runtime has started
 
+The transcript policy states keep retention and export rules separate
+from message content:
+
+- `available_as_data`: checked policy data is available without
+  executing anything
+- `blocked`: a required storage, redaction, or user-action boundary is
+  missing
+- `disabled`: transcript persistence or export is intentionally
+  unavailable
+- `empty_not_captured`: no prompt or response body is captured or stored
+- `inactive`: no launcher-owned transcript exists
+- `not_configured`: no local store, retention period, or deletion rule
+  exists
+- `not_generated`: no assistant response or transcript summary exists
+- `planned`: described for a future reviewed boundary
+- `summary_only`: future summaries must stay separate from raw content
+
 ## Coordination Boundary
 
 The standalone chat surface depends on the existing launcher model
@@ -225,6 +261,10 @@ reads, clipboard access, or send enablement.
 The send-result contract adds a reviewable blocked-result display shape
 without prompt acceptance, prompt echo, response generation, runtime
 execution, model loading, persistence, or writes.
+The transcript policy contract adds a reviewable retention/export
+policy shape without message content, transcript persistence, summary
+generation, artifact reads, artifact writes, runtime execution, model
+loading, provider calls, or target access.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -240,6 +280,8 @@ This chat/session surface does not add:
   clipboard access
 - send acceptance, prompt echo, response generation, or send-result
   persistence
+- transcript retention, transcript export, local transcript storage,
+  transcript summaries, or transcript message content
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes
