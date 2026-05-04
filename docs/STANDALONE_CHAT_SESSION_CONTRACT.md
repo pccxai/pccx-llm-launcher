@@ -20,6 +20,7 @@ The implementation lives in:
 - `contracts/chat_send_result_contract.py`
 - `contracts/chat_transcript_policy_contract.py`
 - `contracts/chat_audit_event_contract.py`
+- `contracts/chat_error_taxonomy_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
@@ -32,6 +33,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-audit-event.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-error-taxonomy.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
@@ -44,6 +46,7 @@ The implementation lives in:
 - `scripts/chat-send-result-stub.sh`
 - `scripts/chat-transcript-policy-stub.sh`
 - `scripts/chat-audit-event-stub.sh`
+- `scripts/chat-error-taxonomy-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -57,6 +60,7 @@ The implementation lives in:
 - `scripts/tests/chat_send_result_contract_test.py`
 - `scripts/tests/chat_transcript_policy_contract_test.py`
 - `scripts/tests/chat_audit_event_contract_test.py`
+- `scripts/tests/chat_error_taxonomy_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
@@ -68,6 +72,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-send-result.sh`
 - `scripts/tests/status-chat-transcript-policy.sh`
 - `scripts/tests/status-chat-audit-event.sh`
+- `scripts/tests/status-chat-error-taxonomy.sh`
 
 ## What Is Implemented
 
@@ -91,6 +96,7 @@ The chat/session contract records:
 - blocked reasons that explain what must exist before send controls can
   be enabled
 - safety flags for the read-only boundary
+- grouped chat error taxonomy metadata for future banners and status rows
 
 The checked fixture is deterministic JSON. The stub command prints that
 JSON for the supported model and target pair:
@@ -257,6 +263,21 @@ runtime trace, raw log, model path, private path, or artifact content is
 read, logged, exported, stored, or persisted. Audit logging and local
 audit history remain disabled and not configured.
 
+The chat error taxonomy fixture records grouped blocked error metadata
+for future chat banners, status rows, and recovery affordances:
+
+```bash
+bash scripts/chat-error-taxonomy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-error-taxonomy
+```
+
+It summarizes readiness blockers, model/runtime blockers, session and
+policy blockers, and local-only/provider policy metadata as deterministic
+data. It does not read prompts, responses, transcripts, configuration
+files, provider settings, environment values, secrets, tokens, model
+asset paths, session-store paths, logs, or artifacts. Recovery actions
+remain disabled and side-effect-free.
+
 The terminal preview command renders the same checked contract as a
 read-only chat surface sketch:
 
@@ -413,6 +434,25 @@ message content, identity data, runtime traces, and persistence:
 - `target_selected`: planned target identity can be displayed as local
   data only
 
+The error-taxonomy states keep user-visible error grouping separate from
+runtime execution, provider state, local stores, and message content:
+
+- `available_as_data`: checked taxonomy data is available without
+  executing anything
+- `blocked`: a required readiness or execution boundary is missing
+- `disabled`: a referenced action remains intentionally unavailable
+- `external_not_configured`: user-provided model assets are not
+  configured
+- `inactive`: no runtime or target session exists
+- `not_configured`: no local session store or policy boundary exists
+- `not_loaded`: model assets are not loaded
+- `not_started`: no local chat runtime has started
+- `not_used`: provider paths are not part of core local chat
+- `planned`: described for a future reviewed boundary
+- `requires_evidence`: future enablement requires evidence first
+- `summary_only`: display data excludes raw content and private paths
+- `unavailable`: input content is not read or captured
+
 ## Coordination Boundary
 
 The standalone chat surface depends on the existing launcher model
@@ -445,6 +485,11 @@ without prompt capture, prompt echo, response content, transcript
 content, actor identifiers, runtime traces, audit persistence, artifact
 reads, artifact writes, runtime execution, model loading, provider
 calls, or target access.
+The error taxonomy contract adds a reviewable grouped error-display shape
+without prompt capture, response content, transcript content, provider
+configuration reads, model asset reads, session-store reads, artifact
+reads, artifact writes, runtime execution, model loading, provider calls,
+or target access.
 
 pccx-lab remains a separate CLI/core diagnostics and verification
 backend. systemverilog-ide may consume launcher data later as read-only
@@ -464,6 +509,8 @@ This chat/session surface does not add:
   transcript summaries, or transcript message content
 - audit logging, audit persistence, actor identifiers, event timestamps,
   runtime traces, raw logs, or audit export behavior
+- error recovery execution, provider/config reads, model asset reads, or
+  taxonomy persistence
 - session creation, restore, clear, close, or export behavior
 - readiness recovery execution
 - manifest, transcript, summary, or lifecycle artifact reads or writes

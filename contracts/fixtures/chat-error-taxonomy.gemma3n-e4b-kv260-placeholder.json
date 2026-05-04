@@ -1,0 +1,270 @@
+{
+  "actionRefs": [
+    {
+      "actionId": "review_chat_readiness",
+      "enabled": false,
+      "label": "review chat readiness",
+      "sideEffectPolicy": "read_only_data",
+      "sourceRef": "chat_readiness",
+      "state": "available_as_data"
+    },
+    {
+      "actionId": "wait_for_asset_boundary",
+      "enabled": false,
+      "label": "wait for asset boundary",
+      "sideEffectPolicy": "no_model_asset_read",
+      "sourceRef": "chat_model_status",
+      "state": "requires_evidence"
+    },
+    {
+      "actionId": "wait_for_runtime_boundary",
+      "enabled": false,
+      "label": "wait for runtime boundary",
+      "sideEffectPolicy": "no_runtime_execution",
+      "sourceRef": "runtime_readiness",
+      "state": "requires_evidence"
+    },
+    {
+      "actionId": "review_session_policy",
+      "enabled": false,
+      "label": "review session policy",
+      "sideEffectPolicy": "no_artifact_read_no_write",
+      "sourceRef": "chat_transcript_policy",
+      "state": "planned"
+    },
+    {
+      "actionId": "review_local_only_policy",
+      "enabled": false,
+      "label": "review local-only policy",
+      "sideEffectPolicy": "no_provider_or_network_call",
+      "sourceRef": "chat_local_only_policy",
+      "state": "available_as_data"
+    }
+  ],
+  "chatAuditEventRef": "chat_audit_event_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatLocalOnlyPolicyRef": "chat_local_only_policy_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "chatSendResultRef": "chat_send_result_gemma3n_e4b_kv260_placeholder",
+  "displayState": "summary_only",
+  "errorGroups": [
+    {
+      "contentPolicy": "no_prompt_response_transcript_or_log_content",
+      "displayPolicy": "show concise blocked status rows only",
+      "groupId": "readiness_blockers",
+      "label": "readiness blockers",
+      "severity": "blocked",
+      "sourceRefs": [
+        "chat_readiness",
+        "runtime_readiness",
+        "device_session_status"
+      ],
+      "state": "blocked"
+    },
+    {
+      "contentPolicy": "no_model_path_weight_or_runtime_log_content",
+      "displayPolicy": "show evidence requirements without model paths",
+      "groupId": "model_and_runtime_blockers",
+      "label": "model and runtime blockers",
+      "severity": "blocked",
+      "sourceRefs": [
+        "chat_model_status",
+        "runtime_readiness"
+      ],
+      "state": "requires_evidence"
+    },
+    {
+      "contentPolicy": "no_session_store_title_summary_or_path_content",
+      "displayPolicy": "show policy summaries without reading stores",
+      "groupId": "session_and_policy_blockers",
+      "label": "session and policy blockers",
+      "severity": "blocked",
+      "sourceRefs": [
+        "chat_session_index",
+        "chat_transcript_policy",
+        "chat_local_only_policy"
+      ],
+      "state": "not_configured"
+    }
+  ],
+  "errorItems": [
+    {
+      "contentPolicy": "no_prompt_response_or_transcript_content",
+      "diagnosticHint": "Review the chat readiness and blocked send-result fixtures.",
+      "groupId": "readiness_blockers",
+      "itemId": "send_disabled_by_readiness",
+      "primaryActionRef": "review_chat_readiness",
+      "severity": "blocked",
+      "sourceErrorRefs": [
+        "runtime_not_ready",
+        "readiness_blocked"
+      ],
+      "state": "blocked",
+      "userMessage": "Send stays disabled until local chat readiness evidence exists."
+    },
+    {
+      "contentPolicy": "no_model_paths_or_weight_names",
+      "diagnosticHint": "A future reviewed asset input boundary must redact local paths.",
+      "groupId": "model_and_runtime_blockers",
+      "itemId": "model_assets_not_configured",
+      "primaryActionRef": "wait_for_asset_boundary",
+      "severity": "blocked",
+      "sourceErrorRefs": [
+        "model_assets_missing",
+        "model_not_loaded"
+      ],
+      "state": "external_not_configured",
+      "userMessage": "Model assets are not configured by this fixture."
+    },
+    {
+      "contentPolicy": "no_generated_response_content",
+      "diagnosticHint": "Runtime execution requires a separate reviewed implementation boundary.",
+      "groupId": "model_and_runtime_blockers",
+      "itemId": "runtime_not_started",
+      "primaryActionRef": "wait_for_runtime_boundary",
+      "severity": "blocked",
+      "sourceErrorRefs": [
+        "chat_runtime_absent",
+        "runtime_not_started"
+      ],
+      "state": "not_started",
+      "userMessage": "No local chat runtime is available for responses."
+    },
+    {
+      "contentPolicy": "no_manifest_transcript_summary_or_path_content",
+      "diagnosticHint": "A future local session store must define retention and redaction rules.",
+      "groupId": "session_and_policy_blockers",
+      "itemId": "session_store_not_configured",
+      "primaryActionRef": "review_session_policy",
+      "severity": "blocked",
+      "sourceErrorRefs": [
+        "session_store_absent",
+        "session_store_not_configured"
+      ],
+      "state": "not_configured",
+      "userMessage": "Session restore, transcript retention, and export are unavailable."
+    },
+    {
+      "contentPolicy": "no_provider_configuration_or_prompt_content",
+      "diagnosticHint": "Local-only policy remains display data and does not read provider configuration.",
+      "groupId": "session_and_policy_blockers",
+      "itemId": "provider_paths_not_used",
+      "primaryActionRef": "review_local_only_policy",
+      "severity": "info",
+      "sourceErrorRefs": [
+        "provider_mode",
+        "provider_and_network_paths_blocked"
+      ],
+      "state": "not_used",
+      "userMessage": "External provider paths are not used for core local chat."
+    }
+  ],
+  "fixtureVersion": "chat-error-taxonomy.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness checks and recovery actions remain local data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_send_result",
+      "schemaVersion": "pccx.chatSendResult.v0",
+      "state": "blocked",
+      "summary": "Send result stays blocked with no accepted input."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "available_as_data",
+      "summary": "Model status display is consumed without model paths."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "blocked",
+      "summary": "Transcript retention and export remain disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "available_as_data",
+      "summary": "Local-only policy is consumed as summary data only."
+    }
+  ],
+  "inputContentState": "unavailable",
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_error_taxonomy_boundary_2026-05-04",
+  "limitations": [
+    "error taxonomy is deterministic fixture data only",
+    "error groups summarize blocked local chat states without reading prompts, responses, transcripts, logs, paths, or artifacts",
+    "model assets, provider configuration, environment secrets, tokens, and network paths are not read",
+    "no recovery action, runtime launch, model load, provider call, hardware probe, preference write, or artifact read/write is performed",
+    "no compatibility promise is made"
+  ],
+  "runtimeState": "not_started",
+  "safetyFlags": {
+    "cloudCalls": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelPathIncluded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "rawLogIncluded": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "secretsRead": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "sessionTitleIncluded": false,
+    "sshExecution": false,
+    "summaryIncluded": false,
+    "taxonomyDisplayOnly": true,
+    "telemetry": false,
+    "tokensRead": false,
+    "transcriptContentIncluded": false,
+    "transcriptPersistence": false,
+    "upload": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatErrorTaxonomy.v0",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "taxonomyId": "chat_error_taxonomy_gemma3n_e4b_kv260_placeholder",
+  "taxonomyState": "available_as_data"
+}
