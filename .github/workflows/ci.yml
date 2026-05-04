@@ -124,6 +124,7 @@ jobs:
                    scripts/chat-send-result-stub.sh \
                    scripts/chat-transcript-policy-stub.sh \
                    scripts/chat-audit-event-stub.sh \
+                   scripts/chat-error-taxonomy-stub.sh \
                    scripts/chat-surface-preview.sh \
                    scripts/chat-stub.sh; do
             [ -f "$f" ] && chmod +x "$f" || true
@@ -208,6 +209,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-audit-event
       - name: run scripts/chat-audit-event-stub.sh
         run: ./scripts/chat-audit-event-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat error taxonomy
+        run: ./scripts/status-stub.sh --include-chat-error-taxonomy
+      - name: run scripts/chat-error-taxonomy-stub.sh
+        run: ./scripts/chat-error-taxonomy-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-surface-preview.sh
         run: ./scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
@@ -254,6 +259,8 @@ jobs:
         run: python3 scripts/tests/chat_transcript_policy_contract_test.py
       - name: run chat audit-event contract tests
         run: python3 scripts/tests/chat_audit_event_contract_test.py
+      - name: run chat error-taxonomy contract tests
+        run: python3 scripts/tests/chat_error_taxonomy_contract_test.py
       - name: run chat surface preview tests
         run: python3 scripts/tests/chat_surface_preview_test.py
 
@@ -278,6 +285,7 @@ jobs:
           chmod +x scripts/chat-send-result-stub.sh
           chmod +x scripts/chat-transcript-policy-stub.sh
           chmod +x scripts/chat-audit-event-stub.sh
+          chmod +x scripts/chat-error-taxonomy-stub.sh
           chmod +x scripts/launch-stub.sh
           chmod +x scripts/tests/status-backend.sh
           chmod +x scripts/tests/status-device-session.sh
@@ -293,6 +301,7 @@ jobs:
           chmod +x scripts/tests/status-chat-send-result.sh
           chmod +x scripts/tests/status-chat-transcript-policy.sh
           chmod +x scripts/tests/status-chat-audit-event.sh
+          chmod +x scripts/tests/status-chat-error-taxonomy.sh
       - name: shellcheck status-stub and test script
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q shellcheck
@@ -311,6 +320,7 @@ jobs:
           shellcheck scripts/tests/status-chat-send-result.sh
           shellcheck scripts/tests/status-chat-transcript-policy.sh
           shellcheck scripts/tests/status-chat-audit-event.sh
+          shellcheck scripts/tests/status-chat-error-taxonomy.sh
       - name: run status-backend tests
         run: bash scripts/tests/status-backend.sh scripts/status-stub.sh
       - name: run status-device-session tests
@@ -339,3 +349,5 @@ jobs:
         run: bash scripts/tests/status-chat-transcript-policy.sh scripts/status-stub.sh
       - name: run status-chat-audit-event tests
         run: bash scripts/tests/status-chat-audit-event.sh scripts/status-stub.sh
+      - name: run status-chat-error-taxonomy tests
+        run: bash scripts/tests/status-chat-error-taxonomy.sh scripts/status-stub.sh
