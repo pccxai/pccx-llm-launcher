@@ -12,6 +12,7 @@ The implementation lives in:
 - `contracts/chat_model_status_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_surface_layout_contract.py`
+- `contracts/chat_local_only_policy_contract.py`
 - `contracts/chat_session_index_contract.py`
 - `contracts/chat_readiness_contract.py`
 - `contracts/chat_composer_contract.py`
@@ -22,6 +23,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json`
@@ -32,6 +34,7 @@ The implementation lives in:
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-layout-stub.sh`
+- `scripts/chat-local-only-policy-stub.sh`
 - `scripts/chat-session-index-stub.sh`
 - `scripts/chat-readiness-stub.sh`
 - `scripts/chat-composer-stub.sh`
@@ -43,6 +46,7 @@ The implementation lives in:
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_layout_contract_test.py`
+- `scripts/tests/chat_local_only_policy_contract_test.py`
 - `scripts/tests/chat_session_index_contract_test.py`
 - `scripts/tests/chat_readiness_contract_test.py`
 - `scripts/tests/chat_composer_contract_test.py`
@@ -52,6 +56,7 @@ The implementation lives in:
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
+- `scripts/tests/status-chat-local-only-policy.sh`
 - `scripts/tests/status-chat-session-index.sh`
 - `scripts/tests/status-chat-readiness.sh`
 - `scripts/tests/status-chat-composer.sh`
@@ -69,6 +74,8 @@ The chat/session contract records:
   clear, and export actions
 - planned shell regions and navigation items for the blocked chat
   surface layout
+- local-only policy metadata that keeps cloud/provider/network fallback
+  paths disabled or not used
 - an empty session index/list surface with disabled refresh, selection,
   restore, rename, and delete controls
 - a message envelope vocabulary without prompt or response content
@@ -123,6 +130,21 @@ and audit footer. The fixture does not implement an app shell, read
 prompt/response/transcript/session-store content, focus the composer,
 start runtime code, load a model, touch hardware, call providers,
 invoke pccx-lab, or write artifacts.
+
+The chat local-only policy fixture records the cloud/provider/network
+dependency boundary for the planned standalone chat UI:
+
+```bash
+bash scripts/chat-local-only-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-local-only-policy
+```
+
+It reports local-only mode, provider configuration, network access, and
+cloud fallback as deterministic metadata. Provider configuration,
+environment secrets, tokens, network paths, cloud fallback, model
+execution, runtime startup, hardware access, pccx-lab invocation,
+artifact reads/writes, telemetry, upload, prompt capture, and response
+generation are not used by this boundary.
 
 The chat session index fixture records the list/sidebar boundary for
 future local chat sessions:
@@ -240,6 +262,10 @@ The chat/session states are deliberately narrow:
 - `not_loaded`: no model assets are loaded
 - `not_started`: no transcript or log stream exists
 - `not_used`: no external provider state is used
+- `no_external_dependency`: a planned local-only path records no cloud
+  dependency
+- `enforced_as_metadata`: policy state is present as fixture metadata,
+  not as runtime enforcement code
 - `unavailable`: output is not available
 - `available_as_data`: local fixture shape is available as data only
 - `empty_not_captured`: no prompt draft is captured or stored
