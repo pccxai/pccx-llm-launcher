@@ -1,0 +1,256 @@
+{
+  "assetDiscoveryState": "blocked",
+  "assetPathState": "not_configured",
+  "blockedReasons": [
+    {
+      "reasonId": "dynamic_catalog_boundary_absent",
+      "requiredBefore": "dynamic_catalog_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed local model catalog source or redaction boundary exists."
+    },
+    {
+      "reasonId": "selection_executor_absent",
+      "requiredBefore": "model_picker_enabled",
+      "state": "disabled",
+      "summary": "No reviewed picker executor or selection persistence boundary exists."
+    },
+    {
+      "reasonId": "model_asset_discovery_blocked",
+      "requiredBefore": "asset_discovery_enabled",
+      "state": "blocked",
+      "summary": "Model asset discovery is blocked until asset path and manifest handling are reviewed."
+    },
+    {
+      "reasonId": "provider_fallback_disabled",
+      "requiredBefore": "fallback_policy_reviewed",
+      "state": "disabled",
+      "summary": "Provider and cloud fallback are disabled by the local-only policy."
+    },
+    {
+      "reasonId": "load_request_blocked",
+      "requiredBefore": "load_request_enabled",
+      "state": "blocked",
+      "summary": "The downstream model-load request boundary remains blocked and data-only."
+    },
+    {
+      "reasonId": "runtime_evidence_absent",
+      "requiredBefore": "runtime_dependent_selection_enabled",
+      "state": "requires_evidence",
+      "summary": "Runtime readiness evidence is absent."
+    },
+    {
+      "reasonId": "hardware_evidence_absent",
+      "requiredBefore": "hardware_target_selection_enabled",
+      "state": "requires_evidence",
+      "summary": "No KV260 runtime or model execution evidence is available in this repository."
+    }
+  ],
+  "catalogState": "static_placeholder",
+  "chatLocalOnlyPolicyRef": "chat_local_only_policy_gemma3n_e4b_kv260_placeholder",
+  "chatModelLoadRequestRef": "chat_model_load_request_gemma3n_e4b_kv260_placeholder",
+  "chatModelStatusRef": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "descriptorState": "available_as_data",
+  "fixtureVersion": "chat-model-selection-policy.gemma3n-e4b-kv260.2026-05-05",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "blocked",
+      "summary": "Model status display keeps model loading blocked and disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_load_request",
+      "schemaVersion": "pccx.chatModelLoadRequest.v0",
+      "state": "blocked",
+      "summary": "Model-load request remains disabled and does not read assets or start runtime."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "blocked",
+      "summary": "Local-only policy keeps provider, cloud, and fallback paths blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Chat readiness keeps send and recovery actions blocked."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_selection_policy_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat model-selection policy fixture; the selected target is static placeholder metadata.",
+    "No model catalog, configuration file, environment value, model path, asset path, model weight, tokenizer, checksum manifest, prompt, response, transcript, runtime log, private path, secret, or token is read.",
+    "No user model selection is accepted, persisted, or handed to a runtime.",
+    "No model asset discovery, provider fallback, network call, runtime preflight, model load, model execution, telemetry, upload, or artifact write is performed.",
+    "No KV260 hardware access, pccx-lab invocation, or systemverilog-ide invocation is performed.",
+    "This is not a release, tag, compatibility commitment, marketplace flow, provider integration, storage layer, runtime, model-loader, or hardware implementation."
+  ],
+  "loadRequestState": "blocked",
+  "modelOptions": [
+    {
+      "assetPolicy": "placeholder_descriptor_only_no_asset_path",
+      "contentPolicy": "target label, family, and descriptor reference only",
+      "descriptorRef": "model_runtime_descriptor_gemma3n_e4b_kv260_placeholder",
+      "enabled": false,
+      "label": "Gemma 3N E4B on KV260 target",
+      "modelFamily": "gemma3n",
+      "optionId": "gemma3n_e4b_kv260_placeholder",
+      "runtimePolicy": "not_loaded_no_runtime_started",
+      "selected": true,
+      "state": "target_selected",
+      "targetDevice": "kv260"
+    }
+  ],
+  "pickerState": "disabled",
+  "privacyState": "summary_only",
+  "providerFallbackState": "disabled",
+  "safetyFlags": {
+    "automaticUpload": false,
+    "checksumManifestRead": false,
+    "checksumValuesIncluded": false,
+    "cloudCalls": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "configWrite": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "dynamicCatalogConfigured": false,
+    "dynamicCatalogDiscovery": false,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "hardwareAccess": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelAssetPathRead": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelCatalogRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelOptionsFromConfig": false,
+    "modelSelectionAcceptedFromUser": false,
+    "modelSelectionPersisted": false,
+    "modelWeightPathsIncluded": false,
+    "modelWeightRead": false,
+    "networkCalls": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "runtimePreflightExecuted": false,
+    "runtimeStarted": false,
+    "secretsIncluded": false,
+    "selectionPolicyDisplayOnly": true,
+    "sessionPersistence": false,
+    "staticOptionOnly": true,
+    "telemetry": false,
+    "tokenizerRead": false,
+    "tokensIncluded": false,
+    "transcriptContentIncluded": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatModelSelectionPolicy.v0",
+  "selectedModelState": "target_selected",
+  "selectionControls": [
+    {
+      "blockedReasonRef": "selection_executor_absent",
+      "controlId": "review_static_target",
+      "enabled": false,
+      "label": "review static target",
+      "launcherAction": "Render static descriptor metadata from checked fixtures only.",
+      "sideEffectPolicy": "local_render_only",
+      "state": "available_as_data",
+      "userAction": "Review the checked target model label in the future chat UI."
+    },
+    {
+      "blockedReasonRef": "dynamic_catalog_boundary_absent",
+      "controlId": "open_model_catalog",
+      "enabled": false,
+      "label": "open model catalog",
+      "launcherAction": "Keep catalog discovery disabled and do not read files, paths, config, or manifests.",
+      "sideEffectPolicy": "no_catalog_or_config_read",
+      "state": "blocked",
+      "userAction": "Open a local catalog only after catalog source and redaction rules are reviewed."
+    },
+    {
+      "blockedReasonRef": "selection_executor_absent",
+      "controlId": "select_model_option",
+      "enabled": false,
+      "label": "select model option",
+      "launcherAction": "Keep selection disabled and do not persist choices.",
+      "sideEffectPolicy": "no_selection_persistence",
+      "state": "disabled",
+      "userAction": "Select a model only after the reviewed picker boundary exists."
+    },
+    {
+      "blockedReasonRef": "model_asset_discovery_blocked",
+      "controlId": "discover_local_assets",
+      "enabled": false,
+      "label": "discover local assets",
+      "launcherAction": "Do not scan directories, read model paths, or inspect model files.",
+      "sideEffectPolicy": "no_model_asset_read",
+      "state": "blocked",
+      "userAction": "Discover assets only after a reviewed local asset boundary exists."
+    },
+    {
+      "blockedReasonRef": "provider_fallback_disabled",
+      "controlId": "configure_provider_fallback",
+      "enabled": false,
+      "label": "configure provider fallback",
+      "launcherAction": "Keep provider and cloud fallback disabled.",
+      "sideEffectPolicy": "no_provider_or_network_call",
+      "state": "disabled",
+      "userAction": "Provider fallback is out of scope for core local chat behavior."
+    },
+    {
+      "blockedReasonRef": "load_request_blocked",
+      "controlId": "handoff_to_load_request",
+      "enabled": false,
+      "label": "handoff to load request",
+      "launcherAction": "Render blocked handoff metadata only.",
+      "sideEffectPolicy": "no_model_load",
+      "state": "blocked",
+      "userAction": "Create a load request only after model assets and runtime evidence are reviewed."
+    }
+  ],
+  "selectionPolicy": {
+    "assetDiscoveryEnabled": false,
+    "contentPolicy": "model selection metadata only; no model path, asset path, catalog body, file name, checksum value, prompt text, response text, transcript text, runtime log, or private path is included",
+    "dynamicCatalogConfigured": false,
+    "loadRequestEnabled": false,
+    "localCatalogRead": false,
+    "mode": "disabled_until_reviewed_model_catalog_and_selection_boundary_exists",
+    "providerFallbackEnabled": false,
+    "selectionEnabled": false,
+    "selectionPersistenceEnabled": false,
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no config, environment, model catalog, model path, asset path, weight file, tokenizer file, prompt, response, transcript, artifact, or runtime log is read",
+    "state": "blocked",
+    "staticOptionCount": 1
+  },
+  "selectionPolicyId": "chat_model_selection_policy_gemma3n_e4b_kv260_placeholder",
+  "selectionState": "blocked",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}

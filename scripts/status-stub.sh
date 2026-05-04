@@ -34,6 +34,9 @@
 # Chat model status display plan (explicit opt-in, read-only local data):
 #   --include-chat-model-status
 #
+# Chat model-selection policy boundary (explicit opt-in, read-only local data):
+#   --include-chat-model-selection-policy
+#
 # Chat model-load request boundary (explicit opt-in, read-only local data):
 #   --include-chat-model-load-request
 #
@@ -95,6 +98,7 @@ INCLUDE_CHAT_SESSION_INDEX="0"
 INCLUDE_CHAT_SESSION_STORE_POLICY="0"
 INCLUDE_CHAT_SESSION_TITLE_POLICY="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
+INCLUDE_CHAT_MODEL_SELECTION_POLICY="0"
 INCLUDE_CHAT_MODEL_LOAD_REQUEST="0"
 INCLUDE_CHAT_READINESS="0"
 INCLUDE_CHAT_COMPOSER="0"
@@ -2075,6 +2079,140 @@ print(
     printf '%s\n' "$CHAT_MODEL_STATUS_SUMMARY"
 }
 
+print_chat_model_selection_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_MODEL_SELECTION_POLICY_STUB="$ROOT_DIR/scripts/chat-model-selection-policy-stub.sh"
+
+    if [ ! -f "$CHAT_MODEL_SELECTION_POLICY_STUB" ]; then
+        ERROR "chat model-selection policy stub not found: $CHAT_MODEL_SELECTION_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_MODEL_SELECTION_POLICY_JSON="$(bash "$CHAT_MODEL_SELECTION_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat model-selection policy stub failed"
+        printf '%s\n' "$CHAT_MODEL_SELECTION_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_MODEL_SELECTION_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_MODEL_SELECTION_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["selectionPolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+options = " ".join(
+    "{}={}:{}:{}".format(
+        option["optionId"],
+        option["state"],
+        b(option["selected"]),
+        b(option["enabled"]),
+    )
+    for option in data["modelOptions"]
+)
+controls = " ".join(
+    "{}={}:{}".format(control["controlId"], control["state"], b(control["enabled"]))
+    for control in data["selectionControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-model-selection-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no catalog/config/model asset path/read/load/runtime/provider/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  selection  : {}".format(data["selectionState"]))
+print("[INFO]  catalog    : {}".format(data["catalogState"]))
+print("[INFO]  picker     : {}".format(data["pickerState"]))
+print("[INFO]  selected   : {}".format(data["selectedModelState"]))
+print("[INFO]  descriptor : {}".format(data["descriptorState"]))
+print("[INFO]  asset disc : {}".format(data["assetDiscoveryState"]))
+print("[INFO]  asset paths: {}".format(data["assetPathState"]))
+print("[INFO]  fallback   : {}".format(data["providerFallbackState"]))
+print("[INFO]  load req   : {}".format(data["loadRequestState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  model-selection : {} mode={} staticOptionCount={} "
+    "dynamicCatalogConfigured={} localCatalogRead={} "
+    "assetDiscoveryEnabled={} selectionEnabled={} "
+    "selectionPersistenceEnabled={} providerFallbackEnabled={} "
+    "loadRequestEnabled={}".format(
+        policy["state"],
+        policy["mode"],
+        policy["staticOptionCount"],
+        b(policy["dynamicCatalogConfigured"]),
+        b(policy["localCatalogRead"]),
+        b(policy["assetDiscoveryEnabled"]),
+        b(policy["selectionEnabled"]),
+        b(policy["selectionPersistenceEnabled"]),
+        b(policy["providerFallbackEnabled"]),
+        b(policy["loadRequestEnabled"]),
+    )
+)
+print("[INFO]  options    : {}".format(options))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "selectionPolicyDisplayOnly={} staticOptionOnly={} "
+    "dynamicCatalogConfigured={} modelCatalogRead={} "
+    "dynamicCatalogDiscovery={} modelSelectionPersisted={} "
+    "modelSelectionAcceptedFromUser={} modelOptionsFromConfig={} "
+    "modelAssetPathsIncluded={} modelAssetPathRead={} modelAssetRead={} "
+    "configRead={} environmentRead={} providerConfigRead={} "
+    "providerCalls={} cloudCalls={} networkCalls={} "
+    "modelLoadAttempted={} modelLoaded={} modelExecution={} "
+    "runtimeExecution={} kv260Access={} hardwareAccess={} "
+    "writesArtifacts={} readsArtifacts={} executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["selectionPolicyDisplayOnly"]),
+        b(flags["staticOptionOnly"]),
+        b(flags["dynamicCatalogConfigured"]),
+        b(flags["modelCatalogRead"]),
+        b(flags["dynamicCatalogDiscovery"]),
+        b(flags["modelSelectionPersisted"]),
+        b(flags["modelSelectionAcceptedFromUser"]),
+        b(flags["modelOptionsFromConfig"]),
+        b(flags["modelAssetPathsIncluded"]),
+        b(flags["modelAssetPathRead"]),
+        b(flags["modelAssetRead"]),
+        b(flags["configRead"]),
+        b(flags["environmentRead"]),
+        b(flags["providerConfigRead"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelLoaded"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat model-selection policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat model selection policy"
+    printf '%s\n' "$CHAT_MODEL_SELECTION_POLICY_SUMMARY"
+}
+
 print_chat_model_load_request_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
     ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
@@ -2517,6 +2655,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_MODEL_STATUS="1"
             shift
             ;;
+        --include-chat-model-selection-policy)
+            INCLUDE_CHAT_MODEL_SELECTION_POLICY="1"
+            shift
+            ;;
         --include-chat-model-load-request)
             INCLUDE_CHAT_MODEL_LOAD_REQUEST="1"
             shift
@@ -2580,8 +2722,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -2604,6 +2746,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat store    : opt-in via --include-chat-session-store-policy (read-only session-store policy data)"
     NOTE "chat titles   : opt-in via --include-chat-session-title-policy (read-only title policy data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
+    NOTE "chat select   : opt-in via --include-chat-model-selection-policy (read-only model-selection data)"
     NOTE "chat load     : opt-in via --include-chat-model-load-request (read-only model-load request data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
@@ -2716,6 +2859,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ]; then
         if ! print_chat_model_status_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ]; then
+        if ! print_chat_model_selection_policy_summary; then
             exit 1
         fi
     fi
