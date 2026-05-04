@@ -49,6 +49,9 @@
 # Chat response stream display boundary (explicit opt-in, read-only local data):
 #   --include-chat-response-stream
 #
+# Chat message-list display boundary (explicit opt-in, read-only local data):
+#   --include-chat-message-list
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -79,6 +82,7 @@ INCLUDE_CHAT_TRANSCRIPT_POLICY="0"
 INCLUDE_CHAT_AUDIT_EVENT="0"
 INCLUDE_CHAT_ERROR_TAXONOMY="0"
 INCLUDE_CHAT_RESPONSE_STREAM="0"
+INCLUDE_CHAT_MESSAGE_LIST="0"
 
 print_chat_error_taxonomy_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -286,6 +290,110 @@ print(
 
     HEAD "chat response stream"
     printf '%s\n' "$CHAT_RESPONSE_STREAM_SUMMARY"
+}
+
+print_chat_message_list_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_MESSAGE_LIST_STUB="$ROOT_DIR/scripts/chat-message-list-stub.sh"
+
+    if [ ! -f "$CHAT_MESSAGE_LIST_STUB" ]; then
+        ERROR "chat message-list stub not found: $CHAT_MESSAGE_LIST_STUB"
+        return 1
+    fi
+
+    if ! CHAT_MESSAGE_LIST_JSON="$(bash "$CHAT_MESSAGE_LIST_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat message-list stub failed"
+        printf '%s\n' "$CHAT_MESSAGE_LIST_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_MESSAGE_LIST_SUMMARY="$(
+        printf '%s\n' "$CHAT_MESSAGE_LIST_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+collection = data["messageCollection"]
+slots = " ".join(
+    "{}={}".format(slot["slotId"], slot["state"])
+    for slot in data["viewportSlots"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-message-list-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no message bodies/transcript/session-store/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  list       : {}".format(data["listState"]))
+print("[INFO]  viewport   : {}".format(data["viewportState"]))
+print("[INFO]  transcript : {}".format(data["transcriptState"]))
+print("[INFO]  content    : {}".format(data["messageContentState"]))
+print("[INFO]  empty      : {}".format(data["emptyState"]))
+print("[INFO]  selection  : {}".format(data["selectionState"]))
+print("[INFO]  scroll     : {}".format(data["scrollState"]))
+print(
+    "[INFO]  collection : {} itemCount={} promptMessagesIncluded={} "
+    "assistantMessagesIncluded={} systemNoticesIncluded={} "
+    "messageBodiesIncluded={} transcriptReadEnabled={}".format(
+        collection["state"],
+        collection["itemCount"],
+        b(collection["promptMessagesIncluded"]),
+        b(collection["assistantMessagesIncluded"]),
+        b(collection["systemNoticesIncluded"]),
+        b(collection["messageBodiesIncluded"]),
+        b(collection["transcriptReadEnabled"]),
+    )
+)
+print("[INFO]  slots      : {}".format(slots))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "messageListDisplayOnly={} messageMetadataOnly={} "
+    "readsSessionStore={} readsTranscript={} messageBodiesIncluded={} "
+    "promptContentIncluded={} responseContentIncluded={} "
+    "responseGenerated={} sendAttempted={} sessionStoreRead={} "
+    "modelAssetRead={} modelExecution={} runtimeExecution={} "
+    "kv260Access={} hardwareAccess={} networkCalls={} providerCalls={} "
+    "executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["messageListDisplayOnly"]),
+        b(flags["messageMetadataOnly"]),
+        b(flags["readsSessionStore"]),
+        b(flags["readsTranscript"]),
+        b(flags["messageBodiesIncluded"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["responseGenerated"]),
+        b(flags["sendAttempted"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat message-list JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat message list"
+    printf '%s\n' "$CHAT_MESSAGE_LIST_SUMMARY"
 }
 
 print_chat_local_only_policy_summary() {
@@ -1683,6 +1791,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_RESPONSE_STREAM="1"
             shift
             ;;
+        --include-chat-message-list)
+            INCLUDE_CHAT_MESSAGE_LIST="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -1698,8 +1810,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, and --include-chat-response-stream are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-model-status, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, and --include-chat-message-list are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -1727,6 +1839,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat audit    : opt-in via --include-chat-audit-event (read-only blocked audit metadata)"
     NOTE "chat errors   : opt-in via --include-chat-error-taxonomy (read-only error taxonomy data)"
     NOTE "chat stream   : opt-in via --include-chat-response-stream (read-only response stream data)"
+    NOTE "chat messages : opt-in via --include-chat-message-list (read-only empty message-list data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
 
     if [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ]; then
@@ -1737,6 +1850,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ]; then
         if ! print_chat_response_stream_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ]; then
+        if ! print_chat_message_list_summary; then
             exit 1
         fi
     fi

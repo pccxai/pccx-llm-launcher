@@ -1,0 +1,230 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "session_inactive",
+      "requiredBefore": "message_collection_loaded",
+      "state": "inactive",
+      "summary": "No launcher-owned chat session exists for message rendering."
+    },
+    {
+      "reasonId": "transcript_source_not_configured",
+      "requiredBefore": "message_bodies_available",
+      "state": "not_configured",
+      "summary": "No reviewed transcript or session-store reader exists."
+    },
+    {
+      "reasonId": "send_result_blocked",
+      "requiredBefore": "user_message_appended",
+      "state": "blocked",
+      "summary": "The checked send-result boundary reports no accepted input."
+    },
+    {
+      "reasonId": "response_stream_blocked",
+      "requiredBefore": "assistant_message_appended",
+      "state": "blocked",
+      "summary": "The checked response-stream boundary reports no generated response."
+    },
+    {
+      "reasonId": "message_content_policy_disabled",
+      "requiredBefore": "message_content_displayed",
+      "state": "disabled",
+      "summary": "Prompt, response, transcript, and summary content remain outside checked fixtures."
+    }
+  ],
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "chatResponseStreamRef": "chat_response_stream_gemma3n_e4b_kv260_placeholder",
+  "chatSendResultRef": "chat_send_result_gemma3n_e4b_kv260_placeholder",
+  "chatSessionRef": "chat_session_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "emptyState": "available_as_data",
+  "fixtureVersion": "chat-message-list.gemma3n-e4b-kv260.2026-05-04",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "inactive",
+      "summary": "Session state is consumed as local metadata only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness data keeps message actions disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-send-result.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_send_result",
+      "schemaVersion": "pccx.chatSendResult.v0",
+      "state": "blocked",
+      "summary": "Blocked send-result data prevents user-message append."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-response-stream.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_response_stream",
+      "schemaVersion": "pccx.chatResponseStream.v0",
+      "state": "blocked",
+      "summary": "Blocked response-stream data prevents assistant-message append."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain unavailable."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_message_list_boundary_2026-05-04",
+  "limitations": [
+    "Data-only empty chat message-list fixture; no prompt, response, transcript, summary, session title, model path, or runtime log content is read or written.",
+    "No transcript or session-store reader is implemented, no message bodies are included, and item count is fixed to zero.",
+    "No send attempt, response stream, model load, runtime execution, provider call, network call, or KV260 hardware access is performed.",
+    "No artifacts, private paths, secrets, tokens, stores, logs, or hardware dumps are read or written.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, or runtime implementation."
+  ],
+  "listPolicy": {
+    "contentPolicy": "empty message collection metadata only; no message bodies are included",
+    "interactionPolicy": "selection, scrolling, transcript append, and message actions remain disabled",
+    "persistencePolicy": "no transcript persistence or export",
+    "renderMode": "future_local_message_viewport",
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no session store, transcript, prompt, response, summary, or model path is read",
+    "state": "placeholder"
+  },
+  "listState": "empty_not_captured",
+  "messageCollection": {
+    "assistantMessagesIncluded": false,
+    "collectionId": "empty_message_collection_gemma3n_e4b_kv260_placeholder",
+    "itemCount": 0,
+    "messageBodiesIncluded": false,
+    "promptMessagesIncluded": false,
+    "schemaVersion": "pccx.chatMessageCollection.v0",
+    "sortOrder": "future_session_local_order",
+    "state": "empty",
+    "summary": "No conversation messages are present or read by this fixture.",
+    "systemNoticesIncluded": false,
+    "transcriptReadEnabled": false
+  },
+  "messageContentState": "empty_not_captured",
+  "messageListId": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "safetyFlags": {
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "messageCountFromStore": false,
+    "messageListDisplayOnly": true,
+    "messageMetadataOnly": true,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "opensSerialPort": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptPersistence": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "readsTranscript": false,
+    "responseChunksEmitted": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "sendAttempted": false,
+    "sessionPersistence": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "summaryGenerated": false,
+    "summaryIncluded": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptExport": false,
+    "transcriptPersistence": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatMessageList.v0",
+  "scrollState": "disabled",
+  "selectionState": "disabled",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "transcriptState": "not_started",
+  "viewportSlots": [
+    {
+      "contentPolicy": "no_prompt_response_transcript_or_summary_content",
+      "displayPolicy": "show empty local conversation state only",
+      "enabled": false,
+      "label": "empty conversation notice",
+      "slotId": "empty_conversation_notice",
+      "sourceRef": "chat_session",
+      "state": "available_as_data",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_generated_response_content",
+      "displayPolicy": "show blocked response-stream state only",
+      "enabled": false,
+      "label": "assistant response placeholder",
+      "slotId": "assistant_response_placeholder",
+      "sourceRef": "chat_response_stream",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_prompt_echo_or_response_content",
+      "displayPolicy": "hidden until a reviewed send-result exists",
+      "enabled": false,
+      "label": "send feedback placeholder",
+      "slotId": "send_feedback_placeholder",
+      "sourceRef": "chat_send_result",
+      "state": "blocked",
+      "visible": false
+    },
+    {
+      "contentPolicy": "policy_metadata_only",
+      "displayPolicy": "show disabled persistence/export state",
+      "enabled": false,
+      "label": "transcript policy notice",
+      "slotId": "transcript_policy_notice",
+      "sourceRef": "chat_transcript_policy",
+      "state": "disabled",
+      "visible": true
+    }
+  ],
+  "viewportState": "placeholder"
+}

@@ -21,6 +21,7 @@ The implementation lives in:
 - `contracts/chat_transcript_policy_contract.py`
 - `contracts/chat_audit_event_contract.py`
 - `contracts/chat_error_taxonomy_contract.py`
+- `contracts/chat_message_list_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
@@ -34,6 +35,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-audit-event.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-error-taxonomy.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
@@ -47,6 +49,7 @@ The implementation lives in:
 - `scripts/chat-transcript-policy-stub.sh`
 - `scripts/chat-audit-event-stub.sh`
 - `scripts/chat-error-taxonomy-stub.sh`
+- `scripts/chat-message-list-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -61,6 +64,7 @@ The implementation lives in:
 - `scripts/tests/chat_transcript_policy_contract_test.py`
 - `scripts/tests/chat_audit_event_contract_test.py`
 - `scripts/tests/chat_error_taxonomy_contract_test.py`
+- `scripts/tests/chat_message_list_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
@@ -74,6 +78,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-audit-event.sh`
 - `scripts/tests/status-chat-error-taxonomy.sh`
 - `scripts/tests/status-chat-response-stream.sh`
+- `scripts/tests/status-chat-message-list.sh`
 
 ## What Is Implemented
 
@@ -100,6 +105,8 @@ The chat/session contract records:
 - grouped chat error taxonomy metadata for future banners and status rows
 - blocked chat response stream metadata for disabled progress, token,
   stop-control, and assistant response placeholders
+- empty chat message-list metadata for the conversation viewport without
+  message bodies or transcript reads
 
 The checked fixture is deterministic JSON. The stub command prints that
 JSON for the supported model and target pair:
@@ -249,6 +256,19 @@ It keeps response streaming as blocked local data: no stream transport
 is opened, no response chunks are generated, no token counts are
 measured, no stop signal is sent, no prompt or response content is read,
 and no transcript or artifact is written.
+
+The chat message-list fixture records the empty conversation viewport
+shape used by the planned standalone chat surface:
+
+```bash
+bash scripts/chat-message-list-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-message-list
+```
+
+It keeps the message list as empty local data: no session store or
+transcript is read, no message bodies are included, no prompt or
+response content is displayed, no response stream is appended, no model
+or runtime path is started, and no transcript or artifact is written.
 
 The chat transcript policy fixture records the retention, export,
 storage, and privacy policy shape for future transcript UI surfaces:
