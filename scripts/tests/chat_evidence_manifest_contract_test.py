@@ -214,6 +214,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "chat_gap_matrix",
         "chat_status_summary",
         "chat_redaction_policy",
+        "chat_accessibility",
     }
     assert refs["runtime_readiness"]["state"] == "requires_evidence"
     assert refs["device_session_status"]["contentPolicy"] == (
@@ -221,21 +222,29 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
     )
     assert refs["chat_review_packet"]["state"] == "not_approved"
     assert refs["chat_gap_matrix"]["state"] == "blocked"
+    assert refs["chat_accessibility"]["schemaVersion"] == "pccx.chatAccessibility.v0"
+    assert refs["chat_accessibility"]["state"] == "requires_review"
+    assert refs["chat_accessibility"]["contentPolicy"] == (
+        "fixture_reference_only_no_ui_focus_keyboard_or_live_region_execution"
+    )
     assert set(links) == {
         "review_packet_gate",
         "gap_matrix_gate",
         "runtime_evidence_gate",
+        "accessibility_review_gate",
     }
     assert set(reasons) == {
         "runtime_evidence_absent",
         "review_not_approved",
         "artifact_evidence_not_read",
         "standalone_chat_still_blocked",
+        "accessibility_review_pending",
     }
     assert set(actions) == {
         "collect_runtime_evidence",
         "review_manifest_refs",
         "keep_chat_blocked",
+        "review_accessibility_metadata",
     }
     for action in actions.values():
         assert action["enabled"] is False
