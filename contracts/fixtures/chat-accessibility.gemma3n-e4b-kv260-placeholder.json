@@ -1,0 +1,415 @@
+{
+  "accessibilityId": "chat_accessibility_gemma3n_e4b_kv260_placeholder",
+  "accessibilityPolicy": {
+    "announcementPolicy": "live-region metadata remains disabled until content and runtime boundaries are reviewed",
+    "contentPolicy": "no prompt, response, transcript, message body, session title, summary, path, runtime log, private path, or artifact content is included",
+    "externalDependencyPolicy": "no provider, network, hardware, pccx-lab, IDE, model asset, session store, or artifact dependency is used",
+    "focusPolicy": "focus-order metadata only; no focus changes, keyboard listeners, or event capture are installed",
+    "renderMode": "future_local_chat_accessibility_metadata",
+    "semanticPolicy": "checked landmark and label metadata only; no app shell implementation is started",
+    "sideEffectPolicy": "local_render_only",
+    "state": "planned"
+  },
+  "accessibilityState": "available_as_data",
+  "announcementState": "disabled",
+  "ariaBindings": [
+    {
+      "ariaLabelPolicy": "static label metadata only",
+      "ariaRole": "region",
+      "bindingId": "surface_landmark_label",
+      "contentPolicy": "no_prompt_response_transcript_or_session_title_content",
+      "enabled": false,
+      "label": "surface landmark label",
+      "liveRegionPolicy": "not_configured",
+      "sourceRef": "chat_surface_layout",
+      "state": "available_as_data",
+      "visible": true
+    },
+    {
+      "ariaLabelPolicy": "target label metadata only",
+      "ariaRole": "status",
+      "bindingId": "model_status_label",
+      "contentPolicy": "descriptor_metadata_only_no_model_paths",
+      "enabled": false,
+      "label": "model status label",
+      "liveRegionPolicy": "disabled",
+      "sourceRef": "chat_model_status",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "ariaLabelPolicy": "blocked readiness metadata only",
+      "ariaRole": "status",
+      "bindingId": "readiness_status_label",
+      "contentPolicy": "readiness_metadata_only_no_logs_or_device_state",
+      "enabled": false,
+      "label": "readiness status label",
+      "liveRegionPolicy": "disabled",
+      "sourceRef": "chat_readiness",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "ariaLabelPolicy": "empty conversation metadata only",
+      "ariaRole": "log",
+      "bindingId": "transcript_region_label",
+      "contentPolicy": "no_message_body_prompt_response_or_transcript_content",
+      "enabled": false,
+      "label": "transcript region label",
+      "liveRegionPolicy": "disabled",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "visible": true
+    },
+    {
+      "ariaLabelPolicy": "disabled input metadata only",
+      "ariaRole": "textbox",
+      "bindingId": "composer_disabled_label",
+      "contentPolicy": "no_prompt_capture_echo_or_persistence",
+      "enabled": false,
+      "label": "composer disabled label",
+      "liveRegionPolicy": "not_configured",
+      "sourceRef": "chat_composer",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "ariaLabelPolicy": "disabled action metadata only",
+      "ariaRole": "toolbar",
+      "bindingId": "actions_disabled_label",
+      "contentPolicy": "no_action_execution_clipboard_export_or_attachment_content",
+      "enabled": false,
+      "label": "actions disabled label",
+      "liveRegionPolicy": "not_configured",
+      "sourceRef": "chat_action_bar",
+      "state": "disabled",
+      "visible": true
+    }
+  ],
+  "blockedReasons": [
+    {
+      "reasonId": "focus_manager_not_installed",
+      "requiredBefore": "keyboard_navigation_enabled",
+      "state": "not_installed",
+      "summary": "No focus manager, keyboard listener, or input event boundary exists in this contract."
+    },
+    {
+      "reasonId": "live_regions_disabled",
+      "requiredBefore": "runtime_status_announcements_enabled",
+      "state": "disabled",
+      "summary": "Live-region updates remain disabled because no runtime status or message content is emitted."
+    },
+    {
+      "reasonId": "contrast_review_missing",
+      "requiredBefore": "visual_theme_enabled",
+      "state": "requires_review",
+      "summary": "Visual contrast expectations require UI review and are not measured by this fixture."
+    },
+    {
+      "reasonId": "reduced_motion_review_missing",
+      "requiredBefore": "animation_or_streaming_ui_enabled",
+      "state": "requires_review",
+      "summary": "Reduced-motion behavior requires UI review and no system preference is read."
+    },
+    {
+      "reasonId": "content_boundaries_blocked",
+      "requiredBefore": "chat_content_accessibility_enabled",
+      "state": "blocked",
+      "summary": "Prompt, response, transcript, message, session-store, runtime, and action boundaries remain blocked."
+    }
+  ],
+  "chatActionBarRef": "chat_action_bar_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatMessageListRef": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "chatSurfaceLayoutRef": "chat_surface_layout_gemma3n_e4b_kv260_placeholder",
+  "contrastState": "requires_review",
+  "fixtureVersion": "chat-accessibility.gemma3n-e4b-kv260.2026-05-05",
+  "focusOrderItems": [
+    {
+      "blockedReasonRef": "focus_manager_not_installed",
+      "enabled": false,
+      "label": "status header order",
+      "orderId": "status_header_order",
+      "orderIndex": 1,
+      "sideEffectPolicy": "no_focus_change",
+      "sourceRef": "chat_model_status",
+      "state": "blocked",
+      "tabStop": false,
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "live_regions_disabled",
+      "enabled": false,
+      "label": "readiness banner order",
+      "orderId": "readiness_banner_order",
+      "orderIndex": 2,
+      "sideEffectPolicy": "no_focus_change",
+      "sourceRef": "chat_readiness",
+      "state": "blocked",
+      "tabStop": false,
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "content_boundaries_blocked",
+      "enabled": false,
+      "label": "conversation region order",
+      "orderId": "conversation_region_order",
+      "orderIndex": 3,
+      "sideEffectPolicy": "no_focus_change",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "tabStop": false,
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "content_boundaries_blocked",
+      "enabled": false,
+      "label": "composer region order",
+      "orderId": "composer_region_order",
+      "orderIndex": 4,
+      "sideEffectPolicy": "no_focus_change",
+      "sourceRef": "chat_composer",
+      "state": "disabled",
+      "tabStop": false,
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "content_boundaries_blocked",
+      "enabled": false,
+      "label": "action bar order",
+      "orderId": "action_bar_order",
+      "orderIndex": 5,
+      "sideEffectPolicy": "no_focus_change",
+      "sourceRef": "chat_action_bar",
+      "state": "disabled",
+      "tabStop": false,
+      "visible": true
+    }
+  ],
+  "focusOrderState": "inactive",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_surface_layout",
+      "schemaVersion": "pccx.chatSurfaceLayout.v0",
+      "state": "placeholder",
+      "summary": "Surface layout defines the planned regions that need accessibility review."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "empty_not_captured",
+      "summary": "Message list remains empty and provides no prompt or response content."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer metadata keeps prompt capture and focus actions disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_action_bar",
+      "schemaVersion": "pccx.chatActionBar.v0",
+      "state": "disabled",
+      "summary": "Action-bar metadata keeps command execution, clipboard, export, and attachment controls disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness metadata remains blocked and does not emit runtime announcements."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_shortcut_map",
+      "schemaVersion": "pccx.chatShortcutMap.v0",
+      "state": "blocked",
+      "summary": "Shortcut metadata remains display-only with no listener, dispatch, or focus change."
+    }
+  ],
+  "inputState": "disabled",
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "landmarkRegions": [
+    {
+      "contentPolicy": "no_prompt_response_transcript_or_session_title_content",
+      "descriptionPolicy": "static shell label metadata only",
+      "enabled": false,
+      "label": "chat shell",
+      "regionId": "chat_shell",
+      "role": "application_region",
+      "sourceRef": "chat_surface_layout",
+      "state": "placeholder",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_model_path_runtime_log_or_hardware_state_content",
+      "descriptionPolicy": "target descriptor label metadata only",
+      "enabled": false,
+      "label": "model status header",
+      "regionId": "model_status_header",
+      "role": "status_region",
+      "sourceRef": "chat_model_status",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_runtime_check_log_provider_or_device_probe_content",
+      "descriptionPolicy": "blocked readiness label metadata only",
+      "enabled": false,
+      "label": "readiness banner",
+      "regionId": "readiness_banner",
+      "role": "status_region",
+      "sourceRef": "chat_readiness",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_message_body_prompt_response_or_transcript_content",
+      "descriptionPolicy": "empty conversation label metadata only",
+      "enabled": false,
+      "label": "conversation region",
+      "regionId": "conversation_region",
+      "role": "main_region",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_prompt_capture_echo_validation_or_persistence",
+      "descriptionPolicy": "disabled composer label metadata only",
+      "enabled": false,
+      "label": "composer region",
+      "regionId": "composer_region",
+      "role": "input_region",
+      "sourceRef": "chat_composer",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no_command_ids_transcript_export_clipboard_or_file_content",
+      "descriptionPolicy": "disabled control group label metadata only",
+      "enabled": false,
+      "label": "action bar region",
+      "regionId": "action_bar_region",
+      "role": "toolbar_region",
+      "sourceRef": "chat_action_bar",
+      "state": "disabled",
+      "visible": true
+    }
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_accessibility_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat accessibility fixture; all displayed values are checked metadata for the planned local chat shell.",
+    "No prompt, response, transcript, message body, summary, session title, session store, configuration file, environment value, model path, tokenizer path, runtime log, private path, secret, or token is read.",
+    "No UI shell, focus manager, keyboard listener, input event capture, live-region update, contrast measurement, motion preference read, prompt capture, response generation, model load, runtime start, target access, provider call, telemetry, upload, or artifact write is performed.",
+    "No pccx-lab invocation, systemverilog-ide invocation, MCP server, LSP, compatibility promise, storage layer, runtime, model-loader, or hardware implementation is included."
+  ],
+  "motionState": "requires_review",
+  "privacyState": "summary_only",
+  "reviewGates": [
+    {
+      "enabled": false,
+      "gateId": "semantic_labels_reviewed",
+      "label": "semantic labels reviewed",
+      "requiredBefore": "accessibility_labels_enabled",
+      "state": "requires_review",
+      "summary": "Landmark and label metadata needs UI review before it can be treated as implemented."
+    },
+    {
+      "enabled": false,
+      "gateId": "contrast_tokens_reviewed",
+      "label": "contrast tokens reviewed",
+      "requiredBefore": "visual_theme_enabled",
+      "state": "requires_review",
+      "summary": "Contrast expectations are recorded as a review gate only; no theme tokens are read."
+    },
+    {
+      "enabled": false,
+      "gateId": "reduced_motion_reviewed",
+      "label": "reduced motion reviewed",
+      "requiredBefore": "animation_or_streaming_ui_enabled",
+      "state": "requires_review",
+      "summary": "Motion preferences remain review metadata and no system preference is read."
+    },
+    {
+      "enabled": false,
+      "gateId": "live_region_behavior_reviewed",
+      "label": "live region behavior reviewed",
+      "requiredBefore": "runtime_status_announcements_enabled",
+      "state": "disabled",
+      "summary": "Live status announcements remain disabled until runtime status content exists."
+    },
+    {
+      "enabled": false,
+      "gateId": "keyboard_path_reviewed",
+      "label": "keyboard path reviewed",
+      "requiredBefore": "keyboard_navigation_enabled",
+      "state": "blocked",
+      "summary": "Keyboard path review is blocked because no focus manager or input boundary is installed."
+    }
+  ],
+  "runtimeState": "not_started",
+  "safetyFlags": {
+    "accessibilityMetadataOnly": true,
+    "cloudCalls": false,
+    "commandDispatch": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "contrastMeasured": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "focusChanged": false,
+    "hardwareAccess": false,
+    "keyboardCapture": false,
+    "keyboardListenerInstalled": false,
+    "kv260Access": false,
+    "liveRegionUpdated": false,
+    "localRenderOnly": true,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageContentIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "motionPreferenceRead": false,
+    "networkCalls": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "responseContentIncluded": false,
+    "runtimeExecution": false,
+    "runtimeStarted": false,
+    "screenReaderEventEmitted": false,
+    "secretsIncluded": false,
+    "semanticLabelsOnly": true,
+    "sessionTitleIncluded": false,
+    "summaryIncluded": false,
+    "telemetry": false,
+    "themeRead": false,
+    "transcriptContentIncluded": false,
+    "upload": false,
+    "writesArtifacts": false,
+    "writesSessionStore": false
+  },
+  "schemaVersion": "pccx.chatAccessibility.v0",
+  "semanticState": "planned",
+  "surfaceState": "placeholder",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}
