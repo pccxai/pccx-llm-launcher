@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-accessibility-ref",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_accessibility_evidence_ref_2026-05-05",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-attachment-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_attachment_evidence_ref_2026-05-05",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -156,6 +156,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "privacy_sensitive_content_paths_enabled",
         },
         {
+            "refId": "chat_attachment_policy",
+            "schemaVersion": "pccx.chatAttachmentPolicy.v0",
+            "fixturePath": "contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Attachment policy metadata is referenced as a checked fixture and still needs review before any attachment control is treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_file_picker_file_read_upload_import_or_preview",
+            "requiredBefore": "attachment_controls_enabled",
+        },
+        {
             "refId": "chat_accessibility",
             "schemaVersion": "pccx.chatAccessibility.v0",
             "fixturePath": "contracts/fixtures/chat-accessibility.gemma3n-e4b-kv260-placeholder.json",
@@ -190,6 +199,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "state": "requires_review",
             "summary": "Accessibility metadata remains a review reference and does not enable UI behavior.",
         },
+        {
+            "linkId": "attachment_policy_gate",
+            "refId": "chat_attachment_policy",
+            "state": "requires_review",
+            "summary": "Attachment metadata remains a review reference and does not enable file picker, upload, import, preview, or persistence behavior.",
+        },
     ],
     "blockedReasons": [
         {
@@ -222,6 +237,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Accessibility labels, focus order, live-region behavior, contrast, and motion metadata still require UI review.",
             "requiredBefore": "accessibility_review_closed",
         },
+        {
+            "reasonId": "attachment_review_pending",
+            "state": "requires_review",
+            "summary": "Attachment file picker, file metadata, file content, upload, import, preview, and persistence behavior still require review.",
+            "requiredBefore": "attachment_controls_enabled",
+        },
     ],
     "nextActions": [
         {
@@ -251,6 +272,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "enabled": False,
             "summary": "Review the checked accessibility fixture separately before enabling any labels, focus behavior, live-region updates, contrast tokens, or motion behavior.",
             "requiredBefore": "accessibility_review_closed",
+        },
+        {
+            "actionId": "review_attachment_policy",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked attachment policy fixture separately before enabling file picker, file read, upload, import, preview, or persistence paths.",
+            "requiredBefore": "attachment_controls_enabled",
         },
     ],
     "safetyFlags": {

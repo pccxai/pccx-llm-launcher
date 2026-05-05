@@ -214,8 +214,14 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "chat_gap_matrix",
         "chat_status_summary",
         "chat_redaction_policy",
+        "chat_attachment_policy",
         "chat_accessibility",
     }
+    assert refs["chat_attachment_policy"]["schemaVersion"] == "pccx.chatAttachmentPolicy.v0"
+    assert refs["chat_attachment_policy"]["state"] == "requires_review"
+    assert refs["chat_attachment_policy"]["contentPolicy"] == (
+        "fixture_reference_only_no_file_picker_file_read_upload_import_or_preview"
+    )
     assert refs["runtime_readiness"]["state"] == "requires_evidence"
     assert refs["device_session_status"]["contentPolicy"] == (
         "fixture_reference_only_no_hardware_dump_or_board_log"
@@ -232,6 +238,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "gap_matrix_gate",
         "runtime_evidence_gate",
         "accessibility_review_gate",
+        "attachment_policy_gate",
     }
     assert set(reasons) == {
         "runtime_evidence_absent",
@@ -239,12 +246,14 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "artifact_evidence_not_read",
         "standalone_chat_still_blocked",
         "accessibility_review_pending",
+        "attachment_review_pending",
     }
     assert set(actions) == {
         "collect_runtime_evidence",
         "review_manifest_refs",
         "keep_chat_blocked",
         "review_accessibility_metadata",
+        "review_attachment_policy",
     }
     for action in actions.values():
         assert action["enabled"] is False
