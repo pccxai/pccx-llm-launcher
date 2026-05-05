@@ -586,12 +586,14 @@ print(
     "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
     "evidenceManifestOnly={} referencesCheckedFixturesOnly={} "
     "reviewPacketReferencedOnly={} gapMatrixReferencedOnly={} "
-    "statusSummaryReferencedOnly={} evidenceAccepted={} gapClosed={} "
+    "statusSummaryReferencedOnly={} sessionStorePolicyReferencedOnly={} "
+    "evidenceAccepted={} gapClosed={} "
     "approvalGranted={} artifactRead={} artifactWrite={} rawLogRead={} "
     "hardwareDumpRead={} promptCapture={} promptRead={} "
     "promptContentIncluded={} responseContentIncluded={} "
     "transcriptContentIncluded={} messageBodiesIncluded={} "
-    "sessionStoreRead={} configRead={} environmentRead={} "
+    "sessionStoreRead={} sessionStoreWrite={} sessionPersistence={} "
+    "configRead={} environmentRead={} "
     "providerConfigRead={} providerCalls={} cloudCalls={} networkCalls={} "
     "modelAssetRead={} modelPathIncluded={} modelLoadAttempted={} "
     "modelExecution={} runtimeExecution={} responseGenerated={} "
@@ -608,6 +610,7 @@ print(
         b(flags["reviewPacketReferencedOnly"]),
         b(flags["gapMatrixReferencedOnly"]),
         b(flags["statusSummaryReferencedOnly"]),
+        b(flags["sessionStorePolicyReferencedOnly"]),
         b(flags["evidenceAccepted"]),
         b(flags["gapClosed"]),
         b(flags["approvalGranted"]),
@@ -622,6 +625,8 @@ print(
         b(flags["transcriptContentIncluded"]),
         b(flags["messageBodiesIncluded"]),
         b(flags["sessionStoreRead"]),
+        b(flags["sessionStoreWrite"]),
+        b(flags["sessionPersistence"]),
         b(flags["configRead"]),
         b(flags["environmentRead"]),
         b(flags["providerConfigRead"]),

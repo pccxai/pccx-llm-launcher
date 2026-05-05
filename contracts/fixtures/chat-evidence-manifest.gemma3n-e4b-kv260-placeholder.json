@@ -26,6 +26,12 @@
       "summary": "Standalone chat remains blocked by unresolved runtime, model, content, store, privacy, and UI gaps."
     },
     {
+      "reasonId": "session_store_review_pending",
+      "requiredBefore": "session_store_enabled",
+      "state": "requires_review",
+      "summary": "Local store configuration, path lookup, manifest reads, session-record reads/writes, deletion, retention, migration, and persistence still require review."
+    },
+    {
       "reasonId": "accessibility_review_pending",
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
@@ -107,6 +113,15 @@
       "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence",
+      "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_store_policy",
+      "requiredBefore": "session_store_enabled",
+      "schemaVersion": "pccx.chatSessionStorePolicy.v0",
+      "state": "requires_review",
+      "summary": "Session-store policy metadata is referenced as a checked fixture and still needs review before any local store path, manifest, session record, or persistence path is treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_keyboard_listener_capture_dispatch_focus_change_or_action_execution",
       "fixturePath": "contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_shortcut_map",
@@ -144,12 +159,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-shortcut-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-session-store-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_shortcut_evidence_ref_2026-05-05",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_store_evidence_ref_2026-05-06",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -178,6 +193,13 @@
       "requiredBefore": "standalone_chat_enabled",
       "state": "blocked",
       "summary": "Standalone chat controls must remain blocked until reviewed evidence and gap closure land separately."
+    },
+    {
+      "actionId": "review_session_store_policy",
+      "enabled": false,
+      "requiredBefore": "session_store_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked session-store policy fixture separately before enabling local store configuration, path lookup, manifest reads, session-record reads/writes, retention, migration, deletion, or persistence."
     },
     {
       "actionId": "review_accessibility_metadata",
@@ -226,6 +248,12 @@
       "refId": "runtime_readiness",
       "state": "requires_evidence",
       "summary": "Runtime evidence must be reviewed in a later evidence-backed change."
+    },
+    {
+      "linkId": "session_store_policy_gate",
+      "refId": "chat_session_store_policy",
+      "state": "requires_review",
+      "summary": "Session-store metadata remains a review reference and does not enable store path, manifest, session record, retention, migration, deletion, or persistence behavior."
     },
     {
       "linkId": "accessibility_review_gate",
@@ -301,7 +329,10 @@
     "reviewPacketReferencedOnly": true,
     "runtimeExecution": false,
     "sendEnabled": false,
+    "sessionPersistence": false,
+    "sessionStorePolicyReferencedOnly": true,
     "sessionStoreRead": false,
+    "sessionStoreWrite": false,
     "settingsChange": false,
     "statusSummaryReferencedOnly": true,
     "transcriptContentIncluded": false

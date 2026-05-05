@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-shortcut-ref",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_shortcut_evidence_ref_2026-05-05",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-session-store-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_store_evidence_ref_2026-05-06",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -156,6 +156,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "privacy_sensitive_content_paths_enabled",
         },
         {
+            "refId": "chat_session_store_policy",
+            "schemaVersion": "pccx.chatSessionStorePolicy.v0",
+            "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Session-store policy metadata is referenced as a checked fixture and still needs review before any local store path, manifest, session record, or persistence path is treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence",
+            "requiredBefore": "session_store_enabled",
+        },
+        {
             "refId": "chat_shortcut_map",
             "schemaVersion": "pccx.chatShortcutMap.v0",
             "fixturePath": "contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json",
@@ -212,6 +221,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Runtime evidence must be reviewed in a later evidence-backed change.",
         },
         {
+            "linkId": "session_store_policy_gate",
+            "refId": "chat_session_store_policy",
+            "state": "requires_review",
+            "summary": "Session-store metadata remains a review reference and does not enable store path, manifest, session record, retention, migration, deletion, or persistence behavior.",
+        },
+        {
             "linkId": "accessibility_review_gate",
             "refId": "chat_accessibility",
             "state": "requires_review",
@@ -262,6 +277,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "standalone_chat_enabled",
         },
         {
+            "reasonId": "session_store_review_pending",
+            "state": "requires_review",
+            "summary": "Local store configuration, path lookup, manifest reads, session-record reads/writes, deletion, retention, migration, and persistence still require review.",
+            "requiredBefore": "session_store_enabled",
+        },
+        {
             "reasonId": "accessibility_review_pending",
             "state": "requires_review",
             "summary": "Accessibility labels, focus order, live-region behavior, contrast, and motion metadata still require UI review.",
@@ -309,6 +330,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "standalone_chat_enabled",
         },
         {
+            "actionId": "review_session_store_policy",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked session-store policy fixture separately before enabling local store configuration, path lookup, manifest reads, session-record reads/writes, retention, migration, deletion, or persistence.",
+            "requiredBefore": "session_store_enabled",
+        },
+        {
             "actionId": "review_accessibility_metadata",
             "state": "requires_review",
             "enabled": False,
@@ -346,6 +374,7 @@ _CHAT_EVIDENCE_MANIFEST = {
         "reviewPacketReferencedOnly": True,
         "gapMatrixReferencedOnly": True,
         "statusSummaryReferencedOnly": True,
+        "sessionStorePolicyReferencedOnly": True,
         "evidenceAccepted": False,
         "gapClosed": False,
         "approvalGranted": False,
@@ -360,6 +389,8 @@ _CHAT_EVIDENCE_MANIFEST = {
         "transcriptContentIncluded": False,
         "messageBodiesIncluded": False,
         "sessionStoreRead": False,
+        "sessionStoreWrite": False,
+        "sessionPersistence": False,
         "configRead": False,
         "environmentRead": False,
         "providerConfigRead": False,
