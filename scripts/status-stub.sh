@@ -37,6 +37,9 @@
 # Chat model-selection policy boundary (explicit opt-in, read-only local data):
 #   --include-chat-model-selection-policy
 #
+# Chat context-window/tokenization policy boundary (explicit opt-in, read-only local data):
+#   --include-chat-context-policy
+#
 # Chat model-load request boundary (explicit opt-in, read-only local data):
 #   --include-chat-model-load-request
 #
@@ -99,6 +102,7 @@ INCLUDE_CHAT_SESSION_STORE_POLICY="0"
 INCLUDE_CHAT_SESSION_TITLE_POLICY="0"
 INCLUDE_CHAT_MODEL_STATUS="0"
 INCLUDE_CHAT_MODEL_SELECTION_POLICY="0"
+INCLUDE_CHAT_CONTEXT_POLICY="0"
 INCLUDE_CHAT_MODEL_LOAD_REQUEST="0"
 INCLUDE_CHAT_READINESS="0"
 INCLUDE_CHAT_COMPOSER="0"
@@ -2213,6 +2217,138 @@ print(
     printf '%s\n' "$CHAT_MODEL_SELECTION_POLICY_SUMMARY"
 }
 
+print_chat_context_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_CONTEXT_POLICY_STUB="$ROOT_DIR/scripts/chat-context-policy-stub.sh"
+
+    if [ ! -f "$CHAT_CONTEXT_POLICY_STUB" ]; then
+        ERROR "chat context-policy stub not found: $CHAT_CONTEXT_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_CONTEXT_POLICY_JSON="$(bash "$CHAT_CONTEXT_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat context-policy stub failed"
+        printf '%s\n' "$CHAT_CONTEXT_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_CONTEXT_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_CONTEXT_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["contextPolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+slots = " ".join(
+    "{}={}:{}".format(slot["slotId"], slot["state"], b(slot["enabled"]))
+    for slot in data["contextSlots"]
+)
+controls = " ".join(
+    "{}={}:{}".format(control["controlId"], control["state"], b(control["enabled"]))
+    for control in data["contextControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-context-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/transcript/tokenizer/runtime/model/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  context   : {}".format(data["contextPolicyState"]))
+print("[INFO]  window    : {}".format(data["contextWindowState"]))
+print("[INFO]  budget    : {}".format(data["budgetState"]))
+print("[INFO]  tokens    : {}".format(data["tokenizationState"]))
+print("[INFO]  prompt    : {}".format(data["promptContentState"]))
+print("[INFO]  transcript: {}".format(data["transcriptState"]))
+print("[INFO]  summary   : {}".format(data["summaryState"]))
+print("[INFO]  truncate  : {}".format(data["truncationState"]))
+print("[INFO]  assembly  : {}".format(data["contextAssemblyState"]))
+print("[INFO]  handoff   : {}".format(data["runtimeHandoffState"]))
+print("[INFO]  privacy   : {}".format(data["privacyState"]))
+print(
+    "[INFO]  context-policy : {} mode={} contextWindowConfigured={} "
+    "tokenBudgetConfigured={} tokenizerConfigured={} tokenCountingEnabled={} "
+    "promptReadEnabled={} transcriptReadEnabled={} summaryReadEnabled={} "
+    "truncationEnabled={} contextAssemblyEnabled={} "
+    "runtimeHandoffEnabled={}".format(
+        policy["state"],
+        policy["mode"],
+        b(policy["contextWindowConfigured"]),
+        b(policy["tokenBudgetConfigured"]),
+        b(policy["tokenizerConfigured"]),
+        b(policy["tokenCountingEnabled"]),
+        b(policy["promptReadEnabled"]),
+        b(policy["transcriptReadEnabled"]),
+        b(policy["summaryReadEnabled"]),
+        b(policy["truncationEnabled"]),
+        b(policy["contextAssemblyEnabled"]),
+        b(policy["runtimeHandoffEnabled"]),
+    )
+)
+print("[INFO]  slots      : {}".format(slots))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "contextPolicyDisplayOnly={} contextMetadataOnly={} "
+    "contextWindowConfigured={} contextWindowSizeIncluded={} "
+    "tokenBudgetConfigured={} tokenBudgetIncluded={} "
+    "tokenizerConfigured={} tokenCountingEnabled={} "
+    "tokenCountMeasured={} tokenContentIncluded={} "
+    "promptCapture={} promptRead={} promptContentIncluded={} "
+    "readsTranscript={} summaryGenerated={} "
+    "contextAssemblyAttempted={} contextTruncationAttempted={} "
+    "runtimeHandoffAttempted={} modelExecution={} runtimeExecution={} "
+    "kv260Access={} hardwareAccess={} networkCalls={} providerCalls={} "
+    "executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["contextPolicyDisplayOnly"]),
+        b(flags["contextMetadataOnly"]),
+        b(flags["contextWindowConfigured"]),
+        b(flags["contextWindowSizeIncluded"]),
+        b(flags["tokenBudgetConfigured"]),
+        b(flags["tokenBudgetIncluded"]),
+        b(flags["tokenizerConfigured"]),
+        b(flags["tokenCountingEnabled"]),
+        b(flags["tokenCountMeasured"]),
+        b(flags["tokenContentIncluded"]),
+        b(flags["promptCapture"]),
+        b(flags["promptRead"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["readsTranscript"]),
+        b(flags["summaryGenerated"]),
+        b(flags["contextAssemblyAttempted"]),
+        b(flags["contextTruncationAttempted"]),
+        b(flags["runtimeHandoffAttempted"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat context-policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat context policy"
+    printf '%s\n' "$CHAT_CONTEXT_POLICY_SUMMARY"
+}
+
 print_chat_model_load_request_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
     ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
@@ -2659,6 +2795,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_MODEL_SELECTION_POLICY="1"
             shift
             ;;
+        --include-chat-context-policy)
+            INCLUDE_CHAT_CONTEXT_POLICY="1"
+            shift
+            ;;
         --include-chat-model-load-request)
             INCLUDE_CHAT_MODEL_LOAD_REQUEST="1"
             shift
@@ -2722,8 +2862,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -2747,6 +2887,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat titles   : opt-in via --include-chat-session-title-policy (read-only title policy data)"
     NOTE "chat model    : opt-in via --include-chat-model-status (read-only model status display data)"
     NOTE "chat select   : opt-in via --include-chat-model-selection-policy (read-only model-selection data)"
+    NOTE "chat context  : opt-in via --include-chat-context-policy (read-only context policy data)"
     NOTE "chat load     : opt-in via --include-chat-model-load-request (read-only model-load request data)"
     NOTE "chat readiness: opt-in via --include-chat-readiness (read-only readiness and recovery data)"
     NOTE "chat composer : opt-in via --include-chat-composer (read-only input control data)"
@@ -2865,6 +3006,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ]; then
         if ! print_chat_model_selection_policy_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ]; then
+        if ! print_chat_context_policy_summary; then
             exit 1
         fi
     fi
