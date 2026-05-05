@@ -50,6 +50,12 @@
       "summary": "Context windows, tokenization, token counting, transcript context, summary handling, truncation, context assembly, and runtime handoff still require review."
     },
     {
+      "reasonId": "empty_state_review_pending",
+      "requiredBefore": "empty_state_display_enabled",
+      "state": "requires_review",
+      "summary": "Placeholder slots, disabled hints, command dispatch, focus changes, prompt reads, transcript reads, and model/runtime handoff remain blocked pending empty-state review."
+    },
+    {
       "reasonId": "accessibility_review_pending",
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
@@ -158,6 +164,15 @@
       "summary": "Context-policy metadata is referenced as a checked fixture and still needs review before any context-window, tokenization, token-counting, summary, truncation, context assembly, or runtime handoff path is treated as implemented."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_prompt_response_transcript_session_store_action_or_runtime_behavior",
+      "fixturePath": "contracts/fixtures/chat-empty-state.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_empty_state",
+      "requiredBefore": "empty_state_display_enabled",
+      "schemaVersion": "pccx.chatEmptyState.v0",
+      "state": "requires_review",
+      "summary": "Empty-state metadata is referenced as a checked fixture and still needs review before any placeholder slot, hint, command dispatch, focus change, prompt read, or display behavior is treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence",
       "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_session_store_policy",
@@ -204,12 +219,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-context-policy-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-empty-state-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_context_policy_evidence_ref_2026-05-06",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_empty_state_evidence_ref_2026-05-06",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -266,6 +281,13 @@
       "requiredBefore": "context_policy_enabled",
       "state": "requires_review",
       "summary": "Review the checked context-policy fixture separately before enabling tokenizer reads, token counting, context-window reads, transcript or summary context, truncation, context assembly, or runtime handoff."
+    },
+    {
+      "actionId": "review_empty_state",
+      "enabled": false,
+      "requiredBefore": "empty_state_display_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked empty-state fixture separately before enabling placeholder slots, disabled hints, command dispatch, focus changes, prompt reads, transcript reads, or display behavior."
     },
     {
       "actionId": "review_accessibility_metadata",
@@ -340,6 +362,12 @@
       "summary": "Context-policy metadata remains a review reference and does not enable tokenizer reads, token counting, context-window reads, summary generation, truncation, context assembly, or runtime handoff."
     },
     {
+      "linkId": "empty_state_gate",
+      "refId": "chat_empty_state",
+      "state": "requires_review",
+      "summary": "Empty-state metadata remains a review reference and does not enable placeholder slot rendering, hint actions, command dispatch, focus changes, prompt reads, or display behavior."
+    },
+    {
       "linkId": "accessibility_review_gate",
       "refId": "chat_accessibility",
       "state": "requires_review",
@@ -380,6 +408,7 @@
     "dataOnly": true,
     "deterministic": true,
     "directoryScan": false,
+    "emptyStateReferencedOnly": true,
     "environmentRead": false,
     "evidenceAccepted": false,
     "evidenceManifestOnly": true,

@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-context-policy-ref",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_context_policy_evidence_ref_2026-05-06",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-empty-state-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_empty_state_evidence_ref_2026-05-06",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -183,6 +183,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "context_policy_enabled",
         },
         {
+            "refId": "chat_empty_state",
+            "schemaVersion": "pccx.chatEmptyState.v0",
+            "fixturePath": "contracts/fixtures/chat-empty-state.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Empty-state metadata is referenced as a checked fixture and still needs review before any placeholder slot, hint, command dispatch, focus change, prompt read, or display behavior is treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_prompt_response_transcript_session_store_action_or_runtime_behavior",
+            "requiredBefore": "empty_state_display_enabled",
+        },
+        {
             "refId": "chat_session_store_policy",
             "schemaVersion": "pccx.chatSessionStorePolicy.v0",
             "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
@@ -272,6 +281,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Context-policy metadata remains a review reference and does not enable tokenizer reads, token counting, context-window reads, summary generation, truncation, context assembly, or runtime handoff.",
         },
         {
+            "linkId": "empty_state_gate",
+            "refId": "chat_empty_state",
+            "state": "requires_review",
+            "summary": "Empty-state metadata remains a review reference and does not enable placeholder slot rendering, hint actions, command dispatch, focus changes, prompt reads, or display behavior.",
+        },
+        {
             "linkId": "accessibility_review_gate",
             "refId": "chat_accessibility",
             "state": "requires_review",
@@ -344,6 +359,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "state": "requires_review",
             "summary": "Context windows, tokenization, token counting, transcript context, summary handling, truncation, context assembly, and runtime handoff still require review.",
             "requiredBefore": "context_policy_enabled",
+        },
+        {
+            "reasonId": "empty_state_review_pending",
+            "state": "requires_review",
+            "summary": "Placeholder slots, disabled hints, command dispatch, focus changes, prompt reads, transcript reads, and model/runtime handoff remain blocked pending empty-state review.",
+            "requiredBefore": "empty_state_display_enabled",
         },
         {
             "reasonId": "accessibility_review_pending",
@@ -421,6 +442,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "context_policy_enabled",
         },
         {
+            "actionId": "review_empty_state",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked empty-state fixture separately before enabling placeholder slots, disabled hints, command dispatch, focus changes, prompt reads, transcript reads, or display behavior.",
+            "requiredBefore": "empty_state_display_enabled",
+        },
+        {
             "actionId": "review_accessibility_metadata",
             "state": "requires_review",
             "enabled": False,
@@ -462,6 +490,7 @@ _CHAT_EVIDENCE_MANIFEST = {
         "modelLoadRequestReferencedOnly": True,
         "modelSelectionPolicyReferencedOnly": True,
         "contextPolicyReferencedOnly": True,
+        "emptyStateReferencedOnly": True,
         "evidenceAccepted": False,
         "gapClosed": False,
         "approvalGranted": False,
