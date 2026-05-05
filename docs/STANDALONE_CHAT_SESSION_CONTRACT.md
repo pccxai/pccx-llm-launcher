@@ -33,6 +33,7 @@ The implementation lives in:
 - `contracts/chat_redaction_policy_contract.py`
 - `contracts/chat_attachment_policy_contract.py`
 - `contracts/chat_shortcut_map_contract.py`
+- `contracts/chat_status_summary_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-selection-policy.gemma3n-e4b-kv260-placeholder.json`
@@ -58,6 +59,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-redaction-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-status-summary.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-model-selection-policy-stub.sh`
@@ -83,6 +85,7 @@ The implementation lives in:
 - `scripts/chat-redaction-policy-stub.sh`
 - `scripts/chat-attachment-policy-stub.sh`
 - `scripts/chat-shortcut-map-stub.sh`
+- `scripts/chat-status-summary-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
@@ -109,6 +112,7 @@ The implementation lives in:
 - `scripts/tests/chat_redaction_policy_contract_test.py`
 - `scripts/tests/chat_attachment_policy_contract_test.py`
 - `scripts/tests/chat_shortcut_map_contract_test.py`
+- `scripts/tests/chat_status_summary_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-model-selection-policy.sh`
@@ -134,6 +138,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-redaction-policy.sh`
 - `scripts/tests/status-chat-attachment-policy.sh`
 - `scripts/tests/status-chat-shortcut-map.sh`
+- `scripts/tests/status-chat-status-summary.sh`
 
 ## What Is Implemented
 
@@ -485,6 +490,8 @@ content-scanning boundary used by the planned standalone chat surface:
 ```bash
 bash scripts/chat-redaction-policy-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/status-stub.sh --include-chat-redaction-policy
+bash scripts/chat-status-summary-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-status-summary
 ```
 
 It keeps redaction handling as local metadata: redaction rule review,
@@ -873,6 +880,10 @@ without prompt capture, response content, transcript content, provider
 configuration reads, model asset reads, session-store reads, artifact
 reads, artifact writes, runtime execution, model loading, provider calls,
 or target access.
+The status-summary contract adds a reviewable aggregate status shape over
+existing checked chat surface references without reading prompts, session
+stores, configuration, model paths, runtime logs, provider state,
+artifacts, or hardware state.
 The action-bar contract adds a reviewable disabled control shape without
 session creation, conversation clearing, transcript export, clipboard
 writes, attachment reads, retry attempts, stop signals, runtime
