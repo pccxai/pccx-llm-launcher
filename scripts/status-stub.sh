@@ -85,6 +85,9 @@
 # Chat shortcut-map boundary (explicit opt-in, read-only local data):
 #   --include-chat-shortcut-map
 #
+# Chat accessibility boundary (explicit opt-in, read-only local data):
+#   --include-chat-accessibility
+#
 # Chat status-summary aggregate (explicit opt-in, read-only local data):
 #   --include-chat-status-summary
 #
@@ -139,6 +142,7 @@ INCLUDE_CHAT_CLIPBOARD_POLICY="0"
 INCLUDE_CHAT_REDACTION_POLICY="0"
 INCLUDE_CHAT_ATTACHMENT_POLICY="0"
 INCLUDE_CHAT_SHORTCUT_MAP="0"
+INCLUDE_CHAT_ACCESSIBILITY="0"
 INCLUDE_CHAT_STATUS_SUMMARY="0"
 INCLUDE_CHAT_REVIEW_PACKET="0"
 INCLUDE_CHAT_GAP_MATRIX="0"
@@ -1607,6 +1611,138 @@ print(
 
     HEAD "chat shortcut map"
     printf '%s\n' "$CHAT_SHORTCUT_MAP_SUMMARY"
+}
+
+print_chat_accessibility_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_ACCESSIBILITY_STUB="$ROOT_DIR/scripts/chat-accessibility-stub.sh"
+
+    if [ ! -f "$CHAT_ACCESSIBILITY_STUB" ]; then
+        ERROR "chat accessibility stub not found: $CHAT_ACCESSIBILITY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_ACCESSIBILITY_JSON="$(bash "$CHAT_ACCESSIBILITY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat accessibility stub failed"
+        printf '%s\n' "$CHAT_ACCESSIBILITY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_ACCESSIBILITY_SUMMARY="$(
+        printf '%s\n' "$CHAT_ACCESSIBILITY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["accessibilityPolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+landmarks = " ".join(
+    "{}={}:{}".format(region["regionId"], region["state"], b(region["enabled"]))
+    for region in data["landmarkRegions"]
+)
+bindings = " ".join(
+    "{}={}:{}".format(binding["bindingId"], binding["state"], b(binding["enabled"]))
+    for binding in data["ariaBindings"]
+)
+focus_order = " ".join(
+    "{}={}:{}:{}".format(
+        item["orderId"],
+        item["state"],
+        b(item["enabled"]),
+        item["orderIndex"],
+    )
+    for item in data["focusOrderItems"]
+)
+gates = " ".join(
+    "{}={}:{}".format(gate["gateId"], gate["state"], b(gate["enabled"]))
+    for gate in data["reviewGates"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-accessibility-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/response/transcript/session-store/focus-change/keyboard-capture/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  access     : {}".format(data["accessibilityState"]))
+print("[INFO]  surface    : {}".format(data["surfaceState"]))
+print("[INFO]  semantic   : {}".format(data["semanticState"]))
+print("[INFO]  announce   : {}".format(data["announcementState"]))
+print("[INFO]  focus      : {}".format(data["focusOrderState"]))
+print("[INFO]  contrast   : {}".format(data["contrastState"]))
+print("[INFO]  motion     : {}".format(data["motionState"]))
+print("[INFO]  input      : {}".format(data["inputState"]))
+print("[INFO]  runtime    : {}".format(data["runtimeState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  access-policy : {} renderMode={} sideEffectPolicy={}".format(
+        policy["state"],
+        policy["renderMode"],
+        policy["sideEffectPolicy"],
+    )
+)
+print("[INFO]  landmarks  : {}".format(landmarks))
+print("[INFO]  bindings   : {}".format(bindings))
+print("[INFO]  focus-order: {}".format(focus_order))
+print("[INFO]  gates      : {}".format(gates))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "accessibilityMetadataOnly={} semanticLabelsOnly={} localRenderOnly={} "
+    "promptCapture={} promptRead={} promptContentIncluded={} "
+    "responseContentIncluded={} transcriptContentIncluded={} "
+    "messageContentIncluded={} readsSessionStore={} keyboardListenerInstalled={} "
+    "keyboardCapture={} commandDispatch={} focusChanged={} "
+    "liveRegionUpdated={} screenReaderEventEmitted={} contrastMeasured={} "
+    "motionPreferenceRead={} themeRead={} modelExecution={} runtimeExecution={} "
+    "kv260Access={} hardwareAccess={} networkCalls={} providerCalls={} "
+    "executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["accessibilityMetadataOnly"]),
+        b(flags["semanticLabelsOnly"]),
+        b(flags["localRenderOnly"]),
+        b(flags["promptCapture"]),
+        b(flags["promptRead"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["messageContentIncluded"]),
+        b(flags["readsSessionStore"]),
+        b(flags["keyboardListenerInstalled"]),
+        b(flags["keyboardCapture"]),
+        b(flags["commandDispatch"]),
+        b(flags["focusChanged"]),
+        b(flags["liveRegionUpdated"]),
+        b(flags["screenReaderEventEmitted"]),
+        b(flags["contrastMeasured"]),
+        b(flags["motionPreferenceRead"]),
+        b(flags["themeRead"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat accessibility JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat accessibility"
+    printf '%s\n' "$CHAT_ACCESSIBILITY_SUMMARY"
 }
 
 print_chat_local_only_policy_summary() {
@@ -3826,6 +3962,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SHORTCUT_MAP="1"
             shift
             ;;
+        --include-chat-accessibility)
+            INCLUDE_CHAT_ACCESSIBILITY="1"
+            shift
+            ;;
         --include-chat-status-summary)
             INCLUDE_CHAT_STATUS_SUMMARY="1"
             shift
@@ -3856,6 +3996,11 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+if [ -n "$BACKEND" ] && [ "$INCLUDE_CHAT_ACCESSIBILITY" = "1" ]; then
+    ERROR "--include-chat-accessibility is only supported in local scaffold mode"
+    exit 1
+fi
 
 if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ] || [ "$INCLUDE_CHAT_REDACTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ] || [ "$INCLUDE_CHAT_STATUS_SUMMARY" = "1" ] || [ "$INCLUDE_CHAT_REVIEW_PACKET" = "1" ] || [ "$INCLUDE_CHAT_GAP_MATRIX" = "1" ] || [ "$INCLUDE_CHAT_EVIDENCE_MANIFEST" = "1" ]; }; then
     ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-clipboard-policy, --include-chat-redaction-policy, --include-chat-attachment-policy, --include-chat-shortcut-map, --include-chat-status-summary, --include-chat-review-packet, --include-chat-gap-matrix, and --include-chat-evidence-manifest are only supported in local scaffold mode"
@@ -3898,6 +4043,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat redact   : opt-in via --include-chat-redaction-policy (read-only disabled redaction-policy data)"
     NOTE "chat attach   : opt-in via --include-chat-attachment-policy (read-only disabled attachment-policy data)"
     NOTE "chat shortcuts: opt-in via --include-chat-shortcut-map (read-only disabled shortcut-map data)"
+    NOTE "chat access   : opt-in via --include-chat-accessibility (read-only accessibility metadata)"
     NOTE "chat summary  : opt-in via --include-chat-status-summary (read-only aggregate status data)"
     NOTE "chat review   : opt-in via --include-chat-review-packet (read-only review packet data)"
     NOTE "chat gaps     : opt-in via --include-chat-gap-matrix (read-only implementation gap data)"
@@ -3972,6 +4118,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; then
         if ! print_chat_shortcut_map_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_ACCESSIBILITY" = "1" ]; then
+        if ! print_chat_accessibility_summary; then
             exit 1
         fi
     fi

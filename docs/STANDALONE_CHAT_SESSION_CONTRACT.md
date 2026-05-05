@@ -33,6 +33,7 @@ The implementation lives in:
 - `contracts/chat_redaction_policy_contract.py`
 - `contracts/chat_attachment_policy_contract.py`
 - `contracts/chat_shortcut_map_contract.py`
+- `contracts/chat_accessibility_contract.py`
 - `contracts/chat_status_summary_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
@@ -59,6 +60,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-redaction-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-accessibility.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-status-summary.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
@@ -85,6 +87,7 @@ The implementation lives in:
 - `scripts/chat-redaction-policy-stub.sh`
 - `scripts/chat-attachment-policy-stub.sh`
 - `scripts/chat-shortcut-map-stub.sh`
+- `scripts/chat-accessibility-stub.sh`
 - `scripts/chat-status-summary-stub.sh`
 - `scripts/chat-surface-preview.sh`
 - `scripts/tests/chat_session_contract_test.py`
@@ -112,6 +115,7 @@ The implementation lives in:
 - `scripts/tests/chat_redaction_policy_contract_test.py`
 - `scripts/tests/chat_attachment_policy_contract_test.py`
 - `scripts/tests/chat_shortcut_map_contract_test.py`
+- `scripts/tests/chat_accessibility_contract_test.py`
 - `scripts/tests/chat_status_summary_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
@@ -138,6 +142,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-redaction-policy.sh`
 - `scripts/tests/status-chat-attachment-policy.sh`
 - `scripts/tests/status-chat-shortcut-map.sh`
+- `scripts/tests/status-chat-accessibility.sh`
 - `scripts/tests/status-chat-status-summary.sh`
 
 ## What Is Implemented
@@ -192,6 +197,9 @@ The chat/session contract records:
 - disabled shortcut-map metadata for planned keyboard accelerators,
   focus, and navigation without listeners, capture, dispatch, or side
   effects
+- accessibility metadata for planned landmarks, labels, focus order,
+  live-region gates, contrast review, and motion review without UI
+  execution or input handling
 
 The checked fixture is deterministic JSON. The stub command prints that
 JSON for the supported model and target pair:
@@ -536,6 +544,23 @@ listener is installed, no key event is captured, no command is
 dispatched, no focus change occurs, no prompt, session, transcript,
 message, clipboard, or file content is read or written, no model/runtime
 path is started, and no artifact is written.
+
+The chat accessibility fixture records planned accessibility metadata
+for the standalone chat surface:
+
+```bash
+bash scripts/chat-accessibility-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-accessibility
+```
+
+It keeps accessibility handling as local metadata: landmarks, labels,
+focus order, live-region gates, contrast review, and motion review are
+recorded for future UI review. No app shell is implemented, no focus
+change occurs, no keyboard listener or input event boundary is installed,
+no live-region update is emitted, no prompt, response, transcript,
+message, session store, configuration, model path, runtime log, private
+path, or artifact content is read or written, no model/runtime path is
+started, and no target access occurs.
 
 The chat transcript policy fixture records the retention, export,
 storage, and privacy policy shape for future transcript UI surfaces:
