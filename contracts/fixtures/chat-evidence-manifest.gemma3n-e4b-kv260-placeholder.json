@@ -42,6 +42,12 @@
       "requiredBefore": "clipboard_controls_enabled",
       "state": "requires_review",
       "summary": "Clipboard read, write, paste, copy, import, export, transcript copy, message copy, and clipboard-backed attachment behavior still require review."
+    },
+    {
+      "reasonId": "shortcut_review_pending",
+      "requiredBefore": "keyboard_shortcuts_enabled",
+      "state": "requires_review",
+      "summary": "Keyboard listener installation, key-event capture, command dispatch, focus changes, shortcut execution, send, retry, stop, copy, attach, clear, export, and session actions still require review."
     }
   ],
   "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
@@ -101,6 +107,15 @@
       "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_keyboard_listener_capture_dispatch_focus_change_or_action_execution",
+      "fixturePath": "contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_shortcut_map",
+      "requiredBefore": "keyboard_shortcuts_enabled",
+      "schemaVersion": "pccx.chatShortcutMap.v0",
+      "state": "requires_review",
+      "summary": "Shortcut-map metadata is referenced as a checked fixture and still needs review before keyboard shortcuts are treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_clipboard_read_write_paste_copy_import_or_export",
       "fixturePath": "contracts/fixtures/chat-clipboard-policy.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_clipboard_policy",
@@ -129,12 +144,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-clipboard-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-shortcut-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_clipboard_evidence_ref_2026-05-05",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_shortcut_evidence_ref_2026-05-05",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -184,6 +199,13 @@
       "requiredBefore": "clipboard_controls_enabled",
       "state": "requires_review",
       "summary": "Review the checked clipboard policy fixture separately before enabling clipboard read, write, paste, copy, import, export, or clipboard-backed attachment paths."
+    },
+    {
+      "actionId": "review_shortcut_map",
+      "enabled": false,
+      "requiredBefore": "keyboard_shortcuts_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked shortcut-map fixture separately before enabling keyboard listeners, key capture, focus changes, command dispatch, shortcut execution, or action paths."
     }
   ],
   "reviewLinks": [
@@ -222,6 +244,12 @@
       "refId": "chat_clipboard_policy",
       "state": "requires_review",
       "summary": "Clipboard metadata remains a review reference and does not enable clipboard read, write, paste, copy, import, or export behavior."
+    },
+    {
+      "linkId": "shortcut_map_gate",
+      "refId": "chat_shortcut_map",
+      "state": "requires_review",
+      "summary": "Shortcut metadata remains a review reference and does not enable keyboard listeners, key capture, command dispatch, focus changes, or shortcut actions."
     }
   ],
   "reviewState": "not_approved",
