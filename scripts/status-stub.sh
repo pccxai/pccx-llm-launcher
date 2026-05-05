@@ -16,6 +16,9 @@
 # Chat surface layout/chrome plan (explicit opt-in, read-only local data):
 #   --include-chat-surface-layout
 #
+# Chat empty-state display boundary (explicit opt-in, read-only local data):
+#   --include-chat-empty-state
+#
 # Chat local-only/cloud-block policy (explicit opt-in, read-only local data):
 #   --include-chat-local-only-policy
 #
@@ -95,6 +98,7 @@ INCLUDE_RUNTIME_READINESS="0"
 INCLUDE_DEVICE_SESSION="0"
 INCLUDE_CHAT_SESSION="0"
 INCLUDE_CHAT_SURFACE_LAYOUT="0"
+INCLUDE_CHAT_EMPTY_STATE="0"
 INCLUDE_CHAT_LOCAL_ONLY_POLICY="0"
 INCLUDE_CHAT_PREFERENCES="0"
 INCLUDE_CHAT_SESSION_INDEX="0"
@@ -1067,6 +1071,126 @@ print(
 
     HEAD "chat surface layout"
     printf '%s\n' "$CHAT_SURFACE_LAYOUT_SUMMARY"
+}
+
+print_chat_empty_state_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_EMPTY_STATE_STUB="$ROOT_DIR/scripts/chat-empty-state-stub.sh"
+
+    if [ ! -f "$CHAT_EMPTY_STATE_STUB" ]; then
+        ERROR "chat empty-state stub not found: $CHAT_EMPTY_STATE_STUB"
+        return 1
+    fi
+
+    if ! CHAT_EMPTY_STATE_JSON="$(bash "$CHAT_EMPTY_STATE_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat empty-state stub failed"
+        printf '%s\n' "$CHAT_EMPTY_STATE_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_EMPTY_STATE_SUMMARY="$(
+        printf '%s\n' "$CHAT_EMPTY_STATE_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["emptyStatePolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+slots = " ".join(
+    "{}={}:{}".format(slot["slotId"], slot["state"], b(slot["enabled"]))
+    for slot in data["displaySlots"]
+)
+hints = " ".join(
+    "{}={}:{}".format(hint["hintId"], hint["state"], b(hint["enabled"]))
+    for hint in data["affordanceHints"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-empty-state-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/response/transcript/session-store/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  empty      : {}".format(data["emptyStateState"]))
+print("[INFO]  surface    : {}".format(data["surfaceState"]))
+print("[INFO]  session    : {}".format(data["sessionState"]))
+print("[INFO]  modelstate : {}".format(data["modelState"]))
+print("[INFO]  readiness  : {}".format(data["readinessState"]))
+print("[INFO]  prompt     : {}".format(data["promptState"]))
+print("[INFO]  transcript : {}".format(data["transcriptState"]))
+print("[INFO]  actions    : {}".format(data["actionState"]))
+print("[INFO]  runtime    : {}".format(data["runtimeState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  empty-policy : {} renderMode={} sideEffectPolicy={}".format(
+        policy["state"],
+        policy["renderMode"],
+        policy["sideEffectPolicy"],
+    )
+)
+print("[INFO]  slots      : {}".format(slots))
+print("[INFO]  hints      : {}".format(hints))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "emptyStateDisplayOnly={} emptyStateTextOnly={} localRenderOnly={} "
+    "promptCapture={} promptRead={} promptContentIncluded={} "
+    "inputAccepted={} responseContentIncluded={} responseGenerated={} "
+    "transcriptContentIncluded={} messageContentIncluded={} "
+    "sessionTitleIncluded={} summaryIncluded={} readsSessionStore={} "
+    "writesSessionStore={} actionExecution={} commandDispatch={} "
+    "modelAssetRead={} modelLoadAttempted={} modelExecution={} "
+    "runtimeExecution={} kv260Access={} hardwareAccess={} networkCalls={} "
+    "providerCalls={} readsArtifacts={} writesArtifacts={} "
+    "executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["emptyStateDisplayOnly"]),
+        b(flags["emptyStateTextOnly"]),
+        b(flags["localRenderOnly"]),
+        b(flags["promptCapture"]),
+        b(flags["promptRead"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["inputAccepted"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["responseGenerated"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["messageContentIncluded"]),
+        b(flags["sessionTitleIncluded"]),
+        b(flags["summaryIncluded"]),
+        b(flags["readsSessionStore"]),
+        b(flags["writesSessionStore"]),
+        b(flags["actionExecution"]),
+        b(flags["commandDispatch"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["readsArtifacts"]),
+        b(flags["writesArtifacts"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat empty-state JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat empty state"
+    printf '%s\n' "$CHAT_EMPTY_STATE_SUMMARY"
 }
 
 print_chat_session_index_summary() {
@@ -2767,6 +2891,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_SURFACE_LAYOUT="1"
             shift
             ;;
+        --include-chat-empty-state)
+            INCLUDE_CHAT_EMPTY_STATE="1"
+            shift
+            ;;
         --include-chat-local-only-policy)
             INCLUDE_CHAT_LOCAL_ONLY_POLICY="1"
             shift
@@ -2862,8 +2990,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -2880,6 +3008,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "device/session: opt-in via --include-device-session (read-only panel data)"
     NOTE "chat/session  : opt-in via --include-chat-session (read-only blocked chat and lifecycle data)"
     NOTE "chat layout   : opt-in via --include-chat-surface-layout (read-only surface layout data)"
+    NOTE "chat empty    : opt-in via --include-chat-empty-state (read-only empty-state data)"
     NOTE "chat local    : opt-in via --include-chat-local-only-policy (read-only local-only policy data)"
     NOTE "chat prefs    : opt-in via --include-chat-preferences (read-only preferences data)"
     NOTE "chat index    : opt-in via --include-chat-session-index (read-only empty session index data)"
@@ -2946,6 +3075,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ]; then
         if ! print_chat_surface_layout_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ]; then
+        if ! print_chat_empty_state_summary; then
             exit 1
         fi
     fi
