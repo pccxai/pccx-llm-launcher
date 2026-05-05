@@ -1,0 +1,359 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "standalone_chat_not_enabled",
+      "requiredBefore": "standalone_chat_enabled",
+      "state": "blocked",
+      "summary": "Standalone chat remains blocked because all gap rows are unresolved."
+    },
+    {
+      "reasonId": "review_packet_not_approved",
+      "requiredBefore": "review_gate_closed",
+      "state": "not_approved",
+      "summary": "The review packet is referenced but not approved by this matrix."
+    },
+    {
+      "reasonId": "runtime_evidence_absent",
+      "requiredBefore": "model_or_runtime_execution_enabled",
+      "state": "requires_evidence",
+      "summary": "Runtime, device, and hardware evidence remain outside this launcher boundary."
+    },
+    {
+      "reasonId": "content_paths_disabled",
+      "requiredBefore": "content_or_io_enabled",
+      "state": "disabled",
+      "summary": "Prompt, response, transcript, attachment, clipboard, redaction, audit, and export paths remain disabled."
+    }
+  ],
+  "dependencyRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-review-packet.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_review_packet",
+      "schemaVersion": "pccx.chatReviewPacket.v0",
+      "state": "not_approved",
+      "summary": "Review packet remains blocked and records review gates only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-status-summary.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_status_summary",
+      "schemaVersion": "pccx.chatStatusSummary.v0",
+      "state": "summary_only",
+      "summary": "Status summary remains a checked display aggregate and is not duplicated here."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Chat readiness remains blocked until runtime, device, model, store, and privacy evidence exists."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_load_request",
+      "schemaVersion": "pccx.chatModelLoadRequest.v0",
+      "state": "blocked",
+      "summary": "Model load request remains blocked with no model asset path read or load attempt."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_store_policy",
+      "schemaVersion": "pccx.chatSessionStorePolicy.v0",
+      "state": "not_configured",
+      "summary": "Session store policy remains disabled and no local store is read."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-redaction-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_redaction_policy",
+      "schemaVersion": "pccx.chatRedactionPolicy.v0",
+      "state": "summary_only",
+      "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
+    }
+  ],
+  "evidenceState": "requires_evidence",
+  "exitCriteria": [
+    {
+      "accepted": false,
+      "blockedBy": [
+        "runtime_device_evidence"
+      ],
+      "criteriaId": "runtime_and_device_evidence_accepted",
+      "requiredEvidence": [
+        "runtime_readiness_with_reviewed_evidence",
+        "device_session_status_with_reviewed_target_state"
+      ],
+      "state": "requires_evidence",
+      "summary": "Runtime and device session evidence must be reviewed before runtime paths are enabled."
+    },
+    {
+      "accepted": false,
+      "blockedBy": [
+        "model_asset_boundary",
+        "session_store_boundary"
+      ],
+      "criteriaId": "model_and_session_boundaries_reviewed",
+      "requiredEvidence": [
+        "reviewed_model_asset_boundary",
+        "reviewed_session_store_boundary"
+      ],
+      "state": "not_approved",
+      "summary": "Model asset and session-store boundaries must be reviewed before local chat state is enabled."
+    },
+    {
+      "accepted": false,
+      "blockedBy": [
+        "prompt_input_boundary",
+        "response_generation_boundary",
+        "privacy_content_policy",
+        "attachment_clipboard_boundary",
+        "audit_persistence_boundary"
+      ],
+      "criteriaId": "content_privacy_boundaries_reviewed",
+      "requiredEvidence": [
+        "reviewed_prompt_input_boundary",
+        "reviewed_response_stream_boundary",
+        "reviewed_privacy_policy_boundary"
+      ],
+      "state": "requires_review",
+      "summary": "Prompt, response, transcript, attachment, clipboard, redaction, and audit boundaries must be reviewed before content paths are enabled."
+    }
+  ],
+  "fixtureVersion": "chat-gap-matrix.gemma3n-e4b-kv260.2026-05-05",
+  "gapMatrixId": "chat_gap_matrix_gemma3n_e4b_kv260_placeholder",
+  "gapRows": [
+    {
+      "area": "runtime",
+      "gapId": "runtime_device_evidence",
+      "label": "runtime and device evidence",
+      "requiredBefore": "model_or_runtime_execution_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_runtime_or_hardware_action",
+      "sourceRefs": [
+        "runtime_readiness",
+        "device_session_status",
+        "chat_review_packet"
+      ],
+      "state": "requires_evidence",
+      "summary": "Runtime readiness and target device session evidence are still absent from this launcher boundary."
+    },
+    {
+      "area": "model",
+      "gapId": "model_asset_boundary",
+      "label": "model asset boundary",
+      "requiredBefore": "model_status_ready",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_model_path_read_or_model_load",
+      "sourceRefs": [
+        "model_runtime_descriptor",
+        "chat_model_selection_policy",
+        "chat_model_load_request"
+      ],
+      "state": "not_loaded",
+      "summary": "Model path, asset discovery, checksum, tokenizer, load, warmup, unload, and persistence remain disabled."
+    },
+    {
+      "area": "content",
+      "gapId": "prompt_input_boundary",
+      "label": "prompt input boundary",
+      "requiredBefore": "send_control_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_prompt_capture_or_input_acceptance",
+      "sourceRefs": [
+        "chat_composer",
+        "chat_send_result",
+        "chat_review_packet"
+      ],
+      "state": "disabled",
+      "summary": "Prompt capture, prompt read, prompt echo, accepted input, validation handoff, and send dispatch remain disabled."
+    },
+    {
+      "area": "content",
+      "gapId": "response_generation_boundary",
+      "label": "response generation boundary",
+      "requiredBefore": "assistant_response_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_response_generation_or_stream_transport",
+      "sourceRefs": [
+        "chat_response_stream",
+        "chat_message_list",
+        "chat_context_policy"
+      ],
+      "state": "disabled",
+      "summary": "Response generation, response chunks, token counts, context assembly, and transcript append remain disabled."
+    },
+    {
+      "area": "session",
+      "gapId": "session_store_boundary",
+      "label": "session store boundary",
+      "requiredBefore": "session_management_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_session_store_or_title_access",
+      "sourceRefs": [
+        "chat_session",
+        "chat_session_lifecycle",
+        "chat_session_store_policy",
+        "chat_session_index",
+        "chat_session_title_policy"
+      ],
+      "state": "not_configured",
+      "summary": "Session store path, manifest, read, write, delete, restore, title, retention, migration, and export remain unconfigured."
+    },
+    {
+      "area": "session",
+      "gapId": "transcript_export_boundary",
+      "label": "transcript and export boundary",
+      "requiredBefore": "transcript_or_export_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_transcript_read_write_or_export",
+      "sourceRefs": [
+        "chat_transcript_policy",
+        "chat_action_bar",
+        "chat_session_lifecycle"
+      ],
+      "state": "disabled",
+      "summary": "Transcript reads, transcript persistence, export summary, raw export, and action-bar export controls remain disabled."
+    },
+    {
+      "area": "privacy",
+      "gapId": "privacy_content_policy",
+      "label": "privacy and content policy",
+      "requiredBefore": "privacy_sensitive_content_paths_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_content_scan_redaction_or_provider_call",
+      "sourceRefs": [
+        "chat_local_only_policy",
+        "chat_redaction_policy",
+        "chat_error_taxonomy"
+      ],
+      "state": "requires_review",
+      "summary": "Local-only policy, redaction, content scanning, detector execution, result persistence, and raw error payload handling remain review-only."
+    },
+    {
+      "area": "input_output",
+      "gapId": "attachment_clipboard_boundary",
+      "label": "attachment and clipboard boundary",
+      "requiredBefore": "attachment_or_clipboard_paths_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_file_clipboard_or_directory_access",
+      "sourceRefs": [
+        "chat_attachment_policy",
+        "chat_clipboard_policy",
+        "chat_action_bar"
+      ],
+      "state": "disabled",
+      "summary": "File picker, file metadata, file content, upload, import, preview, clipboard read, and clipboard write remain disabled."
+    },
+    {
+      "area": "audit",
+      "gapId": "audit_persistence_boundary",
+      "label": "audit persistence boundary",
+      "requiredBefore": "audit_logging_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_audit_write_or_raw_log_read",
+      "sourceRefs": [
+        "chat_audit_event",
+        "chat_redaction_policy",
+        "chat_review_packet"
+      ],
+      "state": "not_configured",
+      "summary": "Audit logging, event persistence, actor identifiers, raw logs, private paths, and generated blobs remain absent."
+    },
+    {
+      "area": "surface",
+      "gapId": "ui_enablement_boundary",
+      "label": "UI enablement boundary",
+      "requiredBefore": "standalone_chat_ui_enabled",
+      "severity": "blocker",
+      "sideEffectPolicy": "no_action_execution_command_dispatch_or_focus_change",
+      "sourceRefs": [
+        "chat_surface_layout",
+        "chat_empty_state",
+        "chat_action_bar",
+        "chat_shortcut_map",
+        "chat_status_summary"
+      ],
+      "state": "blocked",
+      "summary": "Surface layout, empty state, action-bar controls, shortcuts, and status cards remain display-only until the blocker rows close."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_gap_matrix_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat implementation gap matrix over existing checked fixture references.",
+    "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
+    "No model load, runtime execution, provider call, network call, hardware access, pccx-lab execution, IDE execution, telemetry, write-back, release, tag, settings, or repository action is performed.",
+    "This matrix does not close issue #9 or approve standalone chat enablement; it records remaining blocker rows only."
+  ],
+  "matrixState": "available_as_data",
+  "readinessState": "blocked",
+  "reviewState": "not_approved",
+  "safetyFlags": {
+    "actionExecution": false,
+    "approvalGranted": false,
+    "attachmentReads": false,
+    "auditLogWritten": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "commandDispatch": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "contentScan": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "directoryScan": false,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileContentRead": false,
+    "fileMetadataRead": false,
+    "focusChanged": false,
+    "gapClosed": false,
+    "gapMatrixOnly": true,
+    "hardwareAccess": false,
+    "inputAccepted": false,
+    "kv260Access": false,
+    "messageBodiesIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelPathIncluded": false,
+    "networkCalls": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "redactionApplied": false,
+    "redactionRulesLoaded": false,
+    "referencesCheckedFixturesOnly": true,
+    "releaseOrTagAction": false,
+    "responseChunksEmitted": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "reviewPacketReferencedOnly": true,
+    "runtimeExecution": false,
+    "sendEnabled": false,
+    "sessionPersistence": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "settingsChange": false,
+    "statusSummaryReferencedOnly": true,
+    "summaryGenerated": false,
+    "telemetry": false,
+    "tokenCountMeasured": false,
+    "transcriptContentIncluded": false,
+    "transcriptExported": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatGapMatrix.v0",
+  "standaloneChatState": "blocked",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}
