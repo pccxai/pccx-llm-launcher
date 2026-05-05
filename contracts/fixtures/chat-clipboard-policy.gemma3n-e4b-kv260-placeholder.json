@@ -1,0 +1,294 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "clipboard_api_boundary_absent",
+      "requiredBefore": "clipboard_read_or_write_enabled",
+      "state": "blocked",
+      "summary": "No reviewed clipboard API permission, read, write, or paste boundary exists."
+    },
+    {
+      "reasonId": "message_content_absent",
+      "requiredBefore": "copy_message_enabled",
+      "state": "empty_not_captured",
+      "summary": "No prompt, response, transcript, or message body content is present."
+    },
+    {
+      "reasonId": "transcript_export_not_reviewed",
+      "requiredBefore": "copy_transcript_enabled",
+      "state": "not_configured",
+      "summary": "Transcript export needs explicit storage, retention, and redaction boundaries."
+    },
+    {
+      "reasonId": "attachment_clipboard_boundary_absent",
+      "requiredBefore": "paste_attachment_enabled",
+      "state": "disabled",
+      "summary": "Clipboard-backed attachments require a reviewed attachment payload boundary."
+    },
+    {
+      "reasonId": "privacy_redaction_not_reviewed",
+      "requiredBefore": "clipboard_import_or_export_enabled",
+      "state": "not_configured",
+      "summary": "Clipboard import and export need explicit redaction and persistence review."
+    }
+  ],
+  "chatActionBarRef": "chat_action_bar_gemma3n_e4b_kv260_placeholder",
+  "chatAttachmentPolicyRef": "chat_attachment_policy_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatLocalOnlyPolicyRef": "chat_local_only_policy_gemma3n_e4b_kv260_placeholder",
+  "chatMessageListRef": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "clipboardControls": [
+    {
+      "blockedReasonRef": "message_content_absent",
+      "contentPolicy": "no message body, selection text, response text, or prompt text",
+      "controlId": "copy_message",
+      "enabled": false,
+      "label": "copy message",
+      "launcherAction": "Keep copy disabled and do not request clipboard write permission.",
+      "sideEffectPolicy": "no_clipboard_write",
+      "state": "disabled",
+      "userAction": "Copy only after message content, selection, redaction, and clipboard write boundaries are reviewed."
+    },
+    {
+      "blockedReasonRef": "transcript_export_not_reviewed",
+      "contentPolicy": "no transcript, prompt, response, session title, or summary content",
+      "controlId": "copy_transcript",
+      "enabled": false,
+      "label": "copy transcript",
+      "launcherAction": "Keep transcript copy disabled and do not read transcript data.",
+      "sideEffectPolicy": "no_transcript_read_no_clipboard_write",
+      "state": "disabled",
+      "userAction": "Copy transcripts only after storage, retention, and redaction policy exists."
+    },
+    {
+      "blockedReasonRef": "clipboard_api_boundary_absent",
+      "contentPolicy": "no clipboard text or prompt text",
+      "controlId": "paste_prompt",
+      "enabled": false,
+      "label": "paste prompt",
+      "launcherAction": "Keep paste disabled and do not inspect clipboard contents.",
+      "sideEffectPolicy": "no_clipboard_read",
+      "state": "disabled",
+      "userAction": "Paste only after an explicit local clipboard read and prompt redaction boundary exists."
+    },
+    {
+      "blockedReasonRef": "attachment_clipboard_boundary_absent",
+      "contentPolicy": "no clipboard payload, file name, path, metadata, preview, or bytes",
+      "controlId": "paste_attachment",
+      "enabled": false,
+      "label": "paste attachment",
+      "launcherAction": "Keep clipboard attachments disabled and do not read clipboard payloads.",
+      "sideEffectPolicy": "no_clipboard_attachment_read",
+      "state": "disabled",
+      "userAction": "Paste attachments only after local attachment and clipboard payload policies are reviewed."
+    },
+    {
+      "blockedReasonRef": "privacy_redaction_not_reviewed",
+      "contentPolicy": "no clipboard text, image, file, path, metadata, preview, or bytes",
+      "controlId": "import_clipboard_payload",
+      "enabled": false,
+      "label": "import clipboard payload",
+      "launcherAction": "Do not import, parse, index, or persist clipboard data.",
+      "sideEffectPolicy": "no_clipboard_import",
+      "state": "disabled",
+      "userAction": "Import clipboard data only after type limits, redaction, and persistence review."
+    },
+    {
+      "blockedReasonRef": "privacy_redaction_not_reviewed",
+      "contentPolicy": "no transcript, message, error detail, file, path, model, runtime, or artifact content",
+      "controlId": "export_to_clipboard",
+      "enabled": false,
+      "label": "export to clipboard",
+      "launcherAction": "Do not write transcript, message, error, file, or artifact data to the clipboard.",
+      "sideEffectPolicy": "no_clipboard_export",
+      "state": "disabled",
+      "userAction": "Export to clipboard only after explicit user action and redaction policy exists."
+    }
+  ],
+  "clipboardExportState": "disabled",
+  "clipboardImportState": "disabled",
+  "clipboardPolicy": {
+    "contentPolicy": "clipboard policy metadata only; no clipboard text, prompt text, response text, transcript text, selection text, file names, paths, bytes, or artifacts are included",
+    "copyEnabled": false,
+    "exportEnabled": false,
+    "importEnabled": false,
+    "mode": "disabled_until_reviewed_clipboard_boundary_exists",
+    "pasteEnabled": false,
+    "persistencePolicy": "no clipboard read, write, paste, copy, import, export, attachment, transcript, session, or artifact persistence",
+    "readEnabled": false,
+    "selectionRequired": false,
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no clipboard API, selection, message, transcript, prompt, attachment, file, artifact, session store, model path, or runtime log is read",
+    "state": "blocked",
+    "userConsentRequired": true,
+    "writeEnabled": false
+  },
+  "clipboardPolicyId": "chat_clipboard_policy_gemma3n_e4b_kv260_placeholder",
+  "clipboardPolicyState": "blocked",
+  "clipboardReadState": "disabled",
+  "clipboardSurfaces": [
+    {
+      "enabled": false,
+      "label": "message actions",
+      "sideEffectPolicy": "no_clipboard_write",
+      "state": "disabled",
+      "summary": "Copy message controls remain disabled because no message content is captured.",
+      "surfaceId": "message_actions"
+    },
+    {
+      "enabled": false,
+      "label": "composer input",
+      "sideEffectPolicy": "no_clipboard_read",
+      "state": "blocked",
+      "summary": "Paste into the composer remains disabled until an explicit clipboard read boundary exists.",
+      "surfaceId": "composer_input"
+    },
+    {
+      "enabled": false,
+      "label": "attachment input",
+      "sideEffectPolicy": "no_clipboard_attachment_read",
+      "state": "disabled",
+      "summary": "Clipboard-backed attachments remain disabled until attachment ingestion and redaction rules exist.",
+      "surfaceId": "attachment_input"
+    },
+    {
+      "enabled": false,
+      "label": "transcript export",
+      "sideEffectPolicy": "no_transcript_export_no_clipboard_write",
+      "state": "not_configured",
+      "summary": "Transcript copy/export remains disabled until retention and redaction boundaries are reviewed.",
+      "surfaceId": "transcript_export"
+    }
+  ],
+  "clipboardWriteState": "disabled",
+  "copyActionState": "disabled",
+  "fixtureVersion": "chat-clipboard-policy.gemma3n-e4b-kv260.2026-05-05",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer data keeps paste controls disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_action_bar",
+      "schemaVersion": "pccx.chatActionBar.v0",
+      "state": "blocked",
+      "summary": "Action bar data keeps copy/export controls disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "empty_not_captured",
+      "summary": "Empty message-list data prevents message copy actions."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_attachment_policy",
+      "schemaVersion": "pccx.chatAttachmentPolicy.v0",
+      "state": "blocked",
+      "summary": "Attachment policy data keeps clipboard-backed attachment reads disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain unavailable."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "blocked",
+      "summary": "Local-only policy keeps provider, cloud, network, and upload paths unavailable."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_clipboard_policy_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat clipboard-policy fixture; no clipboard content, selection, prompt, response, transcript, message body, file, artifact, model path, runtime log, or private path is read or written.",
+    "Clipboard read, write, paste, copy, import, export, transcript-copy, message-copy, and clipboard-backed attachment controls remain disabled or blocked.",
+    "No session store, transcript, message body, attachment, artifact, private path, secret, token, log, or hardware dump is read or written.",
+    "No clipboard API request, prompt capture, transcript export, upload, import, model load, runtime execution, provider call, network call, or KV260 hardware access is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, or runtime implementation."
+  ],
+  "messageContentState": "empty_not_captured",
+  "pasteActionState": "disabled",
+  "privacyState": "summary_only",
+  "safetyFlags": {
+    "attachmentReads": false,
+    "automaticUpload": false,
+    "clipboardAttachmentRead": false,
+    "clipboardCopy": false,
+    "clipboardEventListenerInstalled": false,
+    "clipboardExport": false,
+    "clipboardImport": false,
+    "clipboardMetadataOnly": true,
+    "clipboardPaste": false,
+    "clipboardPolicyDisplayOnly": true,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileImport": false,
+    "filePreview": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelWeightPathsIncluded": false,
+    "networkCalls": false,
+    "networkScan": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "readsTranscript": false,
+    "responseContentIncluded": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretsIncluded": false,
+    "selectionRead": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "sshExecution": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptContentIncluded": false,
+    "transcriptExport": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatClipboardPolicy.v0",
+  "selectionState": "empty_not_captured",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "transcriptState": "not_started"
+}

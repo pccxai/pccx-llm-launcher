@@ -73,6 +73,9 @@
 # Chat action-bar controls boundary (explicit opt-in, read-only local data):
 #   --include-chat-action-bar
 #
+# Chat clipboard-policy boundary (explicit opt-in, read-only local data):
+#   --include-chat-clipboard-policy
+#
 # Chat attachment-policy boundary (explicit opt-in, read-only local data):
 #   --include-chat-attachment-policy
 #
@@ -117,6 +120,7 @@ INCLUDE_CHAT_ERROR_TAXONOMY="0"
 INCLUDE_CHAT_RESPONSE_STREAM="0"
 INCLUDE_CHAT_MESSAGE_LIST="0"
 INCLUDE_CHAT_ACTION_BAR="0"
+INCLUDE_CHAT_CLIPBOARD_POLICY="0"
 INCLUDE_CHAT_ATTACHMENT_POLICY="0"
 INCLUDE_CHAT_SHORTCUT_MAP="0"
 
@@ -534,6 +538,148 @@ print(
 
     HEAD "chat action bar"
     printf '%s\n' "$CHAT_ACTION_BAR_SUMMARY"
+}
+
+print_chat_clipboard_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_CLIPBOARD_POLICY_STUB="$ROOT_DIR/scripts/chat-clipboard-policy-stub.sh"
+
+    if [ ! -f "$CHAT_CLIPBOARD_POLICY_STUB" ]; then
+        ERROR "chat clipboard-policy stub not found: $CHAT_CLIPBOARD_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_CLIPBOARD_POLICY_JSON="$(bash "$CHAT_CLIPBOARD_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat clipboard-policy stub failed"
+        printf '%s\n' "$CHAT_CLIPBOARD_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_CLIPBOARD_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_CLIPBOARD_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["clipboardPolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+surfaces = " ".join(
+    "{}={}:{}".format(surface["surfaceId"], surface["state"], b(surface["enabled"]))
+    for surface in data["clipboardSurfaces"]
+)
+controls = " ".join(
+    "{}={}:{}".format(control["controlId"], control["state"], b(control["enabled"]))
+    for control in data["clipboardControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-clipboard-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no clipboard read/write/paste/copy/import/export/session-store/transcript/message/file/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  policy     : {}".format(data["clipboardPolicyState"]))
+print("[INFO]  read       : {}".format(data["clipboardReadState"]))
+print("[INFO]  write      : {}".format(data["clipboardWriteState"]))
+print("[INFO]  copy       : {}".format(data["copyActionState"]))
+print("[INFO]  paste      : {}".format(data["pasteActionState"]))
+print("[INFO]  import     : {}".format(data["clipboardImportState"]))
+print("[INFO]  export     : {}".format(data["clipboardExportState"]))
+print("[INFO]  selection  : {}".format(data["selectionState"]))
+print("[INFO]  message    : {}".format(data["messageContentState"]))
+print("[INFO]  transcript : {}".format(data["transcriptState"]))
+print("[INFO]  privacy    : {}".format(data["privacyState"]))
+print(
+    "[INFO]  clipboard-policy : {} mode={} readEnabled={} "
+    "writeEnabled={} copyEnabled={} pasteEnabled={} "
+    "importEnabled={} exportEnabled={} userConsentRequired={}".format(
+        policy["state"],
+        policy["mode"],
+        b(policy["readEnabled"]),
+        b(policy["writeEnabled"]),
+        b(policy["copyEnabled"]),
+        b(policy["pasteEnabled"]),
+        b(policy["importEnabled"]),
+        b(policy["exportEnabled"]),
+        b(policy["userConsentRequired"]),
+    )
+)
+print("[INFO]  surfaces   : {}".format(surfaces))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "clipboardPolicyDisplayOnly={} clipboardMetadataOnly={} "
+    "clipboardRead={} clipboardWrite={} clipboardCopy={} "
+    "clipboardPaste={} clipboardImport={} clipboardExport={} "
+    "clipboardAttachmentRead={} clipboardEventListenerInstalled={} "
+    "selectionRead={} messageBodiesIncluded={} promptCapture={} "
+    "promptRead={} promptContentIncluded={} responseContentIncluded={} "
+    "transcriptContentIncluded={} readsTranscript={} "
+    "transcriptExport={} readsSessionStore={} sessionStoreRead={} "
+    "sessionStoreWrite={} attachmentReads={} fileUpload={} "
+    "fileImport={} filePreview={} writesArtifacts={} "
+    "readsArtifacts={} modelAssetRead={} modelExecution={} "
+    "runtimeExecution={} kv260Access={} hardwareAccess={} "
+    "networkCalls={} providerCalls={} cloudCalls={} "
+    "executesPccxLab={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["clipboardPolicyDisplayOnly"]),
+        b(flags["clipboardMetadataOnly"]),
+        b(flags["clipboardRead"]),
+        b(flags["clipboardWrite"]),
+        b(flags["clipboardCopy"]),
+        b(flags["clipboardPaste"]),
+        b(flags["clipboardImport"]),
+        b(flags["clipboardExport"]),
+        b(flags["clipboardAttachmentRead"]),
+        b(flags["clipboardEventListenerInstalled"]),
+        b(flags["selectionRead"]),
+        b(flags["messageBodiesIncluded"]),
+        b(flags["promptCapture"]),
+        b(flags["promptRead"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["readsTranscript"]),
+        b(flags["transcriptExport"]),
+        b(flags["readsSessionStore"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["sessionStoreWrite"]),
+        b(flags["attachmentReads"]),
+        b(flags["fileUpload"]),
+        b(flags["fileImport"]),
+        b(flags["filePreview"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["executesPccxLab"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat clipboard-policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat clipboard policy"
+    printf '%s\n' "$CHAT_CLIPBOARD_POLICY_SUMMARY"
 }
 
 print_chat_attachment_policy_summary() {
@@ -2967,6 +3113,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_ACTION_BAR="1"
             shift
             ;;
+        --include-chat-clipboard-policy)
+            INCLUDE_CHAT_CLIPBOARD_POLICY="1"
+            shift
+            ;;
         --include-chat-attachment-policy)
             INCLUDE_CHAT_ATTACHMENT_POLICY="1"
             shift
@@ -2990,8 +3140,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-clipboard-policy, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -3027,6 +3177,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat stream   : opt-in via --include-chat-response-stream (read-only response stream data)"
     NOTE "chat messages : opt-in via --include-chat-message-list (read-only empty message-list data)"
     NOTE "chat actions  : opt-in via --include-chat-action-bar (read-only disabled action-bar data)"
+    NOTE "chat clipboard: opt-in via --include-chat-clipboard-policy (read-only disabled clipboard-policy data)"
     NOTE "chat attach   : opt-in via --include-chat-attachment-policy (read-only disabled attachment-policy data)"
     NOTE "chat shortcuts: opt-in via --include-chat-shortcut-map (read-only disabled shortcut-map data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
@@ -3051,6 +3202,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ]; then
         if ! print_chat_action_bar_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ]; then
+        if ! print_chat_clipboard_policy_summary; then
             exit 1
         fi
     fi

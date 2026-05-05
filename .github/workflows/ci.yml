@@ -134,6 +134,7 @@ jobs:
                    scripts/chat-response-stream-stub.sh \
                    scripts/chat-message-list-stub.sh \
                    scripts/chat-action-bar-stub.sh \
+                   scripts/chat-clipboard-policy-stub.sh \
                    scripts/chat-attachment-policy-stub.sh \
                    scripts/chat-shortcut-map-stub.sh \
                    scripts/chat-surface-preview.sh \
@@ -260,6 +261,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-action-bar
       - name: run scripts/chat-action-bar-stub.sh
         run: ./scripts/chat-action-bar-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat clipboard policy
+        run: ./scripts/status-stub.sh --include-chat-clipboard-policy
+      - name: run scripts/chat-clipboard-policy-stub.sh
+        run: ./scripts/chat-clipboard-policy-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/status-stub.sh with chat attachment policy
         run: ./scripts/status-stub.sh --include-chat-attachment-policy
       - name: run scripts/chat-attachment-policy-stub.sh
@@ -334,6 +339,8 @@ jobs:
         run: python3 scripts/tests/chat_message_list_contract_test.py
       - name: run chat action-bar contract tests
         run: python3 scripts/tests/chat_action_bar_contract_test.py
+      - name: run chat clipboard-policy contract tests
+        run: python3 scripts/tests/chat_clipboard_policy_contract_test.py
       - name: run chat attachment-policy contract tests
         run: python3 scripts/tests/chat_attachment_policy_contract_test.py
       - name: run chat shortcut-map contract tests
@@ -372,6 +379,7 @@ jobs:
           chmod +x scripts/chat-response-stream-stub.sh
           chmod +x scripts/chat-message-list-stub.sh
           chmod +x scripts/chat-action-bar-stub.sh
+          chmod +x scripts/chat-clipboard-policy-stub.sh
           chmod +x scripts/chat-attachment-policy-stub.sh
           chmod +x scripts/chat-shortcut-map-stub.sh
           chmod +x scripts/launch-stub.sh
@@ -399,6 +407,7 @@ jobs:
           chmod +x scripts/tests/status-chat-response-stream.sh
           chmod +x scripts/tests/status-chat-message-list.sh
           chmod +x scripts/tests/status-chat-action-bar.sh
+          chmod +x scripts/tests/status-chat-clipboard-policy.sh
           chmod +x scripts/tests/status-chat-attachment-policy.sh
           chmod +x scripts/tests/status-chat-shortcut-map.sh
       - name: shellcheck status-stub and test script
@@ -429,6 +438,7 @@ jobs:
           shellcheck scripts/tests/status-chat-response-stream.sh
           shellcheck scripts/tests/status-chat-message-list.sh
           shellcheck scripts/tests/status-chat-action-bar.sh
+          shellcheck scripts/tests/status-chat-clipboard-policy.sh
           shellcheck scripts/tests/status-chat-attachment-policy.sh
           shellcheck scripts/tests/status-chat-shortcut-map.sh
       - name: run status-backend tests
@@ -479,6 +489,8 @@ jobs:
         run: bash scripts/tests/status-chat-message-list.sh scripts/status-stub.sh
       - name: run status-chat-action-bar tests
         run: bash scripts/tests/status-chat-action-bar.sh scripts/status-stub.sh
+      - name: run status-chat-clipboard-policy tests
+        run: bash scripts/tests/status-chat-clipboard-policy.sh scripts/status-stub.sh
       - name: run status-chat-attachment-policy tests
         run: bash scripts/tests/status-chat-attachment-policy.sh scripts/status-stub.sh
       - name: run status-chat-shortcut-map tests
