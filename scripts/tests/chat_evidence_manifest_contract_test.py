@@ -216,6 +216,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "chat_redaction_policy",
         "chat_model_load_request",
         "chat_model_selection_policy",
+        "chat_context_policy",
         "chat_session_store_policy",
         "chat_shortcut_map",
         "chat_clipboard_policy",
@@ -238,6 +239,11 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
     assert refs["chat_model_selection_policy"]["state"] == "requires_review"
     assert refs["chat_model_selection_policy"]["contentPolicy"] == (
         "fixture_reference_only_no_model_catalog_config_asset_selection_persistence_or_provider_fallback"
+    )
+    assert refs["chat_context_policy"]["schemaVersion"] == "pccx.chatContextPolicy.v0"
+    assert refs["chat_context_policy"]["state"] == "requires_review"
+    assert refs["chat_context_policy"]["contentPolicy"] == (
+        "fixture_reference_only_no_prompt_transcript_summary_tokenizer_context_assembly_or_runtime_handoff"
     )
     assert refs["chat_shortcut_map"]["schemaVersion"] == "pccx.chatShortcutMap.v0"
     assert refs["chat_shortcut_map"]["state"] == "requires_review"
@@ -272,6 +278,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "session_store_policy_gate",
         "model_load_request_gate",
         "model_selection_policy_gate",
+        "context_policy_gate",
         "accessibility_review_gate",
         "attachment_policy_gate",
         "clipboard_policy_gate",
@@ -285,6 +292,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "session_store_review_pending",
         "model_load_request_review_pending",
         "model_selection_policy_review_pending",
+        "context_policy_review_pending",
         "accessibility_review_pending",
         "attachment_review_pending",
         "clipboard_review_pending",
@@ -297,6 +305,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "review_session_store_policy",
         "review_model_load_request",
         "review_model_selection_policy",
+        "review_context_policy",
         "review_accessibility_metadata",
         "review_attachment_policy",
         "review_clipboard_policy",
@@ -321,6 +330,7 @@ def test_safety_flags_preserve_manifest_only_boundary() -> None:
     assert flags["sessionStorePolicyReferencedOnly"] is True
     assert flags["modelLoadRequestReferencedOnly"] is True
     assert flags["modelSelectionPolicyReferencedOnly"] is True
+    assert flags["contextPolicyReferencedOnly"] is True
     for name in [
         "evidenceAccepted",
         "gapClosed",

@@ -588,6 +588,7 @@ print(
     "reviewPacketReferencedOnly={} gapMatrixReferencedOnly={} "
     "statusSummaryReferencedOnly={} sessionStorePolicyReferencedOnly={} "
     "modelLoadRequestReferencedOnly={} modelSelectionPolicyReferencedOnly={} "
+    "contextPolicyReferencedOnly={} "
     "evidenceAccepted={} gapClosed={} "
     "approvalGranted={} artifactRead={} artifactWrite={} rawLogRead={} "
     "hardwareDumpRead={} promptCapture={} promptRead={} "
@@ -614,6 +615,7 @@ print(
         b(flags["sessionStorePolicyReferencedOnly"]),
         b(flags["modelLoadRequestReferencedOnly"]),
         b(flags["modelSelectionPolicyReferencedOnly"]),
+        b(flags["contextPolicyReferencedOnly"]),
         b(flags["evidenceAccepted"]),
         b(flags["gapClosed"]),
         b(flags["approvalGranted"]),

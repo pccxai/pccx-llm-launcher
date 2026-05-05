@@ -117,7 +117,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/chat-status-summary-stub.sh`](./scripts/chat-status-summary-stub.sh) | Data-only chat status-summary JSON for the Gemma 3N E4B + KV260 target. Aggregates existing checked chat surface references into blocked/disabled display cards without reading prompts, session stores, configuration, model paths, runtime logs, artifacts, provider state, or hardware state. |
 | [`scripts/chat-review-packet-stub.sh`](./scripts/chat-review-packet-stub.sh) | Data-only chat review-packet JSON for the Gemma 3N E4B + KV260 target. Collects existing checked chat fixture references and review gates without approving prompt capture, session-store reads, model loading, runtime execution, provider calls, or hardware access. |
 | [`scripts/chat-gap-matrix-stub.sh`](./scripts/chat-gap-matrix-stub.sh) | Data-only chat implementation gap-matrix JSON for the Gemma 3N E4B + KV260 target. Tracks remaining standalone chat blockers over existing checked fixture references without closing gaps, reading prompts, reading session stores, loading models, executing runtime paths, calling providers, reading files or clipboard data, invoking pccx-lab or IDE paths, touching hardware, or reading artifacts. |
-| [`scripts/chat-evidence-manifest-stub.sh`](./scripts/chat-evidence-manifest-stub.sh) | Data-only chat evidence-manifest JSON for the Gemma 3N E4B + KV260 target. Lists checked fixture references, including the model-selection policy, model-load request, session-store policy, accessibility, shortcut-map, clipboard-policy, and attachment-policy fixtures, and missing evidence gates without accepting evidence, closing gaps, approving review gates, reading model catalogs, reading model assets, reading stores, reading artifacts, loading models, executing runtime paths, calling providers, invoking pccx-lab or IDE paths, touching hardware, or enabling standalone chat. |
+| [`scripts/chat-evidence-manifest-stub.sh`](./scripts/chat-evidence-manifest-stub.sh) | Data-only chat evidence-manifest JSON for the Gemma 3N E4B + KV260 target. Lists checked fixture references, including the model-selection policy, context-policy, model-load request, session-store policy, accessibility, shortcut-map, clipboard-policy, and attachment-policy fixtures, and missing evidence gates without accepting evidence, closing gaps, approving review gates, reading model catalogs, reading context inputs, reading model assets, reading stores, reading artifacts, loading models, executing runtime paths, calling providers, invoking pccx-lab or IDE paths, touching hardware, or enabling standalone chat. |
 | [`scripts/chat-transcript-policy-stub.sh`](./scripts/chat-transcript-policy-stub.sh) | Data-only chat transcript policy JSON for the Gemma 3N E4B + KV260 target. Reports retention, export, storage, and privacy policy state without reading, generating, storing, persisting, summarizing, or exporting prompt/response/transcript content. |
 | [`scripts/chat-audit-event-stub.sh`](./scripts/chat-audit-event-stub.sh) | Data-only chat audit-event JSON for the Gemma 3N E4B + KV260 target. Reports blocked send metadata, redaction policy, absent prompt/response/transcript content, and disabled audit persistence. |
 | [`scripts/chat-error-taxonomy-stub.sh`](./scripts/chat-error-taxonomy-stub.sh) | Data-only chat error taxonomy JSON for the Gemma 3N E4B + KV260 target. Groups blocked readiness, model/runtime, session, and policy errors without reading prompts, providers, configs, model paths, logs, stores, or artifacts. |
@@ -549,6 +549,13 @@ model option plus disabled catalog, picker, asset discovery, provider
 fallback, selection persistence, and load-request gates without reading
 configuration, catalogs, model paths, assets, prompts, responses,
 transcripts, runtime logs, or artifacts.
+
+The chat context-policy fixture defines the disabled context-window and
+tokenization boundary for the planned chat surface. It records disabled
+context windows, tokenization, token counting, transcript context,
+summary handling, truncation, context assembly, and runtime handoff gates
+without reading prompts, transcripts, summaries, tokenizers, model paths,
+runtime logs, or artifacts.
 
 The chat model-load request fixture defines the disabled local model-load
 boundary for the planned chat surface. It records descriptor selection,

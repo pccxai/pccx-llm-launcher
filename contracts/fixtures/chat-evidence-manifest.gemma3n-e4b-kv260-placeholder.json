@@ -44,6 +44,12 @@
       "summary": "Model catalog discovery, config option reads, selection acceptance, selection persistence, provider fallback, and model-load handoff still require review."
     },
     {
+      "reasonId": "context_policy_review_pending",
+      "requiredBefore": "context_policy_enabled",
+      "state": "requires_review",
+      "summary": "Context windows, tokenization, token counting, transcript context, summary handling, truncation, context assembly, and runtime handoff still require review."
+    },
+    {
       "reasonId": "accessibility_review_pending",
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
@@ -143,6 +149,15 @@
       "summary": "Model-selection policy metadata is referenced as a checked fixture and still needs review before any model catalog discovery, config option read, selection acceptance, selection persistence, provider fallback, or model-load handoff is treated as implemented."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_prompt_transcript_summary_tokenizer_context_assembly_or_runtime_handoff",
+      "fixturePath": "contracts/fixtures/chat-context-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_context_policy",
+      "requiredBefore": "context_policy_enabled",
+      "schemaVersion": "pccx.chatContextPolicy.v0",
+      "state": "requires_review",
+      "summary": "Context-policy metadata is referenced as a checked fixture and still needs review before any context-window, tokenization, token-counting, summary, truncation, context assembly, or runtime handoff path is treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence",
       "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_session_store_policy",
@@ -189,12 +204,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-selection-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-context-policy-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_selection_evidence_ref_2026-05-06",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_context_policy_evidence_ref_2026-05-06",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -244,6 +259,13 @@
       "requiredBefore": "model_selection_enabled",
       "state": "requires_review",
       "summary": "Review the checked model-selection policy fixture separately before enabling model catalog discovery, config option reads, selection acceptance, persistence, provider fallback, or model-load handoff."
+    },
+    {
+      "actionId": "review_context_policy",
+      "enabled": false,
+      "requiredBefore": "context_policy_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked context-policy fixture separately before enabling tokenizer reads, token counting, context-window reads, transcript or summary context, truncation, context assembly, or runtime handoff."
     },
     {
       "actionId": "review_accessibility_metadata",
@@ -312,6 +334,12 @@
       "summary": "Model-selection metadata remains a review reference and does not enable model catalog discovery, config option reads, selection acceptance, persistence, provider fallback, or model-load handoff."
     },
     {
+      "linkId": "context_policy_gate",
+      "refId": "chat_context_policy",
+      "state": "requires_review",
+      "summary": "Context-policy metadata remains a review reference and does not enable tokenizer reads, token counting, context-window reads, summary generation, truncation, context assembly, or runtime handoff."
+    },
+    {
       "linkId": "accessibility_review_gate",
       "refId": "chat_accessibility",
       "state": "requires_review",
@@ -348,6 +376,7 @@
     "compatibilityClaim": false,
     "configRead": false,
     "contentScan": false,
+    "contextPolicyReferencedOnly": true,
     "dataOnly": true,
     "deterministic": true,
     "directoryScan": false,
