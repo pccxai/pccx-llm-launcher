@@ -38,6 +38,12 @@
       "summary": "Model asset path lookup, validation, load, warmup, unload, and load-request persistence still require review."
     },
     {
+      "reasonId": "model_selection_policy_review_pending",
+      "requiredBefore": "model_selection_enabled",
+      "state": "requires_review",
+      "summary": "Model catalog discovery, config option reads, selection acceptance, selection persistence, provider fallback, and model-load handoff still require review."
+    },
+    {
       "reasonId": "accessibility_review_pending",
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
@@ -128,6 +134,15 @@
       "summary": "Model-load request metadata is referenced as a checked fixture and still needs review before any model asset path, validation, load, warmup, unload, or persistence path is treated as implemented."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_model_catalog_config_asset_selection_persistence_or_provider_fallback",
+      "fixturePath": "contracts/fixtures/chat-model-selection-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_selection_policy",
+      "requiredBefore": "model_selection_enabled",
+      "schemaVersion": "pccx.chatModelSelectionPolicy.v0",
+      "state": "requires_review",
+      "summary": "Model-selection policy metadata is referenced as a checked fixture and still needs review before any model catalog discovery, config option read, selection acceptance, selection persistence, provider fallback, or model-load handoff is treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence",
       "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_session_store_policy",
@@ -174,12 +189,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-load-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-selection-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_load_evidence_ref_2026-05-06",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_selection_evidence_ref_2026-05-06",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -222,6 +237,13 @@
       "requiredBefore": "model_load_request_enabled",
       "state": "requires_review",
       "summary": "Review the checked model-load request fixture separately before enabling model asset path lookup, validation, load, warmup, unload, or load-request persistence."
+    },
+    {
+      "actionId": "review_model_selection_policy",
+      "enabled": false,
+      "requiredBefore": "model_selection_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked model-selection policy fixture separately before enabling model catalog discovery, config option reads, selection acceptance, persistence, provider fallback, or model-load handoff."
     },
     {
       "actionId": "review_accessibility_metadata",
@@ -284,6 +306,12 @@
       "summary": "Model-load request metadata remains a review reference and does not enable model asset path lookup, validation, load, warmup, unload, or persistence behavior."
     },
     {
+      "linkId": "model_selection_policy_gate",
+      "refId": "chat_model_selection_policy",
+      "state": "requires_review",
+      "summary": "Model-selection metadata remains a review reference and does not enable model catalog discovery, config option reads, selection acceptance, persistence, provider fallback, or model-load handoff."
+    },
+    {
       "linkId": "accessibility_review_gate",
       "refId": "chat_accessibility",
       "state": "requires_review",
@@ -341,6 +369,7 @@
     "modelLoadAttempted": false,
     "modelLoadRequestReferencedOnly": true,
     "modelPathIncluded": false,
+    "modelSelectionPolicyReferencedOnly": true,
     "networkCalls": false,
     "promptCapture": false,
     "promptContentIncluded": false,

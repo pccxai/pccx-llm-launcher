@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-load-ref",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_load_evidence_ref_2026-05-06",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-selection-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_selection_evidence_ref_2026-05-06",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -163,6 +163,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Model-load request metadata is referenced as a checked fixture and still needs review before any model asset path, validation, load, warmup, unload, or persistence path is treated as implemented.",
             "contentPolicy": "fixture_reference_only_no_model_asset_path_read_validation_load_warmup_unload_or_persistence",
             "requiredBefore": "model_load_request_enabled",
+        },
+        {
+            "refId": "chat_model_selection_policy",
+            "schemaVersion": "pccx.chatModelSelectionPolicy.v0",
+            "fixturePath": "contracts/fixtures/chat-model-selection-policy.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Model-selection policy metadata is referenced as a checked fixture and still needs review before any model catalog discovery, config option read, selection acceptance, selection persistence, provider fallback, or model-load handoff is treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_model_catalog_config_asset_selection_persistence_or_provider_fallback",
+            "requiredBefore": "model_selection_enabled",
         },
         {
             "refId": "chat_session_store_policy",
@@ -242,6 +251,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Model-load request metadata remains a review reference and does not enable model asset path lookup, validation, load, warmup, unload, or persistence behavior.",
         },
         {
+            "linkId": "model_selection_policy_gate",
+            "refId": "chat_model_selection_policy",
+            "state": "requires_review",
+            "summary": "Model-selection metadata remains a review reference and does not enable model catalog discovery, config option reads, selection acceptance, persistence, provider fallback, or model-load handoff.",
+        },
+        {
             "linkId": "accessibility_review_gate",
             "refId": "chat_accessibility",
             "state": "requires_review",
@@ -302,6 +317,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "state": "requires_review",
             "summary": "Model asset path lookup, validation, load, warmup, unload, and load-request persistence still require review.",
             "requiredBefore": "model_load_request_enabled",
+        },
+        {
+            "reasonId": "model_selection_policy_review_pending",
+            "state": "requires_review",
+            "summary": "Model catalog discovery, config option reads, selection acceptance, selection persistence, provider fallback, and model-load handoff still require review.",
+            "requiredBefore": "model_selection_enabled",
         },
         {
             "reasonId": "accessibility_review_pending",
@@ -365,6 +386,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "model_load_request_enabled",
         },
         {
+            "actionId": "review_model_selection_policy",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked model-selection policy fixture separately before enabling model catalog discovery, config option reads, selection acceptance, persistence, provider fallback, or model-load handoff.",
+            "requiredBefore": "model_selection_enabled",
+        },
+        {
             "actionId": "review_accessibility_metadata",
             "state": "requires_review",
             "enabled": False,
@@ -404,6 +432,7 @@ _CHAT_EVIDENCE_MANIFEST = {
         "statusSummaryReferencedOnly": True,
         "sessionStorePolicyReferencedOnly": True,
         "modelLoadRequestReferencedOnly": True,
+        "modelSelectionPolicyReferencedOnly": True,
         "evidenceAccepted": False,
         "gapClosed": False,
         "approvalGranted": False,
