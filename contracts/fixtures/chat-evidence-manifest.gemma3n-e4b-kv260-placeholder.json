@@ -30,6 +30,12 @@
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
       "summary": "Accessibility labels, focus order, live-region behavior, contrast, and motion metadata still require UI review."
+    },
+    {
+      "reasonId": "attachment_review_pending",
+      "requiredBefore": "attachment_controls_enabled",
+      "state": "requires_review",
+      "summary": "Attachment file picker, file metadata, file content, upload, import, preview, and persistence behavior still require review."
     }
   ],
   "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
@@ -89,6 +95,15 @@
       "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_file_picker_file_read_upload_import_or_preview",
+      "fixturePath": "contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_attachment_policy",
+      "requiredBefore": "attachment_controls_enabled",
+      "schemaVersion": "pccx.chatAttachmentPolicy.v0",
+      "state": "requires_review",
+      "summary": "Attachment policy metadata is referenced as a checked fixture and still needs review before any attachment control is treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_ui_focus_keyboard_or_live_region_execution",
       "fixturePath": "contracts/fixtures/chat-accessibility.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_accessibility",
@@ -99,12 +114,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-accessibility-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-attachment-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_accessibility_evidence_ref_2026-05-05",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_attachment_evidence_ref_2026-05-05",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -140,6 +155,13 @@
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
       "summary": "Review the checked accessibility fixture separately before enabling any labels, focus behavior, live-region updates, contrast tokens, or motion behavior."
+    },
+    {
+      "actionId": "review_attachment_policy",
+      "enabled": false,
+      "requiredBefore": "attachment_controls_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked attachment policy fixture separately before enabling file picker, file read, upload, import, preview, or persistence paths."
     }
   ],
   "reviewLinks": [
@@ -166,6 +188,12 @@
       "refId": "chat_accessibility",
       "state": "requires_review",
       "summary": "Accessibility metadata remains a review reference and does not enable UI behavior."
+    },
+    {
+      "linkId": "attachment_policy_gate",
+      "refId": "chat_attachment_policy",
+      "state": "requires_review",
+      "summary": "Attachment metadata remains a review reference and does not enable file picker, upload, import, preview, or persistence behavior."
     }
   ],
   "reviewState": "not_approved",
