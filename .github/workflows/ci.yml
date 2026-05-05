@@ -119,6 +119,7 @@ jobs:
                    scripts/chat-session-stub.sh \
                    scripts/chat-session-lifecycle-stub.sh \
                    scripts/chat-surface-layout-stub.sh \
+                   scripts/chat-empty-state-stub.sh \
                    scripts/chat-local-only-policy-stub.sh \
                    scripts/chat-preferences-stub.sh \
                    scripts/chat-session-index-stub.sh \
@@ -199,6 +200,10 @@ jobs:
         run: ./scripts/status-stub.sh --include-chat-surface-layout
       - name: run scripts/chat-surface-layout-stub.sh
         run: ./scripts/chat-surface-layout-stub.sh --model gemma3n-e4b --target kv260
+      - name: run scripts/status-stub.sh with chat empty state
+        run: ./scripts/status-stub.sh --include-chat-empty-state
+      - name: run scripts/chat-empty-state-stub.sh
+        run: ./scripts/chat-empty-state-stub.sh --model gemma3n-e4b --target kv260
       - name: run scripts/status-stub.sh with chat local-only policy
         run: ./scripts/status-stub.sh --include-chat-local-only-policy
       - name: run scripts/chat-local-only-policy-stub.sh
@@ -299,6 +304,8 @@ jobs:
         run: python3 scripts/tests/chat_session_lifecycle_contract_test.py
       - name: run chat surface-layout contract tests
         run: python3 scripts/tests/chat_surface_layout_contract_test.py
+      - name: run chat empty-state contract tests
+        run: python3 scripts/tests/chat_empty_state_contract_test.py
       - name: run chat local-only policy contract tests
         run: python3 scripts/tests/chat_local_only_policy_contract_test.py
       - name: run chat preferences contract tests
@@ -350,6 +357,7 @@ jobs:
           chmod +x scripts/chat-session-stub.sh
           chmod +x scripts/chat-session-lifecycle-stub.sh
           chmod +x scripts/chat-surface-layout-stub.sh
+          chmod +x scripts/chat-empty-state-stub.sh
           chmod +x scripts/chat-local-only-policy-stub.sh
           chmod +x scripts/chat-preferences-stub.sh
           chmod +x scripts/chat-session-index-stub.sh
@@ -376,6 +384,7 @@ jobs:
           chmod +x scripts/tests/status-chat-model-load-request.sh
           chmod +x scripts/tests/status-chat-session.sh
           chmod +x scripts/tests/status-chat-surface-layout.sh
+          chmod +x scripts/tests/status-chat-empty-state.sh
           chmod +x scripts/tests/status-chat-local-only-policy.sh
           chmod +x scripts/tests/status-chat-preferences.sh
           chmod +x scripts/tests/status-chat-session-index.sh
@@ -405,6 +414,7 @@ jobs:
           shellcheck scripts/tests/status-chat-model-load-request.sh
           shellcheck scripts/tests/status-chat-session.sh
           shellcheck scripts/tests/status-chat-surface-layout.sh
+          shellcheck scripts/tests/status-chat-empty-state.sh
           shellcheck scripts/tests/status-chat-local-only-policy.sh
           shellcheck scripts/tests/status-chat-preferences.sh
           shellcheck scripts/tests/status-chat-session-index.sh
@@ -439,6 +449,8 @@ jobs:
         run: bash scripts/tests/status-chat-session.sh scripts/status-stub.sh
       - name: run status-chat-surface-layout tests
         run: bash scripts/tests/status-chat-surface-layout.sh scripts/status-stub.sh
+      - name: run status-chat-empty-state tests
+        run: bash scripts/tests/status-chat-empty-state.sh scripts/status-stub.sh
       - name: run status-chat-local-only-policy tests
         run: bash scripts/tests/status-chat-local-only-policy.sh scripts/status-stub.sh
       - name: run status-chat-preferences tests

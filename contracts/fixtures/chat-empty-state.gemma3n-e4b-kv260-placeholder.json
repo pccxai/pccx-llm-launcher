@@ -1,0 +1,289 @@
+{
+  "actionState": "disabled",
+  "affordanceHints": [
+    {
+      "blockedReasonRef": "session_store_not_configured",
+      "contentPolicy": "display label only; no session creation, title generation, store read, store write, or command dispatch",
+      "enabled": false,
+      "hintId": "start_new_session_hint",
+      "label": "start new session hint",
+      "sourceRef": "chat_session_lifecycle",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "model_asset_boundary_absent",
+      "contentPolicy": "display label only; no catalog read, model path read, asset validation, or model selection persistence",
+      "enabled": false,
+      "hintId": "select_model_hint",
+      "label": "select model hint",
+      "sourceRef": "chat_model_selection_policy",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "runtime_evidence_absent",
+      "contentPolicy": "display label only; no runtime check, log read, hardware probe, or provider call",
+      "enabled": false,
+      "hintId": "review_readiness_hint",
+      "label": "review readiness hint",
+      "sourceRef": "chat_readiness",
+      "state": "available_as_data",
+      "visible": true
+    },
+    {
+      "blockedReasonRef": "prompt_capture_blocked",
+      "contentPolicy": "display label only; no focus change, prompt read, prompt capture, or key event capture",
+      "enabled": false,
+      "hintId": "focus_composer_hint",
+      "label": "focus composer hint",
+      "sourceRef": "chat_composer",
+      "state": "disabled",
+      "visible": true
+    }
+  ],
+  "blockedReasons": [
+    {
+      "reasonId": "runtime_evidence_absent",
+      "requiredBefore": "assistant_response_display_enabled",
+      "state": "blocked",
+      "summary": "No reviewed local chat runtime evidence exists for enabling conversation output."
+    },
+    {
+      "reasonId": "model_asset_boundary_absent",
+      "requiredBefore": "model_picker_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed model asset input, validation, or load boundary exists."
+    },
+    {
+      "reasonId": "session_store_not_configured",
+      "requiredBefore": "session_creation_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed session store, retention, or title boundary is enabled."
+    },
+    {
+      "reasonId": "prompt_capture_blocked",
+      "requiredBefore": "composer_focus_or_send_enabled",
+      "state": "empty_not_captured",
+      "summary": "Prompt capture remains disabled by the composer and send-result boundaries."
+    },
+    {
+      "reasonId": "transcript_content_absent",
+      "requiredBefore": "message_list_rendered_from_store",
+      "state": "empty_not_captured",
+      "summary": "No prompt, response, message body, transcript, session title, or summary content exists in this fixture."
+    },
+    {
+      "reasonId": "action_execution_disabled",
+      "requiredBefore": "empty_state_affordances_enabled",
+      "state": "disabled",
+      "summary": "Empty-state hints are display-only and do not dispatch commands."
+    }
+  ],
+  "chatActionBarRef": "chat_action_bar_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatModelStatusRef": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "chatReadinessRef": "chat_readiness_gemma3n_e4b_kv260_placeholder",
+  "chatSessionIndexRef": "chat_session_index_gemma3n_e4b_kv260_placeholder",
+  "chatSurfaceLayoutRef": "chat_surface_layout_gemma3n_e4b_kv260_placeholder",
+  "displaySlots": [
+    {
+      "contentPolicy": "target labels only; no model asset, model path, tokenizer, runtime, or hardware evidence is included",
+      "displayRole": "status",
+      "enabled": true,
+      "label": "target banner",
+      "slotId": "target_banner",
+      "sourceRef": "chat_model_status",
+      "state": "target_selected",
+      "visible": true
+    },
+    {
+      "contentPolicy": "no prompt, response, message body, transcript text, session title, or summary is included",
+      "displayRole": "primary",
+      "enabled": true,
+      "label": "empty transcript notice",
+      "slotId": "empty_transcript_notice",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "visible": true
+    },
+    {
+      "contentPolicy": "readiness labels only; no log, runtime output, hardware probe, or provider state is included",
+      "displayRole": "readiness",
+      "enabled": true,
+      "label": "readiness notice",
+      "slotId": "readiness_notice",
+      "sourceRef": "chat_readiness",
+      "state": "blocked",
+      "visible": true
+    },
+    {
+      "contentPolicy": "input affordance metadata only; no prompt capture, echo, validation, or persistence is included",
+      "displayRole": "input",
+      "enabled": true,
+      "label": "composer disabled notice",
+      "slotId": "composer_disabled_notice",
+      "sourceRef": "chat_composer",
+      "state": "disabled",
+      "visible": true
+    },
+    {
+      "contentPolicy": "local-only policy labels only; no provider configuration, network state, or fallback path is included",
+      "displayRole": "policy",
+      "enabled": true,
+      "label": "local-only notice",
+      "slotId": "local_only_notice",
+      "sourceRef": "chat_local_only_policy",
+      "state": "summary_only",
+      "visible": true
+    }
+  ],
+  "emptyStateId": "chat_empty_state_gemma3n_e4b_kv260_placeholder",
+  "emptyStatePolicy": {
+    "contentPolicy": "empty-state metadata only; no message body, transcript text, prompt text, response text, file path, model path, runtime log, or private path is included",
+    "externalDependencyPolicy": "no provider, network, hardware, pccx-lab, IDE, model asset, session store, or artifact dependency is used",
+    "hintPolicy": "disabled affordance hints only; no command ids, command dispatch, or action execution is included",
+    "messagePolicy": "static placeholder text only; no prompt, response, transcript, session title, summary, or generated content is read",
+    "renderMode": "future_local_chat_empty_state",
+    "sideEffectPolicy": "local_render_only",
+    "state": "available_as_data"
+  },
+  "emptyStateState": "available_as_data",
+  "fixtureVersion": "chat-empty-state.gemma3n-e4b-kv260.2026-05-05",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_surface_layout",
+      "schemaVersion": "pccx.chatSurfaceLayout.v0",
+      "state": "placeholder",
+      "summary": "Surface layout defines the planned shell regions for the empty state."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness metadata keeps model, runtime, and target checks blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "blocked",
+      "summary": "Model status keeps descriptor, load, runtime, context, and response rows blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session_index",
+      "schemaVersion": "pccx.chatSessionIndex.v0",
+      "state": "empty_not_captured",
+      "summary": "Session index remains empty and does not read titles, summaries, or stores."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer metadata keeps prompt capture and send disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "empty_not_captured",
+      "summary": "Message list remains empty without message bodies or transcript content."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_action_bar",
+      "schemaVersion": "pccx.chatActionBar.v0",
+      "state": "disabled",
+      "summary": "Action-bar metadata keeps conversation controls disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "summary_only",
+      "summary": "Local-only policy keeps provider, cloud, and fallback paths unavailable."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_empty_state_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat empty-state fixture; all displayed values are checked metadata for the planned local chat shell.",
+    "No prompt, response, transcript, message body, summary, session title, session store, configuration file, environment value, model path, tokenizer path, runtime log, private path, secret, or token is read.",
+    "No prompt capture, input acceptance, response generation, model asset read, model load, runtime start, target access, provider call, command dispatch, focus change, clipboard access, attachment read, telemetry, upload, or artifact write is performed.",
+    "No pccx-lab invocation, systemverilog-ide invocation, MCP server, LSP, compatibility promise, storage layer, runtime, model-loader, or hardware implementation is included."
+  ],
+  "modelState": "not_loaded",
+  "privacyState": "summary_only",
+  "promptState": "empty_not_captured",
+  "readinessState": "blocked",
+  "runtimeState": "not_started",
+  "safetyFlags": {
+    "actionExecution": false,
+    "attachmentReads": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "commandDispatch": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "emptyStateDisplayOnly": true,
+    "emptyStateTextOnly": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "filePickerOpened": false,
+    "focusChanged": false,
+    "hardwareAccess": false,
+    "inputAccepted": false,
+    "keyboardCapture": false,
+    "kv260Access": false,
+    "localRenderOnly": true,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageContentIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "modelPathIncluded": false,
+    "networkCalls": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "runtimeOutputIncluded": false,
+    "runtimeStarted": false,
+    "secretsIncluded": false,
+    "sessionTitleIncluded": false,
+    "summaryIncluded": false,
+    "telemetry": false,
+    "transcriptContentIncluded": false,
+    "upload": false,
+    "writesArtifacts": false,
+    "writesSessionStore": false
+  },
+  "schemaVersion": "pccx.chatEmptyState.v0",
+  "sessionState": "inactive",
+  "surfaceState": "placeholder",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "transcriptState": "empty_not_captured"
+}

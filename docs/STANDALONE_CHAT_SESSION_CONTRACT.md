@@ -15,6 +15,7 @@ The implementation lives in:
 - `contracts/chat_model_load_request_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_surface_layout_contract.py`
+- `contracts/chat_empty_state_contract.py`
 - `contracts/chat_local_only_policy_contract.py`
 - `contracts/chat_preferences_contract.py`
 - `contracts/chat_session_index_contract.py`
@@ -37,6 +38,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-empty-state.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-preferences.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-index.gemma3n-e4b-kv260-placeholder.json`
@@ -59,6 +61,7 @@ The implementation lives in:
 - `scripts/chat-model-load-request-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-layout-stub.sh`
+- `scripts/chat-empty-state-stub.sh`
 - `scripts/chat-local-only-policy-stub.sh`
 - `scripts/chat-preferences-stub.sh`
 - `scripts/chat-session-index-stub.sh`
@@ -82,6 +85,7 @@ The implementation lives in:
 - `scripts/tests/chat_model_load_request_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_layout_contract_test.py`
+- `scripts/tests/chat_empty_state_contract_test.py`
 - `scripts/tests/chat_local_only_policy_contract_test.py`
 - `scripts/tests/chat_preferences_contract_test.py`
 - `scripts/tests/chat_session_index_contract_test.py`
@@ -103,6 +107,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-context-policy.sh`
 - `scripts/tests/status-chat-model-load-request.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
+- `scripts/tests/status-chat-empty-state.sh`
 - `scripts/tests/status-chat-local-only-policy.sh`
 - `scripts/tests/status-chat-preferences.sh`
 - `scripts/tests/status-chat-session-index.sh`
@@ -138,6 +143,8 @@ The chat/session contract records:
   clear, and export actions
 - planned shell regions and navigation items for the blocked chat
   surface layout
+- static empty-state display slots and disabled hints for the blocked
+  chat surface without command dispatch or action execution
 - local-only policy metadata that keeps cloud/provider/network fallback
   paths disabled or not used
 - planned preferences panels for model/target display, privacy,
@@ -265,6 +272,23 @@ and audit footer. The fixture does not implement an app shell, read
 prompt/response/transcript/session-store content, focus the composer,
 start runtime code, load a model, touch hardware, call providers,
 invoke pccx-lab, or write artifacts.
+
+The chat empty-state fixture records static placeholder display slots
+and disabled hints for the planned standalone chat UI:
+
+```bash
+bash scripts/chat-empty-state-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-empty-state
+```
+
+It reports target, empty transcript, readiness, disabled composer, and
+local-only display slots plus disabled hints for future session, model,
+readiness, and composer affordances. The fixture does not read prompts,
+responses, transcripts, session stores, model paths, configuration,
+environment values, runtime logs, private paths, or artifacts, and it
+does not accept input, dispatch commands, change focus, load models,
+start runtimes, access a target, call providers, invoke pccx-lab, or
+write artifacts.
 
 The chat local-only policy fixture records the cloud/provider/network
 dependency boundary for the planned standalone chat UI:
