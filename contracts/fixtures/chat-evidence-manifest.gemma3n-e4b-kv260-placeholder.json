@@ -36,6 +36,12 @@
       "requiredBefore": "attachment_controls_enabled",
       "state": "requires_review",
       "summary": "Attachment file picker, file metadata, file content, upload, import, preview, and persistence behavior still require review."
+    },
+    {
+      "reasonId": "clipboard_review_pending",
+      "requiredBefore": "clipboard_controls_enabled",
+      "state": "requires_review",
+      "summary": "Clipboard read, write, paste, copy, import, export, transcript copy, message copy, and clipboard-backed attachment behavior still require review."
     }
   ],
   "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
@@ -95,6 +101,15 @@
       "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_clipboard_read_write_paste_copy_import_or_export",
+      "fixturePath": "contracts/fixtures/chat-clipboard-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_clipboard_policy",
+      "requiredBefore": "clipboard_controls_enabled",
+      "schemaVersion": "pccx.chatClipboardPolicy.v0",
+      "state": "requires_review",
+      "summary": "Clipboard policy metadata is referenced as a checked fixture and still needs review before clipboard controls are treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_file_picker_file_read_upload_import_or_preview",
       "fixturePath": "contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_attachment_policy",
@@ -114,12 +129,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-attachment-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-clipboard-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_attachment_evidence_ref_2026-05-05",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_clipboard_evidence_ref_2026-05-05",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -162,6 +177,13 @@
       "requiredBefore": "attachment_controls_enabled",
       "state": "requires_review",
       "summary": "Review the checked attachment policy fixture separately before enabling file picker, file read, upload, import, preview, or persistence paths."
+    },
+    {
+      "actionId": "review_clipboard_policy",
+      "enabled": false,
+      "requiredBefore": "clipboard_controls_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked clipboard policy fixture separately before enabling clipboard read, write, paste, copy, import, export, or clipboard-backed attachment paths."
     }
   ],
   "reviewLinks": [
@@ -194,6 +216,12 @@
       "refId": "chat_attachment_policy",
       "state": "requires_review",
       "summary": "Attachment metadata remains a review reference and does not enable file picker, upload, import, preview, or persistence behavior."
+    },
+    {
+      "linkId": "clipboard_policy_gate",
+      "refId": "chat_clipboard_policy",
+      "state": "requires_review",
+      "summary": "Clipboard metadata remains a review reference and does not enable clipboard read, write, paste, copy, import, or export behavior."
     }
   ],
   "reviewState": "not_approved",
