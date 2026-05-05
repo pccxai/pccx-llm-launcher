@@ -11,6 +11,7 @@ The implementation lives in:
 - `contracts/chat_session_contract.py`
 - `contracts/chat_model_status_contract.py`
 - `contracts/chat_model_selection_policy_contract.py`
+- `contracts/chat_context_policy_contract.py`
 - `contracts/chat_model_load_request_contract.py`
 - `contracts/chat_session_lifecycle_contract.py`
 - `contracts/chat_surface_layout_contract.py`
@@ -32,6 +33,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-selection-policy.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-context-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-session-lifecycle.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json`
@@ -53,6 +55,7 @@ The implementation lives in:
 - `scripts/chat-session-stub.sh`
 - `scripts/chat-model-status-stub.sh`
 - `scripts/chat-model-selection-policy-stub.sh`
+- `scripts/chat-context-policy-stub.sh`
 - `scripts/chat-model-load-request-stub.sh`
 - `scripts/chat-session-lifecycle-stub.sh`
 - `scripts/chat-surface-layout-stub.sh`
@@ -75,6 +78,7 @@ The implementation lives in:
 - `scripts/tests/chat_session_contract_test.py`
 - `scripts/tests/chat_model_status_contract_test.py`
 - `scripts/tests/chat_model_selection_policy_contract_test.py`
+- `scripts/tests/chat_context_policy_contract_test.py`
 - `scripts/tests/chat_model_load_request_contract_test.py`
 - `scripts/tests/chat_session_lifecycle_contract_test.py`
 - `scripts/tests/chat_surface_layout_contract_test.py`
@@ -96,6 +100,7 @@ The implementation lives in:
 - `scripts/tests/chat_surface_preview_test.py`
 - `scripts/tests/status-chat-model-status.sh`
 - `scripts/tests/status-chat-model-selection-policy.sh`
+- `scripts/tests/status-chat-context-policy.sh`
 - `scripts/tests/status-chat-model-load-request.sh`
 - `scripts/tests/status-chat-surface-layout.sh`
 - `scripts/tests/status-chat-local-only-policy.sh`
@@ -124,6 +129,9 @@ The chat/session contract records:
 - a disabled model-selection policy boundary for static target option,
   model catalog, picker, asset discovery, provider fallback, persistence,
   and load-request gates
+- a disabled context-policy boundary for context windows, tokenization,
+  token counting, transcript context, summaries, truncation, context
+  assembly, and runtime handoff
 - a disabled model-load request boundary for descriptor selection, asset
   paths, checksums, runtime preflight, load, warmup, and unload gates
 - disabled session controls for new session, model status, send,
@@ -195,6 +203,24 @@ weights, tokenizer files, checksum manifests, private paths, prompts,
 responses, transcripts, runtime logs, or artifacts, and it does not
 accept or persist model selections, call providers, validate assets,
 load models, start runtimes, or write model-selection data.
+
+The chat context-policy fixture records the disabled context-window,
+tokenization, and context-assembly boundary for future chat turns:
+
+```bash
+bash scripts/chat-context-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-context-policy
+```
+
+It reports context-window, token budget, tokenizer, prompt-context,
+transcript-context, summary, truncation, context assembly, and runtime
+handoff gates as disabled, blocked, not configured, or not generated. The
+fixture does not read prompts, responses, transcripts, message bodies,
+summaries, session stores, configuration files, environment values, model
+paths, tokenizer paths, runtime logs, private paths, or artifacts, and it
+does not count tokens, truncate context, assemble a runtime payload,
+generate summaries, load models, start runtimes, call providers, or write
+context data.
 
 The chat model-load request fixture records the disabled local load
 boundary for future chat model loading:
@@ -613,6 +639,25 @@ content, token data, runtime transport, and transcript storage:
 - `unavailable`: token counts, stream completion, or response content
   are unavailable
 
+The context-policy states keep context-window and context-assembly
+metadata separate from prompt content, transcript content, token data,
+summaries, and runtime handoff:
+
+- `available_as_data`: checked context-policy metadata is available
+  without executing anything
+- `blocked`: a required tokenizer, context, transcript, summary, or
+  runtime boundary is missing
+- `disabled`: truncation or context-control behavior is intentionally
+  unavailable
+- `empty_not_captured`: no prompt draft is captured or stored
+- `not_configured`: no context window, token budget, transcript store,
+  or local context source exists
+- `not_generated`: no summary or assistant output has been produced
+- `requires_evidence`: future enablement requires runtime or context
+  evidence first
+- `summary_only`: display data excludes raw content, private paths, and
+  token content
+
 The action-bar states keep user-visible conversation controls separate
 from session storage, transcripts, clipboard access, file access, runtime
 transport, and message content:
@@ -698,6 +743,11 @@ The model-selection policy contract adds a disabled picker/catalog shape
 without configuration reads, model catalog reads, model path reads, asset
 path reads, provider fallback, selection persistence, runtime execution,
 model loading, hardware access, or artifact access.
+The context-policy contract adds a reviewable disabled context-window,
+tokenization, transcript-context, summary, truncation, context assembly,
+and runtime-handoff shape without prompt reads, transcript reads, token
+counting, summary generation, model loading, runtime execution, provider
+calls, target access, persistence, or artifact access.
 The lifecycle contract adds a reviewable session-management shape, but
 these contracts do not add runtime execution, model loading, provider
 calls, persistence, target access, artifact reads, or artifact writes.
@@ -731,6 +781,12 @@ The response-stream contract adds a reviewable disabled stream/progress
 display shape without opening transport, generating response chunks,
 counting tokens, sending cancellation signals, appending transcripts,
 executing runtime code, loading models, provider calls, or target access.
+The context-policy contract adds a reviewable disabled context-budget
+and context-assembly shape without reading prompts, transcripts,
+summaries, tokenizers, model paths, runtime logs, private paths, or
+artifacts, and without token counting, truncation, context assembly,
+summary generation, runtime handoff, model loading, provider calls, or
+target access.
 The transcript policy contract adds a reviewable retention/export
 policy shape without message content, transcript persistence, summary
 generation, artifact reads, artifact writes, runtime execution, model
@@ -773,6 +829,10 @@ This chat/session surface does not add:
   persistence
 - response streaming, response chunk generation, token counting, stop
   signal delivery, or stream transport behavior
+- context-window configuration, token-budget reads, tokenizer reads,
+  prompt-context reads, transcript-context reads, summary reads,
+  truncation, context assembly, runtime context handoff, or context data
+  persistence
 - action-bar execution, session creation, conversation clearing,
   transcript export, clipboard writes, retry attempts, stop signals, file
   attachment reads, or action persistence

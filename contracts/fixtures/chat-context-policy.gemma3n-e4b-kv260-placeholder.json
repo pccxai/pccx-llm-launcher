@@ -1,0 +1,284 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "context_window_evidence_absent",
+      "requiredBefore": "context_budget_display_enabled",
+      "state": "requires_evidence",
+      "summary": "No reviewed context-window size, budget source, or runtime evidence exists."
+    },
+    {
+      "reasonId": "tokenizer_boundary_absent",
+      "requiredBefore": "token_counting_enabled",
+      "state": "blocked",
+      "summary": "No reviewed tokenizer, token counter, or token redaction boundary exists."
+    },
+    {
+      "reasonId": "prompt_capture_blocked",
+      "requiredBefore": "prompt_context_enabled",
+      "state": "empty_not_captured",
+      "summary": "Prompt capture remains disabled by the composer and send-result boundaries."
+    },
+    {
+      "reasonId": "transcript_store_blocked",
+      "requiredBefore": "transcript_context_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed transcript/session-store read boundary exists."
+    },
+    {
+      "reasonId": "summarization_boundary_absent",
+      "requiredBefore": "summary_context_enabled",
+      "state": "not_generated",
+      "summary": "No reviewed summary generation, summary read, or summary storage boundary exists."
+    },
+    {
+      "reasonId": "runtime_handoff_blocked",
+      "requiredBefore": "runtime_context_handoff_enabled",
+      "state": "blocked",
+      "summary": "Runtime context handoff is blocked until model-load and runtime execution evidence exist."
+    }
+  ],
+  "budgetState": "not_configured",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatMessageListRef": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "chatModelStatusRef": "chat_model_status_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "contextAssemblyState": "blocked",
+  "contextControls": [
+    {
+      "blockedReasonRef": "context_window_evidence_absent",
+      "controlId": "review_context_policy",
+      "enabled": false,
+      "label": "review context policy",
+      "launcherAction": "Render deterministic metadata from checked fixtures only.",
+      "sideEffectPolicy": "local_render_only",
+      "state": "available_as_data",
+      "userAction": "Review checked context-policy metadata in the future chat UI."
+    },
+    {
+      "blockedReasonRef": "tokenizer_boundary_absent",
+      "controlId": "measure_prompt_tokens",
+      "enabled": false,
+      "label": "measure prompt tokens",
+      "launcherAction": "Do not read prompts or invoke a tokenizer.",
+      "sideEffectPolicy": "no_prompt_read_or_token_count",
+      "state": "blocked",
+      "userAction": "Measure prompt tokens only after tokenizer and prompt-read boundaries are reviewed."
+    },
+    {
+      "blockedReasonRef": "transcript_store_blocked",
+      "controlId": "read_transcript_context",
+      "enabled": false,
+      "label": "read transcript context",
+      "launcherAction": "Do not read transcript, message, summary, or session-store data.",
+      "sideEffectPolicy": "no_transcript_or_store_read",
+      "state": "blocked",
+      "userAction": "Use transcript history only after a reviewed session-store and transcript boundary exists."
+    },
+    {
+      "blockedReasonRef": "context_window_evidence_absent",
+      "controlId": "truncate_context",
+      "enabled": false,
+      "label": "truncate context",
+      "launcherAction": "Do not truncate, mutate, or persist context data.",
+      "sideEffectPolicy": "no_context_mutation",
+      "state": "disabled",
+      "userAction": "Apply truncation only after context-budget and redaction rules are reviewed."
+    },
+    {
+      "blockedReasonRef": "summarization_boundary_absent",
+      "controlId": "generate_context_summary",
+      "enabled": false,
+      "label": "generate context summary",
+      "launcherAction": "Do not generate or read summaries.",
+      "sideEffectPolicy": "no_summary_generation",
+      "state": "blocked",
+      "userAction": "Generate summaries only after explicit summary and storage boundaries are reviewed."
+    },
+    {
+      "blockedReasonRef": "runtime_handoff_blocked",
+      "controlId": "handoff_runtime_context",
+      "enabled": false,
+      "label": "handoff runtime context",
+      "launcherAction": "Keep runtime handoff blocked and do not start model execution.",
+      "sideEffectPolicy": "no_runtime_handoff",
+      "state": "blocked",
+      "userAction": "Send context to a runtime only after model-load and runtime evidence are reviewed."
+    }
+  ],
+  "contextPolicy": {
+    "contentPolicy": "context metadata only; no prompt, response, transcript, summary, token text, token count, model path, tokenizer path, runtime log, or private path is included",
+    "contextAssemblyEnabled": false,
+    "contextWindowConfigured": false,
+    "mode": "disabled_until_reviewed_context_window_tokenization_and_runtime_boundary_exists",
+    "promptReadEnabled": false,
+    "runtimeHandoffEnabled": false,
+    "sideEffectPolicy": "local_render_only",
+    "state": "blocked",
+    "summaryReadEnabled": false,
+    "tokenBudgetConfigured": false,
+    "tokenCountingEnabled": false,
+    "tokenizerConfigured": false,
+    "transcriptReadEnabled": false,
+    "truncationEnabled": false
+  },
+  "contextPolicyId": "chat_context_policy_gemma3n_e4b_kv260_placeholder",
+  "contextPolicyState": "blocked",
+  "contextSlots": [
+    {
+      "blockedReasonRef": "context_window_evidence_absent",
+      "contentPolicy": "no context size, token budget, path, or runtime evidence value is included",
+      "enabled": false,
+      "label": "model context window",
+      "slotId": "model_context_window",
+      "sourcePolicy": "checked target label only; no model descriptor, runtime, config, model path, tokenizer, or asset file is read",
+      "state": "not_configured"
+    },
+    {
+      "blockedReasonRef": "prompt_capture_blocked",
+      "contentPolicy": "no prompt content, prompt length, token text, token count, or derived summary is included",
+      "enabled": false,
+      "label": "prompt draft",
+      "slotId": "prompt_draft",
+      "sourcePolicy": "composer boundary remains disabled and does not capture prompt text",
+      "state": "empty_not_captured"
+    },
+    {
+      "blockedReasonRef": "transcript_store_blocked",
+      "contentPolicy": "no transcript message bodies, summaries, token counts, or history metadata are included",
+      "enabled": false,
+      "label": "transcript history",
+      "slotId": "transcript_history",
+      "sourcePolicy": "transcript and session-store reads are disabled",
+      "state": "not_configured"
+    },
+    {
+      "blockedReasonRef": "summarization_boundary_absent",
+      "contentPolicy": "no summary text, transcript-derived metadata, or generated content is included",
+      "enabled": false,
+      "label": "generated summary",
+      "slotId": "generated_summary",
+      "sourcePolicy": "summary generation and summary reads are unavailable",
+      "state": "not_generated"
+    },
+    {
+      "blockedReasonRef": "runtime_handoff_blocked",
+      "contentPolicy": "no assembled prompt, serialized context, tokenized context, or runtime payload is included",
+      "enabled": false,
+      "label": "assembled runtime context",
+      "slotId": "assembled_context",
+      "sourcePolicy": "context assembly is blocked until prompt, transcript, tokenizer, and runtime handoff boundaries are reviewed",
+      "state": "blocked"
+    }
+  ],
+  "contextWindowState": "not_configured",
+  "fixtureVersion": "chat-context-policy.gemma3n-e4b-kv260.2026-05-05",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer metadata keeps prompt capture and send controls blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "blocked",
+      "summary": "Transcript policy keeps retention, export, and content access disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "empty_not_captured",
+      "summary": "Message-list metadata keeps the viewport empty and message bodies absent."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "blocked",
+      "summary": "Model status keeps runtime, context, and response rows blocked."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_context_policy_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat context-policy fixture; context windows, budgets, tokenization, summaries, and runtime handoff remain disabled.",
+    "No prompt, response, transcript, message body, summary, session store, configuration file, environment value, model path, tokenizer path, runtime log, private path, secret, or token is read.",
+    "No token count, context-window size, token budget, transcript history, summary text, or runtime payload is included.",
+    "No prompt capture, transcript read, token counting, context truncation, context assembly, summary generation, model load, model execution, runtime handoff, telemetry, upload, or artifact write is performed.",
+    "No KV260 hardware access, pccx-lab invocation, or systemverilog-ide invocation is performed.",
+    "This is not a release, tag, compatibility commitment, marketplace flow, storage layer, tokenizer implementation, context manager, runtime, model-loader, or hardware implementation."
+  ],
+  "privacyState": "summary_only",
+  "promptContentState": "empty_not_captured",
+  "runtimeHandoffState": "blocked",
+  "safetyFlags": {
+    "cloudCalls": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "contextAssemblyAttempted": false,
+    "contextMetadataOnly": true,
+    "contextPolicyDisplayOnly": true,
+    "contextTruncationAttempted": false,
+    "contextWindowConfigured": false,
+    "contextWindowSizeIncluded": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "hardwareAccess": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "modelContextUpdated": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "networkCalls": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptEchoed": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsTranscript": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "runtimeHandoffAttempted": false,
+    "runtimeStarted": false,
+    "secretsIncluded": false,
+    "sessionStoreRead": false,
+    "summaryGenerated": false,
+    "summaryIncluded": false,
+    "telemetry": false,
+    "tokenBudgetConfigured": false,
+    "tokenBudgetIncluded": false,
+    "tokenContentIncluded": false,
+    "tokenCountMeasured": false,
+    "tokenCountingEnabled": false,
+    "tokenizerConfigured": false,
+    "tokensIncluded": false,
+    "transcriptContentIncluded": false,
+    "transcriptPersistence": false,
+    "upload": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatContextPolicy.v0",
+  "summaryState": "not_generated",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "tokenizationState": "blocked",
+  "transcriptState": "not_configured",
+  "truncationState": "disabled"
+}
