@@ -1,0 +1,266 @@
+{
+  "blockedReasons": [
+    {
+      "reasonId": "runtime_evidence_absent",
+      "requiredBefore": "send_message_enabled",
+      "state": "blocked",
+      "summary": "No reviewed runtime readiness evidence exists for local chat execution."
+    },
+    {
+      "reasonId": "model_load_absent",
+      "requiredBefore": "model_status_ready",
+      "state": "blocked",
+      "summary": "No reviewed model asset, validation, load, warmup, or unload boundary is enabled."
+    },
+    {
+      "reasonId": "device_session_absent",
+      "requiredBefore": "runtime_session_started",
+      "state": "inactive",
+      "summary": "No active device session is represented by this local fixture."
+    },
+    {
+      "reasonId": "session_store_absent",
+      "requiredBefore": "session_management_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed session store, retention, restore, or export path exists."
+    },
+    {
+      "reasonId": "content_boundary_absent",
+      "requiredBefore": "prompt_or_response_content_displayed",
+      "state": "requires_review",
+      "summary": "Prompt, response, transcript, attachment, clipboard, and redaction content boundaries remain disabled or summary-only."
+    }
+  ],
+  "contentState": "empty_not_captured",
+  "evidenceState": "blocked",
+  "fixtureVersion": "chat-status-summary.gemma3n-e4b-kv260.2026-05-05",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-surface-layout.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_surface_layout",
+      "schemaVersion": "pccx.chatSurfaceLayout.v0",
+      "state": "available_as_data",
+      "summary": "Planned layout is consumed as local display data only."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-readiness.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_readiness",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "state": "blocked",
+      "summary": "Readiness stays blocked until evidence-backed runtime and session paths exist."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-model-status.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_status",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "state": "blocked",
+      "summary": "Model status remains descriptor-only and blocked."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_session",
+      "schemaVersion": "pccx.chatSession.v0",
+      "state": "inactive",
+      "summary": "Base session state remains inactive local data."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-redaction-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_redaction_policy",
+      "schemaVersion": "pccx.chatRedactionPolicy.v0",
+      "state": "summary_only",
+      "summary": "Redaction policy is referenced without loading rules or scanning content."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_status_summary_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat status summary over checked local fixture references.",
+    "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, or hardware content is read.",
+    "No model load, runtime execution, provider call, network call, hardware access, telemetry, write-back, release, tag, settings, or repository action is performed.",
+    "Send and response streaming remain disabled until separate reviewed runtime, model, device-session, content, and persistence boundaries exist."
+  ],
+  "modelState": "blocked",
+  "nextActions": [
+    {
+      "actionId": "review_readiness_data",
+      "enabled": false,
+      "label": "review readiness data",
+      "sideEffectPolicy": "read_only_data",
+      "state": "available_as_data",
+      "summary": "Render existing checked readiness, model, session, and policy fixtures."
+    },
+    {
+      "actionId": "keep_send_disabled",
+      "enabled": false,
+      "label": "keep send disabled",
+      "sideEffectPolicy": "no_prompt_capture_no_runtime_execution",
+      "state": "blocked",
+      "summary": "Do not accept prompts or dispatch runtime work from this summary."
+    },
+    {
+      "actionId": "wait_for_runtime_boundary",
+      "enabled": false,
+      "label": "wait for runtime boundary",
+      "sideEffectPolicy": "no_model_or_hardware_action",
+      "state": "requires_evidence",
+      "summary": "Enable chat execution only after separate reviewed runtime and evidence boundaries exist."
+    }
+  ],
+  "overallState": "blocked",
+  "privacyState": "summary_only",
+  "runtimeState": "blocked",
+  "safetyFlags": {
+    "aggregatesCheckedFixturesOnly": true,
+    "attachmentReads": false,
+    "clipboardRead": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileContentRead": false,
+    "hardwareAccess": false,
+    "kv260Access": false,
+    "messageBodiesIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelPathIncluded": false,
+    "networkCalls": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "releaseOrTagAction": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "runtimeExecution": false,
+    "sendEnabled": false,
+    "sessionPersistence": false,
+    "sessionStoreRead": false,
+    "settingsChange": false,
+    "statusSummaryOnly": true,
+    "telemetry": false,
+    "transcriptContentIncluded": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatStatusSummary.v0",
+  "sendState": "disabled",
+  "sessionState": "inactive",
+  "statusCards": [
+    {
+      "cardId": "surface_layout",
+      "contentPolicy": "no_prompt_response_transcript_or_session_content",
+      "label": "surface layout",
+      "requiredBefore": "chat_shell_enabled",
+      "schemaVersion": "pccx.chatSurfaceLayout.v0",
+      "severity": "info",
+      "sourceRef": "chat_surface_layout",
+      "state": "available_as_data",
+      "summary": "The planned chat shell regions can be rendered from checked local data."
+    },
+    {
+      "cardId": "session_state",
+      "contentPolicy": "no_session_store_title_summary_or_path_content",
+      "label": "session state",
+      "requiredBefore": "session_restore_or_export_enabled",
+      "schemaVersion": "pccx.chatSession.v0",
+      "severity": "blocked",
+      "sourceRef": "chat_session",
+      "state": "inactive",
+      "summary": "No active launcher-owned chat session exists."
+    },
+    {
+      "cardId": "model_status",
+      "contentPolicy": "no_model_path_weight_tokenizer_or_checksum_content",
+      "label": "model status",
+      "requiredBefore": "model_load_enabled",
+      "schemaVersion": "pccx.chatModelStatus.v0",
+      "severity": "blocked",
+      "sourceRef": "chat_model_status",
+      "state": "blocked",
+      "summary": "Model status remains descriptor-only with no local asset or runtime load."
+    },
+    {
+      "cardId": "readiness",
+      "contentPolicy": "summary_only_no_runtime_log_or_artifact_content",
+      "label": "chat readiness",
+      "requiredBefore": "send_message_enabled",
+      "schemaVersion": "pccx.chatReadiness.v0",
+      "severity": "blocked",
+      "sourceRef": "chat_readiness",
+      "state": "blocked",
+      "summary": "Chat readiness is blocked until runtime, device, model, and store evidence exist."
+    },
+    {
+      "cardId": "composer",
+      "contentPolicy": "no_prompt_text_or_attachment_content",
+      "label": "composer",
+      "requiredBefore": "prompt_capture_enabled",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "severity": "info",
+      "sourceRef": "chat_composer",
+      "state": "available_as_data",
+      "summary": "Composer controls can be displayed as disabled/local data without prompt capture."
+    },
+    {
+      "cardId": "send_result",
+      "contentPolicy": "no_prompt_echo_or_generated_response",
+      "label": "send result",
+      "requiredBefore": "assistant_response_available",
+      "schemaVersion": "pccx.chatSendResult.v0",
+      "severity": "blocked",
+      "sourceRef": "chat_send_result",
+      "state": "disabled",
+      "summary": "Send remains disabled and no input is accepted by this boundary."
+    },
+    {
+      "cardId": "message_list",
+      "contentPolicy": "no_message_body_transcript_or_summary_content",
+      "label": "message list",
+      "requiredBefore": "conversation_history_displayed",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "severity": "info",
+      "sourceRef": "chat_message_list",
+      "state": "empty_not_captured",
+      "summary": "The conversation viewport is empty because no messages are captured."
+    },
+    {
+      "cardId": "response_stream",
+      "contentPolicy": "no_response_chunk_token_or_runtime_log_content",
+      "label": "response stream",
+      "requiredBefore": "stream_transport_enabled",
+      "schemaVersion": "pccx.chatResponseStream.v0",
+      "severity": "blocked",
+      "sourceRef": "chat_response_stream",
+      "state": "disabled",
+      "summary": "Assistant streaming remains disabled and no token stream exists."
+    },
+    {
+      "cardId": "privacy_controls",
+      "contentPolicy": "no_raw_content_detector_match_or_redaction_result",
+      "label": "privacy controls",
+      "requiredBefore": "content_scan_or_redaction_enabled",
+      "schemaVersion": "pccx.chatRedactionPolicy.v0",
+      "severity": "blocked",
+      "sourceRef": "chat_redaction_policy",
+      "state": "summary_only",
+      "summary": "Privacy and redaction controls are summary-only with content scanning disabled."
+    }
+  ],
+  "statusSummaryId": "chat_status_summary_gemma3n_e4b_kv260_placeholder",
+  "surfaceState": "available_as_data",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}
