@@ -94,6 +94,9 @@
 # Chat implementation gap matrix (explicit opt-in, read-only local data):
 #   --include-chat-gap-matrix
 #
+# Chat evidence manifest (explicit opt-in, read-only local data):
+#   --include-chat-evidence-manifest
+#
 # pccx-lab backend (explicit opt-in):
 #   --backend pccx-lab        call pccx-lab status --format json
 #   PCCX_LAB_BIN              override path to pccx-lab binary (takes priority over PATH)
@@ -139,6 +142,7 @@ INCLUDE_CHAT_SHORTCUT_MAP="0"
 INCLUDE_CHAT_STATUS_SUMMARY="0"
 INCLUDE_CHAT_REVIEW_PACKET="0"
 INCLUDE_CHAT_GAP_MATRIX="0"
+INCLUDE_CHAT_EVIDENCE_MANIFEST="0"
 
 print_chat_status_summary_summary() {
     SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -516,6 +520,140 @@ print(
 
     HEAD "chat gap matrix"
     printf '%s\n' "$CHAT_GAP_MATRIX_TEXT"
+}
+
+print_chat_evidence_manifest_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_EVIDENCE_MANIFEST_STUB="$ROOT_DIR/scripts/chat-evidence-manifest-stub.sh"
+
+    if [ ! -f "$CHAT_EVIDENCE_MANIFEST_STUB" ]; then
+        ERROR "chat evidence-manifest stub not found: $CHAT_EVIDENCE_MANIFEST_STUB"
+        return 1
+    fi
+
+    if ! CHAT_EVIDENCE_MANIFEST_JSON="$(bash "$CHAT_EVIDENCE_MANIFEST_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat evidence-manifest stub failed"
+        printf '%s\n' "$CHAT_EVIDENCE_MANIFEST_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_EVIDENCE_MANIFEST_TEXT="$(
+        printf '%s\n' "$CHAT_EVIDENCE_MANIFEST_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+refs = " ".join(
+    "{}={}".format(ref["refId"], ref["state"])
+    for ref in data["evidenceRefs"]
+)
+links = " ".join(
+    "{}={}".format(link["linkId"], link["state"])
+    for link in data["reviewLinks"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+actions = " ".join(
+    "{}={}:{}".format(action["actionId"], action["state"], str(action["enabled"]).lower())
+    for action in data["nextActions"]
+)
+
+def b(value):
+    return "true" if value else "false"
+
+print("[INFO]  source     : scripts/chat-evidence-manifest-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no prompt/session-store/artifact/model/runtime/provider/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  manifest  : {}".format(data["manifestState"]))
+print("[INFO]  review    : {}".format(data["reviewState"]))
+print("[INFO]  gap       : {}".format(data["gapState"]))
+print("[INFO]  evidence  : {}".format(data["evidenceState"]))
+print("[INFO]  artifact  : {}".format(data["artifactState"]))
+print("[INFO]  refs       : {}".format(refs))
+print("[INFO]  links      : {}".format(links))
+print("[INFO]  blocked    : {}".format(blocked))
+print("[INFO]  actions    : {}".format(actions))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "evidenceManifestOnly={} referencesCheckedFixturesOnly={} "
+    "reviewPacketReferencedOnly={} gapMatrixReferencedOnly={} "
+    "statusSummaryReferencedOnly={} evidenceAccepted={} gapClosed={} "
+    "approvalGranted={} artifactRead={} artifactWrite={} rawLogRead={} "
+    "hardwareDumpRead={} promptCapture={} promptRead={} "
+    "promptContentIncluded={} responseContentIncluded={} "
+    "transcriptContentIncluded={} messageBodiesIncluded={} "
+    "sessionStoreRead={} configRead={} environmentRead={} "
+    "providerConfigRead={} providerCalls={} cloudCalls={} networkCalls={} "
+    "modelAssetRead={} modelPathIncluded={} modelLoadAttempted={} "
+    "modelExecution={} runtimeExecution={} responseGenerated={} "
+    "sendEnabled={} clipboardRead={} attachmentReads={} "
+    "fileMetadataRead={} fileContentRead={} directoryScan={} "
+    "redactionRulesLoaded={} contentScan={} redactionApplied={} "
+    "auditLogWritten={} kv260Access={} hardwareAccess={} "
+    "executesPccxLab={} executesSystemverilogIde={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["evidenceManifestOnly"]),
+        b(flags["referencesCheckedFixturesOnly"]),
+        b(flags["reviewPacketReferencedOnly"]),
+        b(flags["gapMatrixReferencedOnly"]),
+        b(flags["statusSummaryReferencedOnly"]),
+        b(flags["evidenceAccepted"]),
+        b(flags["gapClosed"]),
+        b(flags["approvalGranted"]),
+        b(flags["artifactRead"]),
+        b(flags["artifactWrite"]),
+        b(flags["rawLogRead"]),
+        b(flags["hardwareDumpRead"]),
+        b(flags["promptCapture"]),
+        b(flags["promptRead"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["messageBodiesIncluded"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["configRead"]),
+        b(flags["environmentRead"]),
+        b(flags["providerConfigRead"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["networkCalls"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelPathIncluded"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["responseGenerated"]),
+        b(flags["sendEnabled"]),
+        b(flags["clipboardRead"]),
+        b(flags["attachmentReads"]),
+        b(flags["fileMetadataRead"]),
+        b(flags["fileContentRead"]),
+        b(flags["directoryScan"]),
+        b(flags["redactionRulesLoaded"]),
+        b(flags["contentScan"]),
+        b(flags["redactionApplied"]),
+        b(flags["auditLogWritten"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["executesPccxLab"]),
+        b(flags["executesSystemverilogIde"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat evidence-manifest JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat evidence manifest"
+    printf '%s\n' "$CHAT_EVIDENCE_MANIFEST_TEXT"
 }
 
 print_chat_error_taxonomy_summary() {
@@ -3700,6 +3838,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_GAP_MATRIX="1"
             shift
             ;;
+        --include-chat-evidence-manifest)
+            INCLUDE_CHAT_EVIDENCE_MANIFEST="1"
+            shift
+            ;;
         --backend)
             BACKEND="${2:-}"
             if [ -z "$BACKEND" ]; then
@@ -3715,8 +3857,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ] || [ "$INCLUDE_CHAT_REDACTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ] || [ "$INCLUDE_CHAT_STATUS_SUMMARY" = "1" ] || [ "$INCLUDE_CHAT_REVIEW_PACKET" = "1" ] || [ "$INCLUDE_CHAT_GAP_MATRIX" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-clipboard-policy, --include-chat-redaction-policy, --include-chat-attachment-policy, --include-chat-shortcut-map, --include-chat-status-summary, --include-chat-review-packet, and --include-chat-gap-matrix are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ] || [ "$INCLUDE_CHAT_REDACTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ] || [ "$INCLUDE_CHAT_STATUS_SUMMARY" = "1" ] || [ "$INCLUDE_CHAT_REVIEW_PACKET" = "1" ] || [ "$INCLUDE_CHAT_GAP_MATRIX" = "1" ] || [ "$INCLUDE_CHAT_EVIDENCE_MANIFEST" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-clipboard-policy, --include-chat-redaction-policy, --include-chat-attachment-policy, --include-chat-shortcut-map, --include-chat-status-summary, --include-chat-review-packet, --include-chat-gap-matrix, and --include-chat-evidence-manifest are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -3759,7 +3901,14 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat summary  : opt-in via --include-chat-status-summary (read-only aggregate status data)"
     NOTE "chat review   : opt-in via --include-chat-review-packet (read-only review packet data)"
     NOTE "chat gaps     : opt-in via --include-chat-gap-matrix (read-only implementation gap data)"
+    NOTE "chat evidence : opt-in via --include-chat-evidence-manifest (read-only evidence manifest data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
+
+    if [ "$INCLUDE_CHAT_EVIDENCE_MANIFEST" = "1" ]; then
+        if ! print_chat_evidence_manifest_summary; then
+            exit 1
+        fi
+    fi
 
     if [ "$INCLUDE_CHAT_GAP_MATRIX" = "1" ]; then
         if ! print_chat_gap_matrix_summary; then

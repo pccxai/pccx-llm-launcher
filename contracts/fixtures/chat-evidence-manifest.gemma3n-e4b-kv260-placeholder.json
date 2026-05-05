@@ -1,0 +1,201 @@
+{
+  "artifactState": "unavailable",
+  "blockedReasons": [
+    {
+      "reasonId": "runtime_evidence_absent",
+      "requiredBefore": "model_or_runtime_execution_enabled",
+      "state": "requires_evidence",
+      "summary": "Runtime and device evidence are referenced only as checked placeholder data."
+    },
+    {
+      "reasonId": "review_not_approved",
+      "requiredBefore": "review_gate_closed",
+      "state": "not_approved",
+      "summary": "No chat review gate is approved by this manifest."
+    },
+    {
+      "reasonId": "artifact_evidence_not_read",
+      "requiredBefore": "evidence_artifact_review",
+      "state": "unavailable",
+      "summary": "Logs, generated blobs, model assets, reports, and board dumps are not read by this boundary."
+    },
+    {
+      "reasonId": "standalone_chat_still_blocked",
+      "requiredBefore": "standalone_chat_enabled",
+      "state": "blocked",
+      "summary": "Standalone chat remains blocked by unresolved runtime, model, content, store, privacy, and UI gaps."
+    }
+  ],
+  "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
+  "evidenceRefs": [
+    {
+      "contentPolicy": "fixture_reference_only_no_runtime_logs_or_device_dumps",
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "refId": "runtime_readiness",
+      "requiredBefore": "model_or_runtime_execution_enabled",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "state": "requires_evidence",
+      "summary": "Runtime readiness remains blocked and this manifest records only the checked fixture reference."
+    },
+    {
+      "contentPolicy": "fixture_reference_only_no_hardware_dump_or_board_log",
+      "fixturePath": "contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json",
+      "refId": "device_session_status",
+      "requiredBefore": "target_session_enabled",
+      "schemaVersion": "pccx.deviceSessionStatus.v0",
+      "state": "requires_evidence",
+      "summary": "Device/session status is referenced as local checked data and does not prove a runtime session."
+    },
+    {
+      "contentPolicy": "fixture_reference_only_no_prompt_response_transcript_or_summary_content",
+      "fixturePath": "contracts/fixtures/chat-review-packet.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_review_packet",
+      "requiredBefore": "review_gate_closed",
+      "schemaVersion": "pccx.chatReviewPacket.v0",
+      "state": "not_approved",
+      "summary": "Review packet remains a blocked handoff reference with no approval granted."
+    },
+    {
+      "contentPolicy": "fixture_reference_only_no_gap_closure_or_runtime_handoff",
+      "fixturePath": "contracts/fixtures/chat-gap-matrix.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_gap_matrix",
+      "requiredBefore": "standalone_chat_enabled",
+      "schemaVersion": "pccx.chatGapMatrix.v0",
+      "state": "blocked",
+      "summary": "Gap matrix remains unresolved and is referenced without closing any blocker row."
+    },
+    {
+      "contentPolicy": "fixture_reference_only_no_status_card_duplication",
+      "fixturePath": "contracts/fixtures/chat-status-summary.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_status_summary",
+      "requiredBefore": "launcher_status_enabled",
+      "schemaVersion": "pccx.chatStatusSummary.v0",
+      "state": "summary_only",
+      "summary": "Status summary is referenced as display data and is not duplicated in this manifest."
+    },
+    {
+      "contentPolicy": "fixture_reference_only_no_content_scan_or_redaction_action",
+      "fixturePath": "contracts/fixtures/chat-redaction-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_redaction_policy",
+      "requiredBefore": "privacy_sensitive_content_paths_enabled",
+      "schemaVersion": "pccx.chatRedactionPolicy.v0",
+      "state": "summary_only",
+      "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
+    }
+  ],
+  "evidenceState": "requires_evidence",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05",
+  "gapState": "blocked",
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_evidence_manifest_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat evidence manifest over existing checked fixture references.",
+    "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
+    "No artifact read/write, model load, runtime execution, provider call, network call, hardware access, pccx-lab execution, IDE execution, release, tag, settings, or repository action is performed.",
+    "This manifest does not close issue #9, approve review gates, accept evidence, close gaps, or enable standalone chat."
+  ],
+  "manifestState": "available_as_data",
+  "nextActions": [
+    {
+      "actionId": "collect_runtime_evidence",
+      "enabled": false,
+      "requiredBefore": "runtime_evidence_review",
+      "state": "disabled",
+      "summary": "Collecting runtime evidence is outside this data-only launcher contract."
+    },
+    {
+      "actionId": "review_manifest_refs",
+      "enabled": false,
+      "requiredBefore": "review_gate_closed",
+      "state": "requires_review",
+      "summary": "Maintainers may review these fixture references, but this contract performs no reads or approvals."
+    },
+    {
+      "actionId": "keep_chat_blocked",
+      "enabled": false,
+      "requiredBefore": "standalone_chat_enabled",
+      "state": "blocked",
+      "summary": "Standalone chat controls must remain blocked until reviewed evidence and gap closure land separately."
+    }
+  ],
+  "reviewLinks": [
+    {
+      "linkId": "review_packet_gate",
+      "refId": "chat_review_packet",
+      "state": "not_approved",
+      "summary": "The review packet must be approved separately before any chat enablement work."
+    },
+    {
+      "linkId": "gap_matrix_gate",
+      "refId": "chat_gap_matrix",
+      "state": "blocked",
+      "summary": "The gap matrix remains blocked; this manifest does not close gaps."
+    },
+    {
+      "linkId": "runtime_evidence_gate",
+      "refId": "runtime_readiness",
+      "state": "requires_evidence",
+      "summary": "Runtime evidence must be reviewed in a later evidence-backed change."
+    }
+  ],
+  "reviewState": "not_approved",
+  "safetyFlags": {
+    "approvalGranted": false,
+    "artifactRead": false,
+    "artifactWrite": false,
+    "attachmentReads": false,
+    "auditLogWritten": false,
+    "clipboardRead": false,
+    "cloudCalls": false,
+    "compatibilityClaim": false,
+    "configRead": false,
+    "contentScan": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "directoryScan": false,
+    "environmentRead": false,
+    "evidenceAccepted": false,
+    "evidenceManifestOnly": true,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileContentRead": false,
+    "fileMetadataRead": false,
+    "gapClosed": false,
+    "gapMatrixReferencedOnly": true,
+    "hardwareAccess": false,
+    "hardwareDumpRead": false,
+    "kv260Access": false,
+    "messageBodiesIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "modelPathIncluded": false,
+    "networkCalls": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptRead": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "rawLogRead": false,
+    "readOnly": true,
+    "redactionApplied": false,
+    "redactionRulesLoaded": false,
+    "referencesCheckedFixturesOnly": true,
+    "releaseOrTagAction": false,
+    "responseContentIncluded": false,
+    "responseGenerated": false,
+    "reviewPacketReferencedOnly": true,
+    "runtimeExecution": false,
+    "sendEnabled": false,
+    "sessionStoreRead": false,
+    "settingsChange": false,
+    "statusSummaryReferencedOnly": true,
+    "transcriptContentIncluded": false
+  },
+  "schemaVersion": "pccx.chatEvidenceManifest.v0",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b"
+}
