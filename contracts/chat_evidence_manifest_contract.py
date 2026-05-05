@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-attachment-ref",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_attachment_evidence_ref_2026-05-05",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-clipboard-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_clipboard_evidence_ref_2026-05-05",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -156,6 +156,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "privacy_sensitive_content_paths_enabled",
         },
         {
+            "refId": "chat_clipboard_policy",
+            "schemaVersion": "pccx.chatClipboardPolicy.v0",
+            "fixturePath": "contracts/fixtures/chat-clipboard-policy.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Clipboard policy metadata is referenced as a checked fixture and still needs review before clipboard controls are treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_clipboard_read_write_paste_copy_import_or_export",
+            "requiredBefore": "clipboard_controls_enabled",
+        },
+        {
             "refId": "chat_attachment_policy",
             "schemaVersion": "pccx.chatAttachmentPolicy.v0",
             "fixturePath": "contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json",
@@ -205,6 +214,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "state": "requires_review",
             "summary": "Attachment metadata remains a review reference and does not enable file picker, upload, import, preview, or persistence behavior.",
         },
+        {
+            "linkId": "clipboard_policy_gate",
+            "refId": "chat_clipboard_policy",
+            "state": "requires_review",
+            "summary": "Clipboard metadata remains a review reference and does not enable clipboard read, write, paste, copy, import, or export behavior.",
+        },
     ],
     "blockedReasons": [
         {
@@ -243,6 +258,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Attachment file picker, file metadata, file content, upload, import, preview, and persistence behavior still require review.",
             "requiredBefore": "attachment_controls_enabled",
         },
+        {
+            "reasonId": "clipboard_review_pending",
+            "state": "requires_review",
+            "summary": "Clipboard read, write, paste, copy, import, export, transcript copy, message copy, and clipboard-backed attachment behavior still require review.",
+            "requiredBefore": "clipboard_controls_enabled",
+        },
     ],
     "nextActions": [
         {
@@ -279,6 +300,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "enabled": False,
             "summary": "Review the checked attachment policy fixture separately before enabling file picker, file read, upload, import, preview, or persistence paths.",
             "requiredBefore": "attachment_controls_enabled",
+        },
+        {
+            "actionId": "review_clipboard_policy",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked clipboard policy fixture separately before enabling clipboard read, write, paste, copy, import, export, or clipboard-backed attachment paths.",
+            "requiredBefore": "clipboard_controls_enabled",
         },
     ],
     "safetyFlags": {
