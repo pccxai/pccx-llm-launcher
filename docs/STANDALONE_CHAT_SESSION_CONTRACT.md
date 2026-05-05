@@ -30,6 +30,7 @@ The implementation lives in:
 - `contracts/chat_message_list_contract.py`
 - `contracts/chat_action_bar_contract.py`
 - `contracts/chat_clipboard_policy_contract.py`
+- `contracts/chat_redaction_policy_contract.py`
 - `contracts/chat_attachment_policy_contract.py`
 - `contracts/chat_shortcut_map_contract.py`
 - `contracts/fixtures/chat-session.gemma3n-e4b-kv260-placeholder.json`
@@ -54,6 +55,7 @@ The implementation lives in:
 - `contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-action-bar.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-clipboard-policy.gemma3n-e4b-kv260-placeholder.json`
+- `contracts/fixtures/chat-redaction-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json`
 - `contracts/fixtures/chat-shortcut-map.gemma3n-e4b-kv260-placeholder.json`
 - `scripts/chat-session-stub.sh`
@@ -78,6 +80,7 @@ The implementation lives in:
 - `scripts/chat-message-list-stub.sh`
 - `scripts/chat-action-bar-stub.sh`
 - `scripts/chat-clipboard-policy-stub.sh`
+- `scripts/chat-redaction-policy-stub.sh`
 - `scripts/chat-attachment-policy-stub.sh`
 - `scripts/chat-shortcut-map-stub.sh`
 - `scripts/chat-surface-preview.sh`
@@ -103,6 +106,7 @@ The implementation lives in:
 - `scripts/tests/chat_message_list_contract_test.py`
 - `scripts/tests/chat_action_bar_contract_test.py`
 - `scripts/tests/chat_clipboard_policy_contract_test.py`
+- `scripts/tests/chat_redaction_policy_contract_test.py`
 - `scripts/tests/chat_attachment_policy_contract_test.py`
 - `scripts/tests/chat_shortcut_map_contract_test.py`
 - `scripts/tests/chat_surface_preview_test.py`
@@ -127,6 +131,7 @@ The implementation lives in:
 - `scripts/tests/status-chat-message-list.sh`
 - `scripts/tests/status-chat-action-bar.sh`
 - `scripts/tests/status-chat-clipboard-policy.sh`
+- `scripts/tests/status-chat-redaction-policy.sh`
 - `scripts/tests/status-chat-attachment-policy.sh`
 - `scripts/tests/status-chat-shortcut-map.sh`
 
@@ -174,6 +179,9 @@ The chat/session contract records:
   message bodies or transcript reads
 - disabled action-bar metadata for new, clear, export, retry, copy, stop,
   and attach controls without side effects
+- disabled redaction-policy metadata for redaction rules, content scan,
+  PII, secret, prompt, response, transcript, message, attachment,
+  clipboard, audit, and result-persistence gates without side effects
 - disabled attachment-policy metadata for file picker, file read, upload,
   import, preview, and persistence gates without side effects
 - disabled shortcut-map metadata for planned keyboard accelerators,
@@ -470,6 +478,25 @@ text, response text, transcript, message body, file data, model path,
 runtime log, or artifact is read or written, no clipboard permission is
 requested, no upload or import runs, no model/runtime path is started,
 and no target access occurs.
+
+The chat redaction-policy fixture records the disabled redaction and
+content-scanning boundary used by the planned standalone chat surface:
+
+```bash
+bash scripts/chat-redaction-policy-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/status-stub.sh --include-chat-redaction-policy
+```
+
+It keeps redaction handling as local metadata: redaction rule review,
+content scan, PII detection, secret detection, prompt redaction, response
+redaction, transcript redaction, message redaction, attachment redaction,
+clipboard redaction, audit redaction, and result persistence remain
+disabled, blocked, or not configured. No redaction rules, prompt text,
+response text, transcript, message body, clipboard data, file data, audit
+content, store content, model path, runtime log, private path, or artifact
+is read or written, no detector runs, no redaction is applied, no result
+is persisted, no model/runtime path is started, and no target access
+occurs.
 
 The chat attachment-policy fixture records the disabled local attachment
 boundary used by the planned standalone chat surface:

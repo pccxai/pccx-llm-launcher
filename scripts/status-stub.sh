@@ -76,6 +76,9 @@
 # Chat clipboard-policy boundary (explicit opt-in, read-only local data):
 #   --include-chat-clipboard-policy
 #
+# Chat redaction-policy boundary (explicit opt-in, read-only local data):
+#   --include-chat-redaction-policy
+#
 # Chat attachment-policy boundary (explicit opt-in, read-only local data):
 #   --include-chat-attachment-policy
 #
@@ -121,6 +124,7 @@ INCLUDE_CHAT_RESPONSE_STREAM="0"
 INCLUDE_CHAT_MESSAGE_LIST="0"
 INCLUDE_CHAT_ACTION_BAR="0"
 INCLUDE_CHAT_CLIPBOARD_POLICY="0"
+INCLUDE_CHAT_REDACTION_POLICY="0"
 INCLUDE_CHAT_ATTACHMENT_POLICY="0"
 INCLUDE_CHAT_SHORTCUT_MAP="0"
 
@@ -680,6 +684,171 @@ print(
 
     HEAD "chat clipboard policy"
     printf '%s\n' "$CHAT_CLIPBOARD_POLICY_SUMMARY"
+}
+
+print_chat_redaction_policy_summary() {
+    SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+    ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+    CHAT_REDACTION_POLICY_STUB="$ROOT_DIR/scripts/chat-redaction-policy-stub.sh"
+
+    if [ ! -f "$CHAT_REDACTION_POLICY_STUB" ]; then
+        ERROR "chat redaction-policy stub not found: $CHAT_REDACTION_POLICY_STUB"
+        return 1
+    fi
+
+    if ! CHAT_REDACTION_POLICY_JSON="$(bash "$CHAT_REDACTION_POLICY_STUB" --model gemma3n-e4b --target kv260 2>&1)"; then
+        ERROR "chat redaction-policy stub failed"
+        printf '%s\n' "$CHAT_REDACTION_POLICY_JSON" >&2
+        return 1
+    fi
+
+    if ! CHAT_REDACTION_POLICY_SUMMARY="$(
+        printf '%s\n' "$CHAT_REDACTION_POLICY_JSON" | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+flags = data["safetyFlags"]
+policy = data["redactionPolicy"]
+
+def b(value):
+    return "true" if value else "false"
+
+surfaces = " ".join(
+    "{}={}:{}".format(surface["surfaceId"], surface["state"], b(surface["enabled"]))
+    for surface in data["redactionSurfaces"]
+)
+controls = " ".join(
+    "{}={}:{}".format(control["controlId"], control["state"], b(control["enabled"]))
+    for control in data["redactionControls"]
+)
+blocked = " ".join(
+    "{}={}".format(reason["reasonId"], reason["state"])
+    for reason in data["blockedReasons"]
+)
+
+print("[INFO]  source     : scripts/chat-redaction-policy-stub.sh --model gemma3n-e4b --target kv260")
+print("[INFO]  boundary   : read-only data; no redaction rule load/content scan/PII detection/secret detection/prompt/message/transcript/clipboard/file/model/runtime/hardware/lab/IDE execution")
+print("[INFO]  target     : {}".format(data["targetDevice"]))
+print("[INFO]  model      : {}".format(data["targetModel"]))
+print("[INFO]  policy     : {}".format(data["redactionPolicyState"]))
+print("[INFO]  scan       : {}".format(data["contentScanState"]))
+print("[INFO]  prompt    : {}".format(data["promptRedactionState"]))
+print("[INFO]  response  : {}".format(data["responseRedactionState"]))
+print("[INFO]  transcript: {}".format(data["transcriptRedactionState"]))
+print("[INFO]  message   : {}".format(data["messageRedactionState"]))
+print("[INFO]  attachment: {}".format(data["attachmentRedactionState"]))
+print("[INFO]  clipboard : {}".format(data["clipboardRedactionState"]))
+print("[INFO]  audit     : {}".format(data["auditRedactionState"]))
+print("[INFO]  pii       : {}".format(data["piiDetectionState"]))
+print("[INFO]  secrets   : {}".format(data["secretDetectionState"]))
+print("[INFO]  persistence: {}".format(data["persistenceState"]))
+print("[INFO]  privacy   : {}".format(data["privacyState"]))
+print(
+    "[INFO]  redaction-policy : {} mode={} scannerEnabled={} "
+    "promptRedactionEnabled={} responseRedactionEnabled={} "
+    "transcriptRedactionEnabled={} messageRedactionEnabled={} "
+    "attachmentRedactionEnabled={} clipboardRedactionEnabled={} "
+    "auditRedactionEnabled={} piiDetectionEnabled={} "
+    "secretDetectionEnabled={} persistenceEnabled={}".format(
+        policy["state"],
+        policy["mode"],
+        b(policy["scannerEnabled"]),
+        b(policy["promptRedactionEnabled"]),
+        b(policy["responseRedactionEnabled"]),
+        b(policy["transcriptRedactionEnabled"]),
+        b(policy["messageRedactionEnabled"]),
+        b(policy["attachmentRedactionEnabled"]),
+        b(policy["clipboardRedactionEnabled"]),
+        b(policy["auditRedactionEnabled"]),
+        b(policy["piiDetectionEnabled"]),
+        b(policy["secretDetectionEnabled"]),
+        b(policy["persistenceEnabled"]),
+    )
+)
+print("[INFO]  surfaces   : {}".format(surfaces))
+print("[INFO]  controls   : {}".format(controls))
+print("[INFO]  blocked    : {}".format(blocked))
+print(
+    "[INFO]  flags      : readOnly={} dataOnly={} deterministic={} "
+    "redactionPolicyDisplayOnly={} redactionMetadataOnly={} "
+    "redactionRulesLoaded={} redactionRulesPersisted={} "
+    "contentScan={} piiDetection={} secretDetection={} "
+    "identifierDetection={} promptRedaction={} responseRedaction={} "
+    "transcriptRedaction={} messageRedaction={} attachmentRedaction={} "
+    "clipboardRedaction={} auditRedaction={} redactionApplied={} "
+    "redactionResultPersisted={} redactionReportGenerated={} "
+    "promptCapture={} promptRead={} promptContentIncluded={} "
+    "responseContentIncluded={} transcriptContentIncluded={} "
+    "messageBodiesIncluded={} readsTranscript={} sessionStoreRead={} "
+    "sessionStoreWrite={} clipboardRead={} clipboardWrite={} "
+    "attachmentReads={} fileMetadataRead={} fileContentRead={} "
+    "directoryScan={} fileImport={} fileUpload={} writesArtifacts={} "
+    "readsArtifacts={} modelAssetRead={} modelLoadAttempted={} "
+    "modelExecution={} runtimeExecution={} kv260Access={} "
+    "hardwareAccess={} networkCalls={} providerCalls={} cloudCalls={} "
+    "executesPccxLab={} executesSystemverilogIde={}".format(
+        b(flags["readOnly"]),
+        b(flags["dataOnly"]),
+        b(flags["deterministic"]),
+        b(flags["redactionPolicyDisplayOnly"]),
+        b(flags["redactionMetadataOnly"]),
+        b(flags["redactionRulesLoaded"]),
+        b(flags["redactionRulesPersisted"]),
+        b(flags["contentScan"]),
+        b(flags["piiDetection"]),
+        b(flags["secretDetection"]),
+        b(flags["identifierDetection"]),
+        b(flags["promptRedaction"]),
+        b(flags["responseRedaction"]),
+        b(flags["transcriptRedaction"]),
+        b(flags["messageRedaction"]),
+        b(flags["attachmentRedaction"]),
+        b(flags["clipboardRedaction"]),
+        b(flags["auditRedaction"]),
+        b(flags["redactionApplied"]),
+        b(flags["redactionResultPersisted"]),
+        b(flags["redactionReportGenerated"]),
+        b(flags["promptCapture"]),
+        b(flags["promptRead"]),
+        b(flags["promptContentIncluded"]),
+        b(flags["responseContentIncluded"]),
+        b(flags["transcriptContentIncluded"]),
+        b(flags["messageBodiesIncluded"]),
+        b(flags["readsTranscript"]),
+        b(flags["sessionStoreRead"]),
+        b(flags["sessionStoreWrite"]),
+        b(flags["clipboardRead"]),
+        b(flags["clipboardWrite"]),
+        b(flags["attachmentReads"]),
+        b(flags["fileMetadataRead"]),
+        b(flags["fileContentRead"]),
+        b(flags["directoryScan"]),
+        b(flags["fileImport"]),
+        b(flags["fileUpload"]),
+        b(flags["writesArtifacts"]),
+        b(flags["readsArtifacts"]),
+        b(flags["modelAssetRead"]),
+        b(flags["modelLoadAttempted"]),
+        b(flags["modelExecution"]),
+        b(flags["runtimeExecution"]),
+        b(flags["kv260Access"]),
+        b(flags["hardwareAccess"]),
+        b(flags["networkCalls"]),
+        b(flags["providerCalls"]),
+        b(flags["cloudCalls"]),
+        b(flags["executesPccxLab"]),
+        b(flags["executesSystemverilogIde"]),
+    )
+)
+'
+    )"; then
+        ERROR "chat redaction-policy JSON could not be summarized"
+        return 1
+    fi
+
+    HEAD "chat redaction policy"
+    printf '%s\n' "$CHAT_REDACTION_POLICY_SUMMARY"
 }
 
 print_chat_attachment_policy_summary() {
@@ -3117,6 +3286,10 @@ while [ $# -gt 0 ]; do
             INCLUDE_CHAT_CLIPBOARD_POLICY="1"
             shift
             ;;
+        --include-chat-redaction-policy)
+            INCLUDE_CHAT_REDACTION_POLICY="1"
+            shift
+            ;;
         --include-chat-attachment-policy)
             INCLUDE_CHAT_ATTACHMENT_POLICY="1"
             shift
@@ -3140,8 +3313,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
-    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-clipboard-policy, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
+if [ -n "$BACKEND" ] && { [ "$INCLUDE_RUNTIME_READINESS" = "1" ] || [ "$INCLUDE_DEVICE_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SESSION" = "1" ] || [ "$INCLUDE_CHAT_SURFACE_LAYOUT" = "1" ] || [ "$INCLUDE_CHAT_EMPTY_STATE" = "1" ] || [ "$INCLUDE_CHAT_LOCAL_ONLY_POLICY" = "1" ] || [ "$INCLUDE_CHAT_PREFERENCES" = "1" ] || [ "$INCLUDE_CHAT_SESSION_INDEX" = "1" ] || [ "$INCLUDE_CHAT_SESSION_STORE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SESSION_TITLE_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_STATUS" = "1" ] || [ "$INCLUDE_CHAT_MODEL_SELECTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_CONTEXT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_MODEL_LOAD_REQUEST" = "1" ] || [ "$INCLUDE_CHAT_READINESS" = "1" ] || [ "$INCLUDE_CHAT_COMPOSER" = "1" ] || [ "$INCLUDE_CHAT_SEND_RESULT" = "1" ] || [ "$INCLUDE_CHAT_TRANSCRIPT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_AUDIT_EVENT" = "1" ] || [ "$INCLUDE_CHAT_ERROR_TAXONOMY" = "1" ] || [ "$INCLUDE_CHAT_RESPONSE_STREAM" = "1" ] || [ "$INCLUDE_CHAT_MESSAGE_LIST" = "1" ] || [ "$INCLUDE_CHAT_ACTION_BAR" = "1" ] || [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ] || [ "$INCLUDE_CHAT_REDACTION_POLICY" = "1" ] || [ "$INCLUDE_CHAT_ATTACHMENT_POLICY" = "1" ] || [ "$INCLUDE_CHAT_SHORTCUT_MAP" = "1" ]; }; then
+    ERROR "--include-runtime-readiness, --include-device-session, --include-chat-session, --include-chat-surface-layout, --include-chat-empty-state, --include-chat-local-only-policy, --include-chat-preferences, --include-chat-session-index, --include-chat-session-store-policy, --include-chat-session-title-policy, --include-chat-model-status, --include-chat-model-selection-policy, --include-chat-context-policy, --include-chat-model-load-request, --include-chat-readiness, --include-chat-composer, --include-chat-send-result, --include-chat-transcript-policy, --include-chat-audit-event, --include-chat-error-taxonomy, --include-chat-response-stream, --include-chat-message-list, --include-chat-action-bar, --include-chat-clipboard-policy, --include-chat-redaction-policy, --include-chat-attachment-policy, and --include-chat-shortcut-map are only supported in local scaffold mode"
     exit 1
 fi
 
@@ -3178,6 +3351,7 @@ if [ -z "$BACKEND" ]; then
     NOTE "chat messages : opt-in via --include-chat-message-list (read-only empty message-list data)"
     NOTE "chat actions  : opt-in via --include-chat-action-bar (read-only disabled action-bar data)"
     NOTE "chat clipboard: opt-in via --include-chat-clipboard-policy (read-only disabled clipboard-policy data)"
+    NOTE "chat redact   : opt-in via --include-chat-redaction-policy (read-only disabled redaction-policy data)"
     NOTE "chat attach   : opt-in via --include-chat-attachment-policy (read-only disabled attachment-policy data)"
     NOTE "chat shortcuts: opt-in via --include-chat-shortcut-map (read-only disabled shortcut-map data)"
     NOTE "editor bridge  : planned (VS Code / other IDEs)"
@@ -3208,6 +3382,12 @@ if [ -z "$BACKEND" ]; then
 
     if [ "$INCLUDE_CHAT_CLIPBOARD_POLICY" = "1" ]; then
         if ! print_chat_clipboard_policy_summary; then
+            exit 1
+        fi
+    fi
+
+    if [ "$INCLUDE_CHAT_REDACTION_POLICY" = "1" ]; then
+        if ! print_chat_redaction_policy_summary; then
             exit 1
         fi
     fi
