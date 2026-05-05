@@ -590,7 +590,9 @@ explicit list of what was and was not imported are in
 ## Related
 
 - [pccxai/pccx][pccx] — spec / docs / roadmap / release coordination
-- [pccxai/pccx-FPGA-NPU-LLM-kv260][pccx-fpga] — RTL / Sail / KV260 / hardware evidence
+- [pccxai/pccx-FPGA-NPU-LLM-kv260][pccx-fpga] — v002 LLM RTL / Sail / KV260 / hardware evidence
+- [pccxai/pccx-LLM-v003][pccx-llm-v003] — active LLM RTL track in a separate repository
+- [pccxai/pccx-vision-v001][pccx-vision-v001] — active vision track for related KV260-oriented work
 - [pccxai/pccx-lab][pccx-lab] — verification lab + analysis backend
 - [pccxai/systemverilog-ide][pccx-ide] — SystemVerilog IDE spin-out
 
@@ -602,3 +604,5 @@ Apache License 2.0 — see [LICENSE](./LICENSE).
 [pccx-fpga]: https://github.com/pccxai/pccx-FPGA-NPU-LLM-kv260
 [pccx-lab]: https://github.com/pccxai/pccx-lab
 [pccx-ide]: https://github.com/pccxai/systemverilog-ide
+[pccx-llm-v003]: https://github.com/pccxai/pccx-LLM-v003
+[pccx-vision-v001]: https://github.com/pccxai/pccx-vision-v001
