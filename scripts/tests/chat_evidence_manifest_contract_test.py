@@ -214,11 +214,17 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "chat_gap_matrix",
         "chat_status_summary",
         "chat_redaction_policy",
+        "chat_session_store_policy",
         "chat_shortcut_map",
         "chat_clipboard_policy",
         "chat_attachment_policy",
         "chat_accessibility",
     }
+    assert refs["chat_session_store_policy"]["schemaVersion"] == "pccx.chatSessionStorePolicy.v0"
+    assert refs["chat_session_store_policy"]["state"] == "requires_review"
+    assert refs["chat_session_store_policy"]["contentPolicy"] == (
+        "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence"
+    )
     assert refs["chat_shortcut_map"]["schemaVersion"] == "pccx.chatShortcutMap.v0"
     assert refs["chat_shortcut_map"]["state"] == "requires_review"
     assert refs["chat_shortcut_map"]["contentPolicy"] == (
@@ -249,6 +255,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "review_packet_gate",
         "gap_matrix_gate",
         "runtime_evidence_gate",
+        "session_store_policy_gate",
         "accessibility_review_gate",
         "attachment_policy_gate",
         "clipboard_policy_gate",
@@ -259,6 +266,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "review_not_approved",
         "artifact_evidence_not_read",
         "standalone_chat_still_blocked",
+        "session_store_review_pending",
         "accessibility_review_pending",
         "attachment_review_pending",
         "clipboard_review_pending",
@@ -268,6 +276,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "collect_runtime_evidence",
         "review_manifest_refs",
         "keep_chat_blocked",
+        "review_session_store_policy",
         "review_accessibility_metadata",
         "review_attachment_policy",
         "review_clipboard_policy",
@@ -289,6 +298,7 @@ def test_safety_flags_preserve_manifest_only_boundary() -> None:
     assert flags["reviewPacketReferencedOnly"] is True
     assert flags["gapMatrixReferencedOnly"] is True
     assert flags["statusSummaryReferencedOnly"] is True
+    assert flags["sessionStorePolicyReferencedOnly"] is True
     for name in [
         "evidenceAccepted",
         "gapClosed",
@@ -304,6 +314,8 @@ def test_safety_flags_preserve_manifest_only_boundary() -> None:
         "transcriptContentIncluded",
         "messageBodiesIncluded",
         "sessionStoreRead",
+        "sessionStoreWrite",
+        "sessionPersistence",
         "configRead",
         "environmentRead",
         "providerConfigRead",
