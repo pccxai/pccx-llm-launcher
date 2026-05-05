@@ -214,10 +214,16 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "chat_gap_matrix",
         "chat_status_summary",
         "chat_redaction_policy",
+        "chat_shortcut_map",
         "chat_clipboard_policy",
         "chat_attachment_policy",
         "chat_accessibility",
     }
+    assert refs["chat_shortcut_map"]["schemaVersion"] == "pccx.chatShortcutMap.v0"
+    assert refs["chat_shortcut_map"]["state"] == "requires_review"
+    assert refs["chat_shortcut_map"]["contentPolicy"] == (
+        "fixture_reference_only_no_keyboard_listener_capture_dispatch_focus_change_or_action_execution"
+    )
     assert refs["chat_clipboard_policy"]["schemaVersion"] == "pccx.chatClipboardPolicy.v0"
     assert refs["chat_clipboard_policy"]["state"] == "requires_review"
     assert refs["chat_clipboard_policy"]["contentPolicy"] == (
@@ -246,6 +252,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "accessibility_review_gate",
         "attachment_policy_gate",
         "clipboard_policy_gate",
+        "shortcut_map_gate",
     }
     assert set(reasons) == {
         "runtime_evidence_absent",
@@ -255,6 +262,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "accessibility_review_pending",
         "attachment_review_pending",
         "clipboard_review_pending",
+        "shortcut_review_pending",
     }
     assert set(actions) == {
         "collect_runtime_evidence",
@@ -263,6 +271,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "review_accessibility_metadata",
         "review_attachment_policy",
         "review_clipboard_policy",
+        "review_shortcut_map",
     }
     for action in actions.values():
         assert action["enabled"] is False
