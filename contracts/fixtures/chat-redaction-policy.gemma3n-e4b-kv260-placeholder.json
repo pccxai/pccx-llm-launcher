@@ -1,0 +1,368 @@
+{
+  "attachmentRedactionState": "blocked",
+  "auditRedactionState": "blocked",
+  "blockedReasons": [
+    {
+      "reasonId": "redaction_rules_absent",
+      "requiredBefore": "redaction_rule_review_enabled",
+      "state": "not_configured",
+      "summary": "No reviewed local redaction rule source exists."
+    },
+    {
+      "reasonId": "content_boundary_absent",
+      "requiredBefore": "content_scan_enabled",
+      "state": "blocked",
+      "summary": "Prompt, response, message, attachment, and clipboard content boundaries remain unavailable."
+    },
+    {
+      "reasonId": "transcript_policy_not_reviewed",
+      "requiredBefore": "transcript_redaction_enabled",
+      "state": "not_configured",
+      "summary": "Transcript storage, retention, export, and redaction policy is not configured."
+    },
+    {
+      "reasonId": "scanner_not_reviewed",
+      "requiredBefore": "sensitive_content_detection_enabled",
+      "state": "requires_review",
+      "summary": "Detector scope, match handling, and replacement policy require review."
+    },
+    {
+      "reasonId": "persistence_not_configured",
+      "requiredBefore": "redaction_result_persistence_enabled",
+      "state": "disabled",
+      "summary": "Redaction results are not persisted or exported."
+    }
+  ],
+  "chatAttachmentPolicyRef": "chat_attachment_policy_gemma3n_e4b_kv260_placeholder",
+  "chatAuditEventRef": "chat_audit_event_gemma3n_e4b_kv260_placeholder",
+  "chatClipboardPolicyRef": "chat_clipboard_policy_gemma3n_e4b_kv260_placeholder",
+  "chatComposerRef": "chat_composer_gemma3n_e4b_kv260_placeholder",
+  "chatLocalOnlyPolicyRef": "chat_local_only_policy_gemma3n_e4b_kv260_placeholder",
+  "chatMessageListRef": "chat_message_list_gemma3n_e4b_kv260_placeholder",
+  "chatTranscriptPolicyRef": "chat_transcript_policy_gemma3n_e4b_kv260_placeholder",
+  "clipboardRedactionState": "disabled",
+  "contentScanState": "disabled",
+  "fixtureVersion": "chat-redaction-policy.gemma3n-e4b-kv260.2026-05-05",
+  "handoffRefs": [
+    {
+      "fixturePath": "contracts/fixtures/chat-composer.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_composer",
+      "schemaVersion": "pccx.chatComposer.v0",
+      "state": "blocked",
+      "summary": "Composer data keeps prompt capture and prompt redaction disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-message-list.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_message_list",
+      "schemaVersion": "pccx.chatMessageList.v0",
+      "state": "empty_not_captured",
+      "summary": "Empty message-list data prevents message redaction."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-transcript-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_transcript_policy",
+      "schemaVersion": "pccx.chatTranscriptPolicy.v0",
+      "state": "disabled",
+      "summary": "Transcript persistence and export remain unavailable."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-attachment-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_attachment_policy",
+      "schemaVersion": "pccx.chatAttachmentPolicy.v0",
+      "state": "blocked",
+      "summary": "Attachment policy keeps attachment payload reads disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-clipboard-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_clipboard_policy",
+      "schemaVersion": "pccx.chatClipboardPolicy.v0",
+      "state": "blocked",
+      "summary": "Clipboard policy keeps clipboard payload reads and writes disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-audit-event.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_audit_event",
+      "schemaVersion": "pccx.chatAuditEvent.v0",
+      "state": "blocked",
+      "summary": "Audit-event data keeps audit redaction and persistence disabled."
+    },
+    {
+      "fixturePath": "contracts/fixtures/chat-local-only-policy.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_local_only_policy",
+      "schemaVersion": "pccx.chatLocalOnlyPolicy.v0",
+      "state": "blocked",
+      "summary": "Local-only policy keeps provider, cloud, network, and upload paths unavailable."
+    }
+  ],
+  "issueRefs": [
+    "pccxai/pccx-llm-launcher#9"
+  ],
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_redaction_policy_boundary_2026-05-05",
+  "limitations": [
+    "Data-only chat redaction-policy fixture; no redaction rules, prompt, response, transcript, message body, attachment, clipboard data, audit content, file, artifact, model path, runtime log, or private path is read or written.",
+    "Content scanning, sensitive-content detection, prompt redaction, response redaction, transcript redaction, message redaction, attachment redaction, clipboard redaction, audit redaction, and result persistence remain disabled or blocked.",
+    "No PII, secret, token, path, identifier, or detector match is produced or included.",
+    "No model load, runtime execution, provider call, network call, upload, artifact access, or KV260 hardware access is performed.",
+    "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, or runtime implementation."
+  ],
+  "messageRedactionState": "empty_not_captured",
+  "persistenceState": "disabled",
+  "piiDetectionState": "disabled",
+  "privacyState": "summary_only",
+  "promptRedactionState": "disabled",
+  "redactionControls": [
+    {
+      "blockedReasonRef": "redaction_rules_absent",
+      "contentPolicy": "no_rule_content_or_private_path",
+      "controlId": "review_redaction_rules",
+      "enabled": false,
+      "label": "review redaction rules",
+      "launcherAction": "Keep rules unavailable and do not load policy files.",
+      "sideEffectPolicy": "no_rule_load",
+      "state": "not_configured",
+      "userAction": "Review rules only after a separate local policy source is defined."
+    },
+    {
+      "blockedReasonRef": "content_boundary_absent",
+      "contentPolicy": "no_prompt_text",
+      "controlId": "scan_prompt_content",
+      "enabled": false,
+      "label": "scan prompt content",
+      "launcherAction": "Do not capture, inspect, or scan prompt text.",
+      "sideEffectPolicy": "no_prompt_scan",
+      "state": "disabled",
+      "userAction": "Scan prompts only after prompt capture and redaction review exists."
+    },
+    {
+      "blockedReasonRef": "content_boundary_absent",
+      "contentPolicy": "no_response_text",
+      "controlId": "scan_response_content",
+      "enabled": false,
+      "label": "scan response content",
+      "launcherAction": "Do not generate, inspect, or scan response text.",
+      "sideEffectPolicy": "no_response_scan",
+      "state": "disabled",
+      "userAction": "Scan responses only after a reviewed response stream exists."
+    },
+    {
+      "blockedReasonRef": "transcript_policy_not_reviewed",
+      "contentPolicy": "no_transcript_text",
+      "controlId": "scan_transcript_content",
+      "enabled": false,
+      "label": "scan transcript content",
+      "launcherAction": "Do not read, export, inspect, or scan transcripts.",
+      "sideEffectPolicy": "no_transcript_scan",
+      "state": "not_configured",
+      "userAction": "Scan transcripts only after local storage and retention policy exists."
+    },
+    {
+      "blockedReasonRef": "scanner_not_reviewed",
+      "contentPolicy": "no_detector_matches_or_raw_content",
+      "controlId": "detect_sensitive_content",
+      "enabled": false,
+      "label": "detect sensitive content",
+      "launcherAction": "Do not run PII, secret, token, path, or identifier detection.",
+      "sideEffectPolicy": "no_detector_execution",
+      "state": "disabled",
+      "userAction": "Run detectors only after local detector scope and review rules exist."
+    },
+    {
+      "blockedReasonRef": "content_boundary_absent",
+      "contentPolicy": "no_file_name_path_metadata_preview_or_bytes",
+      "controlId": "redact_attachment_payload",
+      "enabled": false,
+      "label": "redact attachment payload",
+      "launcherAction": "Do not open, read, parse, scan, or redact file or artifact payloads.",
+      "sideEffectPolicy": "no_attachment_read_or_redaction",
+      "state": "blocked",
+      "userAction": "Redact attachments only after file input, parsing, and redaction rules are reviewed."
+    },
+    {
+      "blockedReasonRef": "content_boundary_absent",
+      "contentPolicy": "no_clipboard_content",
+      "controlId": "redact_clipboard_payload",
+      "enabled": false,
+      "label": "redact clipboard payload",
+      "launcherAction": "Do not read, scan, redact, import, or write clipboard data.",
+      "sideEffectPolicy": "no_clipboard_read_or_redaction",
+      "state": "disabled",
+      "userAction": "Redact clipboard data only after clipboard read and redaction boundaries are reviewed."
+    },
+    {
+      "blockedReasonRef": "persistence_not_configured",
+      "contentPolicy": "no_redacted_content_or_report",
+      "controlId": "persist_redaction_result",
+      "enabled": false,
+      "label": "persist redaction result",
+      "launcherAction": "Do not write redaction reports, artifacts, transcripts, or session records.",
+      "sideEffectPolicy": "no_redaction_result_persistence",
+      "state": "disabled",
+      "userAction": "Persist redaction results only after local store and retention policy exists."
+    }
+  ],
+  "redactionPolicy": {
+    "attachmentRedactionEnabled": false,
+    "auditRedactionEnabled": false,
+    "clipboardRedactionEnabled": false,
+    "contentPolicy": "redaction policy metadata only; no raw content, detector matches, replacement text, identifiers, file names, paths, bytes, prompts, responses, transcripts, or messages are included",
+    "messageRedactionEnabled": false,
+    "mode": "disabled_until_reviewed_redaction_rules_and_content_boundaries_exist",
+    "persistenceEnabled": false,
+    "piiDetectionEnabled": false,
+    "promptRedactionEnabled": false,
+    "responseRedactionEnabled": false,
+    "scannerEnabled": false,
+    "secretDetectionEnabled": false,
+    "sideEffectPolicy": "local_render_only",
+    "sourcePolicy": "checked fixture only; no prompt, response, transcript, message, attachment, clipboard, audit, session-store, file, artifact, model path, or runtime log is read",
+    "state": "blocked",
+    "transcriptRedactionEnabled": false
+  },
+  "redactionPolicyId": "chat_redaction_policy_gemma3n_e4b_kv260_placeholder",
+  "redactionPolicyState": "blocked",
+  "redactionSurfaces": [
+    {
+      "contentPolicy": "no_prompt_text",
+      "enabled": false,
+      "label": "composer prompt",
+      "sideEffectPolicy": "no_prompt_scan",
+      "state": "blocked",
+      "summary": "Prompt redaction remains disabled because prompt capture is not enabled.",
+      "surfaceId": "composer_prompt"
+    },
+    {
+      "contentPolicy": "no_response_text",
+      "enabled": false,
+      "label": "assistant response",
+      "sideEffectPolicy": "no_response_scan",
+      "state": "disabled",
+      "summary": "Response redaction remains disabled because no generated response exists.",
+      "surfaceId": "assistant_response"
+    },
+    {
+      "contentPolicy": "no_message_body",
+      "enabled": false,
+      "label": "message list",
+      "sideEffectPolicy": "no_message_scan",
+      "state": "empty_not_captured",
+      "summary": "Message redaction remains unavailable because message bodies are not captured.",
+      "surfaceId": "message_list"
+    },
+    {
+      "contentPolicy": "no_transcript_text",
+      "enabled": false,
+      "label": "transcript export",
+      "sideEffectPolicy": "no_transcript_scan_or_export",
+      "state": "not_configured",
+      "summary": "Transcript redaction requires a reviewed store, retention, and export policy.",
+      "surfaceId": "transcript_export"
+    },
+    {
+      "contentPolicy": "no_file_name_path_metadata_or_bytes",
+      "enabled": false,
+      "label": "attachment payload",
+      "sideEffectPolicy": "no_attachment_scan",
+      "state": "blocked",
+      "summary": "Attachment redaction remains blocked until file and artifact input boundaries exist.",
+      "surfaceId": "attachment_payload"
+    },
+    {
+      "contentPolicy": "no_clipboard_content",
+      "enabled": false,
+      "label": "clipboard payload",
+      "sideEffectPolicy": "no_clipboard_scan",
+      "state": "disabled",
+      "summary": "Clipboard redaction remains disabled because clipboard reads are unavailable.",
+      "surfaceId": "clipboard_payload"
+    },
+    {
+      "contentPolicy": "no_actor_identifier_prompt_response_or_raw_event",
+      "enabled": false,
+      "label": "audit event",
+      "sideEffectPolicy": "no_audit_scan_or_persistence",
+      "state": "blocked",
+      "summary": "Audit redaction remains blocked because audit persistence is not configured.",
+      "surfaceId": "audit_event"
+    }
+  ],
+  "responseRedactionState": "disabled",
+  "safetyFlags": {
+    "attachmentReads": false,
+    "attachmentRedaction": false,
+    "auditRedaction": false,
+    "automaticUpload": false,
+    "clipboardRead": false,
+    "clipboardRedaction": false,
+    "clipboardWrite": false,
+    "cloudCalls": false,
+    "configRead": false,
+    "contentScan": false,
+    "dataOnly": true,
+    "deterministic": true,
+    "directoryScan": false,
+    "environmentRead": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false,
+    "fileContentRead": false,
+    "fileImport": false,
+    "fileMetadataRead": false,
+    "fileNameIncluded": false,
+    "filePathIncluded": false,
+    "fileUpload": false,
+    "generatedBlobsIncluded": false,
+    "hardwareAccess": false,
+    "hardwareDumpsIncluded": false,
+    "identifierDetection": false,
+    "kv260Access": false,
+    "lspImplemented": false,
+    "mcpServerImplemented": false,
+    "messageBodiesIncluded": false,
+    "messageRedaction": false,
+    "modelAssetPathsIncluded": false,
+    "modelAssetRead": false,
+    "modelExecution": false,
+    "modelLoadAttempted": false,
+    "networkCalls": false,
+    "piiDetection": false,
+    "privatePathsIncluded": false,
+    "promptCapture": false,
+    "promptContentIncluded": false,
+    "promptRead": false,
+    "promptRedaction": false,
+    "providerCalls": false,
+    "providerConfigRead": false,
+    "readOnly": true,
+    "readsArtifacts": false,
+    "readsSessionStore": false,
+    "readsTranscript": false,
+    "redactionApplied": false,
+    "redactionMetadataOnly": true,
+    "redactionPolicyDisplayOnly": true,
+    "redactionReportGenerated": false,
+    "redactionResultPersisted": false,
+    "redactionRulesLoaded": false,
+    "redactionRulesPersisted": false,
+    "responseContentIncluded": false,
+    "responseRedaction": false,
+    "runtimeExecution": false,
+    "runtimeLogsIncluded": false,
+    "secretDetection": false,
+    "secretsIncluded": false,
+    "sessionStoreRead": false,
+    "sessionStoreWrite": false,
+    "stableApiAbiClaim": false,
+    "telemetry": false,
+    "tokensIncluded": false,
+    "touchesHardware": false,
+    "transcriptContentIncluded": false,
+    "transcriptRedaction": false,
+    "writeBack": false,
+    "writesArtifacts": false
+  },
+  "schemaVersion": "pccx.chatRedactionPolicy.v0",
+  "secretDetectionState": "disabled",
+  "targetBoard": "xilinx_kria_kv260",
+  "targetDevice": "kv260",
+  "targetModel": "gemma3n-e4b",
+  "transcriptRedactionState": "not_configured"
+}
