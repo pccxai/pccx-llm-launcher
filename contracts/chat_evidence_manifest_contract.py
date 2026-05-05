@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_evidence_manifest_boundary_2026-05-05",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-05-accessibility-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_accessibility_evidence_ref_2026-05-05",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -155,6 +155,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "contentPolicy": "fixture_reference_only_no_content_scan_or_redaction_action",
             "requiredBefore": "privacy_sensitive_content_paths_enabled",
         },
+        {
+            "refId": "chat_accessibility",
+            "schemaVersion": "pccx.chatAccessibility.v0",
+            "fixturePath": "contracts/fixtures/chat-accessibility.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Accessibility metadata is referenced as a checked fixture and still needs UI review before any chat surface is treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_ui_focus_keyboard_or_live_region_execution",
+            "requiredBefore": "accessibility_review_closed",
+        },
     ],
     "reviewLinks": [
         {
@@ -174,6 +183,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "refId": "runtime_readiness",
             "state": "requires_evidence",
             "summary": "Runtime evidence must be reviewed in a later evidence-backed change.",
+        },
+        {
+            "linkId": "accessibility_review_gate",
+            "refId": "chat_accessibility",
+            "state": "requires_review",
+            "summary": "Accessibility metadata remains a review reference and does not enable UI behavior.",
         },
     ],
     "blockedReasons": [
@@ -201,6 +216,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Standalone chat remains blocked by unresolved runtime, model, content, store, privacy, and UI gaps.",
             "requiredBefore": "standalone_chat_enabled",
         },
+        {
+            "reasonId": "accessibility_review_pending",
+            "state": "requires_review",
+            "summary": "Accessibility labels, focus order, live-region behavior, contrast, and motion metadata still require UI review.",
+            "requiredBefore": "accessibility_review_closed",
+        },
     ],
     "nextActions": [
         {
@@ -223,6 +244,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "enabled": False,
             "summary": "Standalone chat controls must remain blocked until reviewed evidence and gap closure land separately.",
             "requiredBefore": "standalone_chat_enabled",
+        },
+        {
+            "actionId": "review_accessibility_metadata",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked accessibility fixture separately before enabling any labels, focus behavior, live-region updates, contrast tokens, or motion behavior.",
+            "requiredBefore": "accessibility_review_closed",
         },
     ],
     "safetyFlags": {
