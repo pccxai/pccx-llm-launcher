@@ -90,8 +90,8 @@ CHAT_EVIDENCE_MANIFEST_STATE_VALUES = (
 _CHAT_EVIDENCE_MANIFEST = {
     "schemaVersion": SCHEMA_VERSION,
     "evidenceManifestId": "chat_evidence_manifest_gemma3n_e4b_kv260_placeholder",
-    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-session-store-ref",
-    "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_store_evidence_ref_2026-05-06",
+    "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-load-ref",
+    "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_load_evidence_ref_2026-05-06",
     "targetDevice": "kv260",
     "targetBoard": "xilinx_kria_kv260",
     "targetModel": "gemma3n-e4b",
@@ -154,6 +154,15 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results.",
             "contentPolicy": "fixture_reference_only_no_content_scan_or_redaction_action",
             "requiredBefore": "privacy_sensitive_content_paths_enabled",
+        },
+        {
+            "refId": "chat_model_load_request",
+            "schemaVersion": "pccx.chatModelLoadRequest.v0",
+            "fixturePath": "contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json",
+            "state": "requires_review",
+            "summary": "Model-load request metadata is referenced as a checked fixture and still needs review before any model asset path, validation, load, warmup, unload, or persistence path is treated as implemented.",
+            "contentPolicy": "fixture_reference_only_no_model_asset_path_read_validation_load_warmup_unload_or_persistence",
+            "requiredBefore": "model_load_request_enabled",
         },
         {
             "refId": "chat_session_store_policy",
@@ -227,6 +236,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "summary": "Session-store metadata remains a review reference and does not enable store path, manifest, session record, retention, migration, deletion, or persistence behavior.",
         },
         {
+            "linkId": "model_load_request_gate",
+            "refId": "chat_model_load_request",
+            "state": "requires_review",
+            "summary": "Model-load request metadata remains a review reference and does not enable model asset path lookup, validation, load, warmup, unload, or persistence behavior.",
+        },
+        {
             "linkId": "accessibility_review_gate",
             "refId": "chat_accessibility",
             "state": "requires_review",
@@ -283,6 +298,12 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "session_store_enabled",
         },
         {
+            "reasonId": "model_load_request_review_pending",
+            "state": "requires_review",
+            "summary": "Model asset path lookup, validation, load, warmup, unload, and load-request persistence still require review.",
+            "requiredBefore": "model_load_request_enabled",
+        },
+        {
             "reasonId": "accessibility_review_pending",
             "state": "requires_review",
             "summary": "Accessibility labels, focus order, live-region behavior, contrast, and motion metadata still require UI review.",
@@ -337,6 +358,13 @@ _CHAT_EVIDENCE_MANIFEST = {
             "requiredBefore": "session_store_enabled",
         },
         {
+            "actionId": "review_model_load_request",
+            "state": "requires_review",
+            "enabled": False,
+            "summary": "Review the checked model-load request fixture separately before enabling model asset path lookup, validation, load, warmup, unload, or load-request persistence.",
+            "requiredBefore": "model_load_request_enabled",
+        },
+        {
             "actionId": "review_accessibility_metadata",
             "state": "requires_review",
             "enabled": False,
@@ -375,6 +403,7 @@ _CHAT_EVIDENCE_MANIFEST = {
         "gapMatrixReferencedOnly": True,
         "statusSummaryReferencedOnly": True,
         "sessionStorePolicyReferencedOnly": True,
+        "modelLoadRequestReferencedOnly": True,
         "evidenceAccepted": False,
         "gapClosed": False,
         "approvalGranted": False,

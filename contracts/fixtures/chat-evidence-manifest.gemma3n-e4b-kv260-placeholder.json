@@ -32,6 +32,12 @@
       "summary": "Local store configuration, path lookup, manifest reads, session-record reads/writes, deletion, retention, migration, and persistence still require review."
     },
     {
+      "reasonId": "model_load_request_review_pending",
+      "requiredBefore": "model_load_request_enabled",
+      "state": "requires_review",
+      "summary": "Model asset path lookup, validation, load, warmup, unload, and load-request persistence still require review."
+    },
+    {
       "reasonId": "accessibility_review_pending",
       "requiredBefore": "accessibility_review_closed",
       "state": "requires_review",
@@ -113,6 +119,15 @@
       "summary": "Redaction policy is referenced without loading rules, scanning content, or persisting results."
     },
     {
+      "contentPolicy": "fixture_reference_only_no_model_asset_path_read_validation_load_warmup_unload_or_persistence",
+      "fixturePath": "contracts/fixtures/chat-model-load-request.gemma3n-e4b-kv260-placeholder.json",
+      "refId": "chat_model_load_request",
+      "requiredBefore": "model_load_request_enabled",
+      "schemaVersion": "pccx.chatModelLoadRequest.v0",
+      "state": "requires_review",
+      "summary": "Model-load request metadata is referenced as a checked fixture and still needs review before any model asset path, validation, load, warmup, unload, or persistence path is treated as implemented."
+    },
+    {
       "contentPolicy": "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence",
       "fixturePath": "contracts/fixtures/chat-session-store-policy.gemma3n-e4b-kv260-placeholder.json",
       "refId": "chat_session_store_policy",
@@ -159,12 +174,12 @@
     }
   ],
   "evidenceState": "requires_evidence",
-  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-session-store-ref",
+  "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-model-load-ref",
   "gapState": "blocked",
   "issueRefs": [
     "pccxai/pccx-llm-launcher#9"
   ],
-  "lastUpdatedSource": "pccx_launcher_issue_9_chat_session_store_evidence_ref_2026-05-06",
+  "lastUpdatedSource": "pccx_launcher_issue_9_chat_model_load_evidence_ref_2026-05-06",
   "limitations": [
     "Data-only chat evidence manifest over existing checked fixture references.",
     "No prompt, response, transcript, message, session-store, config, provider, model-path, runtime-log, artifact, private-path, secret, token, file, clipboard, or hardware content is read.",
@@ -200,6 +215,13 @@
       "requiredBefore": "session_store_enabled",
       "state": "requires_review",
       "summary": "Review the checked session-store policy fixture separately before enabling local store configuration, path lookup, manifest reads, session-record reads/writes, retention, migration, deletion, or persistence."
+    },
+    {
+      "actionId": "review_model_load_request",
+      "enabled": false,
+      "requiredBefore": "model_load_request_enabled",
+      "state": "requires_review",
+      "summary": "Review the checked model-load request fixture separately before enabling model asset path lookup, validation, load, warmup, unload, or load-request persistence."
     },
     {
       "actionId": "review_accessibility_metadata",
@@ -254,6 +276,12 @@
       "refId": "chat_session_store_policy",
       "state": "requires_review",
       "summary": "Session-store metadata remains a review reference and does not enable store path, manifest, session record, retention, migration, deletion, or persistence behavior."
+    },
+    {
+      "linkId": "model_load_request_gate",
+      "refId": "chat_model_load_request",
+      "state": "requires_review",
+      "summary": "Model-load request metadata remains a review reference and does not enable model asset path lookup, validation, load, warmup, unload, or persistence behavior."
     },
     {
       "linkId": "accessibility_review_gate",
@@ -311,6 +339,7 @@
     "modelAssetRead": false,
     "modelExecution": false,
     "modelLoadAttempted": false,
+    "modelLoadRequestReferencedOnly": true,
     "modelPathIncluded": false,
     "networkCalls": false,
     "promptCapture": false,

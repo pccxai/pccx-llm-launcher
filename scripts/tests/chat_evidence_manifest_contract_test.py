@@ -214,6 +214,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "chat_gap_matrix",
         "chat_status_summary",
         "chat_redaction_policy",
+        "chat_model_load_request",
         "chat_session_store_policy",
         "chat_shortcut_map",
         "chat_clipboard_policy",
@@ -224,6 +225,11 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
     assert refs["chat_session_store_policy"]["state"] == "requires_review"
     assert refs["chat_session_store_policy"]["contentPolicy"] == (
         "fixture_reference_only_no_store_path_manifest_session_record_read_or_persistence"
+    )
+    assert refs["chat_model_load_request"]["schemaVersion"] == "pccx.chatModelLoadRequest.v0"
+    assert refs["chat_model_load_request"]["state"] == "requires_review"
+    assert refs["chat_model_load_request"]["contentPolicy"] == (
+        "fixture_reference_only_no_model_asset_path_read_validation_load_warmup_unload_or_persistence"
     )
     assert refs["chat_shortcut_map"]["schemaVersion"] == "pccx.chatShortcutMap.v0"
     assert refs["chat_shortcut_map"]["state"] == "requires_review"
@@ -256,6 +262,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "gap_matrix_gate",
         "runtime_evidence_gate",
         "session_store_policy_gate",
+        "model_load_request_gate",
         "accessibility_review_gate",
         "attachment_policy_gate",
         "clipboard_policy_gate",
@@ -267,6 +274,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "artifact_evidence_not_read",
         "standalone_chat_still_blocked",
         "session_store_review_pending",
+        "model_load_request_review_pending",
         "accessibility_review_pending",
         "attachment_review_pending",
         "clipboard_review_pending",
@@ -277,6 +285,7 @@ def test_manifest_tracks_references_without_accepting_evidence() -> None:
         "review_manifest_refs",
         "keep_chat_blocked",
         "review_session_store_policy",
+        "review_model_load_request",
         "review_accessibility_metadata",
         "review_attachment_policy",
         "review_clipboard_policy",
@@ -299,6 +308,7 @@ def test_safety_flags_preserve_manifest_only_boundary() -> None:
     assert flags["gapMatrixReferencedOnly"] is True
     assert flags["statusSummaryReferencedOnly"] is True
     assert flags["sessionStorePolicyReferencedOnly"] is True
+    assert flags["modelLoadRequestReferencedOnly"] is True
     for name in [
         "evidenceAccepted",
         "gapClosed",
