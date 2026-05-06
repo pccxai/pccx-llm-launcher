@@ -1,0 +1,44 @@
+/* Shared preview-card styling. Each card is a 700-wide tile with
+   minimal chrome — the asset name renders OUTSIDE the card. */
+
+@import url("./colors_and_type.css");
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--pccx-bg);
+  color: var(--pccx-fg-1);
+  font-family: var(--pccx-font-sans);
+}
+body {
+  width: 700px;
+  padding: 20px;
+}
+
+/* Common in-card helpers */
+.row     { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.row-tight{display: flex; gap: 8px;  align-items: center; flex-wrap: wrap; }
+.col     { display: flex; flex-direction: column; gap: 12px; }
+.divider { height: 1px; background: var(--pccx-line); margin: 14px 0; }
+
+/* Eyebrow used inside cards when a single card carries 2 sub-groups. */
+.eyebrow {
+  font: 600 10px/14px var(--pccx-font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pccx-fg-3);
+  margin: 0 0 10px 0;
+}
+
+/* Token chip — the "Aa", swatch, or radii box. */
+.tile {
+  border: 1px solid var(--pccx-line);
+  border-radius: var(--pccx-radius-md);
+  background: var(--pccx-bg);
+}
+.cap {
+  font: 400 10px/14px var(--pccx-font-mono);
+  letter-spacing: 0.04em;
+  color: var(--pccx-fg-3);
+  margin-top: 6px;
+}
