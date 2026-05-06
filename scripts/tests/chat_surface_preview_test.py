@@ -78,6 +78,33 @@ def test_preview_avoids_runtime_and_readiness_overclaims() -> None:
         assert phrase not in output, phrase
 
 
+def test_html_preview_uses_pccx_ui_assets_without_runtime_claims() -> None:
+    result = run_preview("--html")
+    output = result.stdout
+    lower_output = output.lower()
+
+    assert result.stderr == ""
+    assert '<link rel="icon" href="assets/icon.svg" type="image/svg+xml">' in output
+    assert '<link rel="stylesheet" href="assets/pccx-ui/launcher.css">' in output
+    assert 'src="assets/pccx-ui/logo-mark.svg"' in output
+    assert "pccx-ui theme tokens and logo assets are applied" in lower_output
+    assert "visual app-shell preview only" in lower_output
+    assert "no model is loaded" in lower_output
+    assert "no runtime path is executed" in lower_output
+    assert "no provider is called" in lower_output
+    assert "no kv260 access is attempted" in lower_output
+
+    forbidden = [
+        "kv260 inference works",
+        "gemma 3n e4b runs on kv260",
+        "20 tok/s achieved",
+        "model executed",
+        "provider call made",
+    ]
+    for phrase in forbidden:
+        assert phrase not in lower_output, phrase
+
+
 def test_unknown_model_is_rejected() -> None:
     result = subprocess.run(
         ["bash", str(SCRIPT_PATH), "--model", "unknown", "--target", "kv260"],
@@ -93,6 +120,7 @@ def test_unknown_model_is_rejected() -> None:
 test_preview_outputs_blocked_chat_surface()
 test_preview_is_deterministic_and_does_not_echo_prompts()
 test_preview_avoids_runtime_and_readiness_overclaims()
+test_html_preview_uses_pccx_ui_assets_without_runtime_claims()
 test_unknown_model_is_rejected()
 
 print("chat surface preview tests ok")

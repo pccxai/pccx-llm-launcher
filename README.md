@@ -121,7 +121,7 @@ and verify host-side prerequisites before the real engine lands.
 | [`scripts/chat-transcript-policy-stub.sh`](./scripts/chat-transcript-policy-stub.sh) | Data-only chat transcript policy JSON for the Gemma 3N E4B + KV260 target. Reports retention, export, storage, and privacy policy state without reading, generating, storing, persisting, summarizing, or exporting prompt/response/transcript content. |
 | [`scripts/chat-audit-event-stub.sh`](./scripts/chat-audit-event-stub.sh) | Data-only chat audit-event JSON for the Gemma 3N E4B + KV260 target. Reports blocked send metadata, redaction policy, absent prompt/response/transcript content, and disabled audit persistence. |
 | [`scripts/chat-error-taxonomy-stub.sh`](./scripts/chat-error-taxonomy-stub.sh) | Data-only chat error taxonomy JSON for the Gemma 3N E4B + KV260 target. Groups blocked readiness, model/runtime, session, and policy errors without reading prompts, providers, configs, model paths, logs, stores, or artifacts. |
-| [`scripts/chat-surface-preview.sh`](./scripts/chat-surface-preview.sh) | Read-only terminal preview of the standalone chat surface. Renders the checked chat/session contract as blocked UI state without accepting prompts, executing a model, or writing artifacts. |
+| [`scripts/chat-surface-preview.sh`](./scripts/chat-surface-preview.sh) | Read-only preview of the standalone chat surface. Default output is terminal text; `--html` renders a pccx-UI branded visual shell to stdout. Both modes keep the checked chat/session contract blocked without accepting prompts, executing a model, or writing artifacts. |
 | [`scripts/launch-stub.sh`](./scripts/launch-stub.sh) | Dry-run preview of the intended launch sequence. Requires `--dry-run`; exits 1 without it. |
 | [`scripts/chat-stub.sh`](./scripts/chat-stub.sh) | Dry-run chat stub. Requires `--dry-run`; exits 1 without it. Accepts `--prompt "..."` or stdin. No model is executed. |
 
@@ -196,6 +196,7 @@ bash scripts/chat-review-packet-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-gap-matrix-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-evidence-manifest-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260 --html
 bash scripts/launch-stub.sh --dry-run
 bash scripts/chat-stub.sh --dry-run --prompt "hello"
 ```
@@ -397,6 +398,7 @@ bash scripts/chat-shortcut-map-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-review-packet-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-gap-matrix-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260 --html
 bash scripts/status-stub.sh --include-chat-model-status
 bash scripts/status-stub.sh --include-chat-model-selection-policy
 bash scripts/status-stub.sh --include-chat-model-load-request

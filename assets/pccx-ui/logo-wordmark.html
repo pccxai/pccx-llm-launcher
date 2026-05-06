@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>pccx · Logo</title>
+<link rel="stylesheet" href="_card.css">
+<style>
+  body { padding: 0; width: 820px; background: #ffffff; }
+  :root { --fg: #0e1320; --brand: #0b5fff; --muted: #6b7280; --line: #e5e7eb; }
+  .head { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); }
+  .head .ttl { font-size: 13px; font-weight: 600; color: var(--fg); }
+  .head .sub { font-size: 11px; color: var(--muted); font-family: var(--pccx-font-mono); margin-top: 2px; }
+
+  .section { border-bottom: 1px solid var(--line); padding: 22px 24px 26px; }
+  .section h3 { margin: 0 0 16px 0; font-size: 10px; font-family: var(--pccx-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+  .lab { display: flex; align-items: center; justify-content: center; padding: 28px; background: #ffffff; border: 1px solid var(--line); border-radius: 6px; min-height: 140px; }
+
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .item .cap { font-family: var(--pccx-font-mono); font-size: 10px; color: var(--muted); margin-top: 8px; text-align: center; letter-spacing: 0.04em; }
+
+  .stroke { stroke: var(--fg); fill: none; stroke-linecap: square; stroke-linejoin: miter; }
+  .core   { fill: var(--brand); }
+  .word   { fill: var(--fg); font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; letter-spacing: 0; }
+  .accent { fill: var(--brand); }
+  .ink    { fill: var(--fg); }
+
+  /* size strip */
+  .sizes { display: flex; gap: 18px; align-items: flex-end; justify-content: flex-start; flex-wrap: wrap; }
+  .sizes .col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .sizes .col .frame { display: flex; align-items: center; justify-content: center; background: #ffffff; border: 1px solid var(--line); border-radius: 4px; }
+  .sizes .col .px { font-family: var(--pccx-font-mono); font-size: 10px; color: var(--muted); letter-spacing: 0.04em; }
+</style>
+</head><body>
+
+<div class="head">
+  <div class="ttl">pccx — logo system (final, light only)</div>
+  <div class="sub">aperture mark · multiple lockups · single light-mode treatment</div>
+</div>
+
+<!-- ── 1 · MARK ALONE ───────────────────────────────────────────────── -->
+<div class="section">
+  <h3>01 · Mark only</h3>
+  <div class="row3">
+    <div class="item">
+      <div class="lab">
+        <svg width="120" height="120" viewBox="0 0 64 64">
+          <polyline class="stroke" stroke-width="3" points="13,24 13,13 51,13 51,24"/>
+          <polyline class="stroke" stroke-width="3" points="13,40 13,51 51,51 51,40"/>
+          <rect class="core" x="28" y="4" width="8" height="56"/>
+          <rect class="core" x="24" y="4" width="16" height="3"/>
+          <rect class="core" x="24" y="57" width="16" height="3"/>
+        </svg>
+      </div>
+      <div class="cap">primary mark</div>
+    </div>
+    <div class="item">
+      <div class="lab">
+        <svg width="120" height="120" viewBox="0 0 64 64">
+          <polyline class="stroke" stroke-width="3" points="13,24 13,13 51,13 51,24"/>
+          <polyline class="stroke" stroke-width="3" points="13,40 13,51 51,51 51,40"/>
+          <rect class="ink" x="28" y="4" width="8" height="56"/>
+          <rect class="ink" x="24" y="4" width="16" height="3"/>
+          <rect class="ink" x="24" y="57" width="16" height="3"/>
+        </svg>
+      </div>
+      <div class="cap">monochrome (ink)</div>
+    </div>
+    <div class="item">
+      <div class="lab">
+        <svg width="120" height="120" viewBox="0 0 64 64">
+          <rect class="core" x="0" y="0" width="64" height="64"/>
+          <polyline points="13,24 13,13 51,13 51,24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="square"/>
+          <polyline points="13,40 13,51 51,51 51,40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="square"/>
+          <rect fill="#fff" x="28" y="4" width="8" height="56"/>
+          <rect fill="#fff" x="24" y="4" width="16" height="3"/>
+          <rect fill="#fff" x="24" y="57" width="16" height="3"/>
+        </svg>
+      </div>
+      <div class="cap">reversed (on brand)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2 · LOCKUPS WITH WORDMARK ────────────────────────────────────── -->
+<div class="section">
+  <h3>02 · Mark + wordmark lockups</h3>
+  <div class="row2">
+    <div class="item">
+      <div class="lab" style="justify-content: flex-start; padding-left: 32px;">
+        <span style="display:inline-flex; align-items:center; gap:14px;">
+          <svg width="56" height="56" viewBox="0 0 64 64">
+            <polyline class="stroke" stroke-width="3" points="13,24 13,13 51,13 51,24"/>
+            <polyline class="stroke" stroke-width="3" points="13,40 13,51 51,51 51,40"/>
+            <rect class="core" x="28" y="4" width="8" height="56"/>
+            <rect class="core" x="24" y="4" width="16" height="3"/>
+            <rect class="core" x="24" y="57" width="16" height="3"/>
+          </svg>
+          <svg width="120" height="56" viewBox="0 0 148 64">
+            <text class="word" x="0" y="42" style="font-size:30px">pccx</text>
+            <rect class="accent" x="0" y="48" width="14" height="2"/>
+          </svg>
+        </span>
+      </div>
+      <div class="cap">horizontal lockup · primary</div>
+    </div>
+    <div class="item">
+      <div class="lab" style="flex-direction:column; gap:10px;">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <polyline class="stroke" stroke-width="3" points="13,24 13,13 51,13 51,24"/>
+          <polyline class="stroke" stroke-width="3" points="13,40 13,51 51,51 51,40"/>
+          <rect class="core" x="28" y="4" width="8" height="56"/>
+          <rect class="core" x="24" y="4" width="16" height="3"/>
+          <rect class="core" x="24" y="57" width="16" height="3"/>
+        </svg>
+        <svg width="100" height="32" viewBox="0 0 148 40">
+          <text class="word" x="0" y="28" style="font-size:26px">pccx</text>
+          <rect class="accent" x="0" y="34" width="12" height="2"/>
+        </svg>
+      </div>
+      <div class="cap">vertical lockup · stacked</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 3 · WORDMARK ONLY ───────────────────────────────────────────── -->
+<div class="section">
+  <h3>03 · Wordmark only</h3>
+  <div class="row2">
+    <div class="item">
+      <div class="lab">
+        <svg width="220" height="68" viewBox="0 0 220 68">
+          <text class="word" x="0" y="48" style="font-size:42px">pccx</text>
+          <rect class="accent" x="0" y="56" width="20" height="3"/>
+        </svg>
+      </div>
+      <div class="cap">wordmark · accent underline</div>
+    </div>
+    <div class="item">
+      <div class="lab">
+        <svg width="220" height="68" viewBox="0 0 220 68">
+          <text class="word" x="0" y="48" style="font-size:42px">pccx</text>
+        </svg>
+      </div>
+      <div class="cap">wordmark · plain</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 4 · TAGLINE LOCKUP ──────────────────────────────────────────── -->
+<div class="section">
+  <h3>04 · Lockup with tagline</h3>
+  <div class="lab" style="justify-content: flex-start; padding-left: 40px; gap: 18px;">
+    <svg width="64" height="64" viewBox="0 0 64 64">
+      <polyline class="stroke" stroke-width="3" points="13,24 13,13 51,13 51,24"/>
+      <polyline class="stroke" stroke-width="3" points="13,40 13,51 51,51 51,40"/>
+      <rect class="core" x="28" y="4" width="8" height="56"/>
+      <rect class="core" x="24" y="4" width="16" height="3"/>
+      <rect class="core" x="24" y="57" width="16" height="3"/>
+    </svg>
+    <div style="display:flex; flex-direction:column; gap:2px;">
+      <svg width="140" height="40" viewBox="0 0 148 40">
+        <text class="word" x="0" y="30" style="font-size:30px">pccx</text>
+        <rect class="accent" x="0" y="36" width="14" height="2"/>
+      </svg>
+      <div style="font-family: var(--pccx-font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.02em; padding-left: 1px;">parallel compute core executor</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 5 · SIZE PREVIEWS ───────────────────────────────────────────── -->
+<div class="section">
+  <h3>05 · Size previews · mark only</h3>
+  <div class="sizes">
+    <div class="col"><div class="frame" style="width:88px;height:88px"><svg width="64" height="64" viewBox="0 0 64 64"><polyline class="stroke" stroke-width="3" points="13,24 13,13 51,13 51,24"/><polyline class="stroke" stroke-width="3" points="13,40 13,51 51,51 51,40"/><rect class="core" x="28" y="4" width="8" height="56"/><rect class="core" x="24" y="4" width="16" height="3"/><rect class="core" x="24" y="57" width="16" height="3"/></svg></div><span class="px">64</span></div>
+    <div class="col"><div class="frame" style="width:64px;height:64px"><svg width="48" height="48" viewBox="0 0 64 64"><polyline class="stroke" stroke-width="3.2" points="13,24 13,13 51,13 51,24"/><polyline class="stroke" stroke-width="3.2" points="13,40 13,51 51,51 51,40"/><rect class="core" x="28" y="4" width="8" height="56"/><rect class="core" x="24" y="4" width="16" height="3"/><rect class="core" x="24" y="57" width="16" height="3"/></svg></div><span class="px">48</span></div>
+    <div class="col"><div class="frame" style="width:48px;height:48px"><svg width="32" height="32" viewBox="0 0 64 64"><polyline class="stroke" stroke-width="4" points="12,24 12,12 52,12 52,24"/><polyline class="stroke" stroke-width="4" points="12,40 12,52 52,52 52,40"/><rect class="core" x="28" y="4" width="8" height="56"/><rect class="core" x="24" y="4" width="16" height="4"/><rect class="core" x="24" y="56" width="16" height="4"/></svg></div><span class="px">32</span></div>
+    <div class="col"><div class="frame" style="width:32px;height:32px"><svg width="20" height="20" viewBox="0 0 64 64"><polyline class="stroke" stroke-width="6" points="11,26 11,11 53,11 53,26"/><polyline class="stroke" stroke-width="6" points="11,38 11,53 53,53 53,38"/><rect class="core" x="26" y="2" width="12" height="60"/></svg></div><span class="px">20</span></div>
+    <div class="col"><div class="frame" style="width:24px;height:24px"><svg width="16" height="16" viewBox="0 0 64 64"><polyline class="stroke" stroke-width="8" points="10,28 10,10 54,10 54,28"/><polyline class="stroke" stroke-width="8" points="10,36 10,54 54,54 54,36"/><rect class="core" x="24" y="0" width="16" height="64"/></svg></div><span class="px">16 · favicon</span></div>
+  </div>
+</div>
+
+</body></html>

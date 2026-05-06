@@ -1,0 +1,177 @@
+/* ============================================================
+   pccx — colors & type foundations
+   Single light-mode treatment. Ink + IBM blue accent + mono.
+   ============================================================ */
+
+/* ---- Webfont stack ---------------------------------------- */
+/* Inter and IBM Plex Mono are preferred when installed locally.
+   The checked launcher preview does not fetch webfonts or other network assets. */
+
+:root {
+  /* ------------------------------------------------------------------
+     Color · Brand
+     ------------------------------------------------------------------ */
+  --pccx-brand-500: #0b5fff;       /* primary action / accent under wordmark */
+  --pccx-brand-600: #0850db;       /* hover */
+  --pccx-brand-700: #063bb0;       /* press */
+  --pccx-brand-50:  #eef4ff;       /* tinted surface · selected nav row */
+  --pccx-brand-100: #d8e6ff;       /* tinted border on selected */
+
+  /* ------------------------------------------------------------------
+     Color · Ink (foreground neutrals)
+     A near-black slightly cool ink + a 4-step text scale.
+     ------------------------------------------------------------------ */
+  --pccx-ink:       #0e1320;       /* fg-1 · primary text, headings, mark */
+  --pccx-fg-1:      #0e1320;
+  --pccx-fg-2:      #374151;       /* labels, secondary headings */
+  --pccx-fg-3:      #6b7280;       /* meta, captions, muted */
+  --pccx-fg-4:      #9ca3af;       /* placeholder, disabled */
+
+  /* ------------------------------------------------------------------
+     Color · Surface (backgrounds)
+     ------------------------------------------------------------------ */
+  --pccx-bg:        #ffffff;       /* canvas */
+  --pccx-bg-alt:    #f9fafb;       /* sunken panel · code block · table head */
+  --pccx-bg-hover:  #f3f4f6;       /* row hover */
+
+  /* ------------------------------------------------------------------
+     Color · Line
+     ------------------------------------------------------------------ */
+  --pccx-line:      #e5e7eb;       /* default 1px hairline */
+  --pccx-line-2:    #d1d5db;       /* stronger separator */
+  --pccx-focus-ring: rgba(11, 95, 255, 0.32);
+
+  /* ------------------------------------------------------------------
+     Color · Semantic status
+     Plain red / green / amber — matches launcher status strings.
+     ------------------------------------------------------------------ */
+  --pccx-success:   #16a34a;       /* "Success" */
+  --pccx-success-bg: #ecfdf5;
+  --pccx-danger:    #dc2626;       /* "Failed" / "Blocked" / "ERROR:" */
+  --pccx-danger-bg: #fef2f2;
+  --pccx-warning:   #d97706;       /* future · "Warning" */
+  --pccx-warning-bg: #fffbeb;
+  --pccx-info:      #0b5fff;       /* uses brand */
+  --pccx-info-bg:   #eef4ff;
+
+  /* ------------------------------------------------------------------
+     Type · Families
+     ------------------------------------------------------------------ */
+  --pccx-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    Roboto, Helvetica, Arial, sans-serif;
+  --pccx-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo,
+                    Consolas, monospace;
+
+  /* ------------------------------------------------------------------
+     Type · Scale (semantic)
+     Kept tight; the product is a desktop launcher with dense panels.
+     ------------------------------------------------------------------ */
+  --pccx-h1-size: 28px;  --pccx-h1-lh: 36px;  --pccx-h1-weight: 600;
+  --pccx-h2-size: 22px;  --pccx-h2-lh: 30px;  --pccx-h2-weight: 600;
+  --pccx-h3-size: 18px;  --pccx-h3-lh: 26px;  --pccx-h3-weight: 600;
+  --pccx-h4-size: 15px;  --pccx-h4-lh: 22px;  --pccx-h4-weight: 600;
+  --pccx-body-size: 14px; --pccx-body-lh: 22px; --pccx-body-weight: 400;
+  --pccx-small-size: 13px; --pccx-small-lh: 20px;
+  --pccx-meta-size: 12px;  --pccx-meta-lh: 18px;
+  --pccx-mono-size: 13px;  --pccx-mono-lh: 20px;
+  --pccx-eyebrow-size: 11px; --pccx-eyebrow-lh: 16px;
+  --pccx-eyebrow-tracking: 0.12em;
+
+  /* ------------------------------------------------------------------
+     Spacing · Radii · Shadow · Layout
+     ------------------------------------------------------------------ */
+  --pccx-s-1: 4px;
+  --pccx-s-2: 8px;
+  --pccx-s-3: 12px;
+  --pccx-s-4: 16px;
+  --pccx-s-5: 20px;
+  --pccx-s-6: 24px;
+  --pccx-s-8: 32px;
+  --pccx-s-10: 40px;
+  --pccx-s-12: 48px;
+
+  --pccx-radius-sm: 4px;            /* inputs, small chips */
+  --pccx-radius-md: 6px;            /* cards, panels */
+  --pccx-radius-lg: 10px;
+  --pccx-radius-pill: 999px;
+
+  /* Shadows are minimal — the launcher reads as "flat with hairlines".
+     Elevation is reserved for dropdowns / menus / focused fields. */
+  --pccx-shadow-0: none;
+  --pccx-shadow-1: 0 1px 2px rgba(14, 19, 32, 0.04);
+  --pccx-shadow-2: 0 4px 12px rgba(14, 19, 32, 0.08);
+  --pccx-shadow-pop: 0 8px 24px rgba(14, 19, 32, 0.12);
+
+  --pccx-control-h: 36px;           /* default input/select/button height */
+  --pccx-control-h-sm: 28px;
+  --pccx-control-h-lg: 44px;
+}
+
+/* =================================================================
+   Semantic element styles
+   Apply these directly on standard tags or via .pccx-* classes.
+   ================================================================= */
+
+html, body {
+  background: var(--pccx-bg);
+  color: var(--pccx-fg-1);
+  font-family: var(--pccx-font-sans);
+  font-size: var(--pccx-body-size);
+  line-height: var(--pccx-body-lh);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.pccx-h1, h1.pccx { font: var(--pccx-h1-weight) var(--pccx-h1-size)/var(--pccx-h1-lh) var(--pccx-font-sans); letter-spacing: 0; color: var(--pccx-fg-1); margin: 0; }
+.pccx-h2, h2.pccx { font: var(--pccx-h2-weight) var(--pccx-h2-size)/var(--pccx-h2-lh) var(--pccx-font-sans); letter-spacing: 0; color: var(--pccx-fg-1); margin: 0; }
+.pccx-h3, h3.pccx { font: var(--pccx-h3-weight) var(--pccx-h3-size)/var(--pccx-h3-lh) var(--pccx-font-sans); letter-spacing: 0; color: var(--pccx-fg-1); margin: 0; }
+.pccx-h4, h4.pccx { font: var(--pccx-h4-weight) var(--pccx-h4-size)/var(--pccx-h4-lh) var(--pccx-font-sans); color: var(--pccx-fg-1); margin: 0; }
+
+.pccx-body  { font: 400 var(--pccx-body-size)/var(--pccx-body-lh) var(--pccx-font-sans); color: var(--pccx-fg-1); }
+.pccx-small { font: 400 var(--pccx-small-size)/var(--pccx-small-lh) var(--pccx-font-sans); color: var(--pccx-fg-2); }
+.pccx-meta  { font: 400 var(--pccx-meta-size)/var(--pccx-meta-lh) var(--pccx-font-sans); color: var(--pccx-fg-3); }
+.pccx-mono  { font: 400 var(--pccx-mono-size)/var(--pccx-mono-lh) var(--pccx-font-mono); color: var(--pccx-fg-1); }
+
+.pccx-label {
+  font: 500 var(--pccx-small-size)/var(--pccx-small-lh) var(--pccx-font-sans);
+  color: var(--pccx-fg-2);
+}
+
+.pccx-eyebrow {
+  font: 600 var(--pccx-eyebrow-size)/var(--pccx-eyebrow-lh) var(--pccx-font-mono);
+  letter-spacing: var(--pccx-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--pccx-fg-3);
+}
+
+code, .pccx-code {
+  font-family: var(--pccx-font-mono);
+  font-size: 0.92em;
+  background: var(--pccx-bg-alt);
+  border: 1px solid var(--pccx-line);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--pccx-fg-1);
+}
+
+pre.pccx, .pccx-pre {
+  font-family: var(--pccx-font-mono);
+  font-size: var(--pccx-mono-size);
+  line-height: var(--pccx-mono-lh);
+  background: var(--pccx-bg-alt);
+  border: 1px solid var(--pccx-line);
+  border-radius: var(--pccx-radius-md);
+  padding: var(--pccx-s-4);
+  color: var(--pccx-fg-1);
+  overflow-x: auto;
+}
+
+a.pccx, .pccx-link {
+  color: var(--pccx-brand-500);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 120ms ease;
+}
+a.pccx:hover, .pccx-link:hover { border-bottom-color: var(--pccx-brand-500); }
+
+::selection { background: var(--pccx-brand-100); color: var(--pccx-fg-1); }
