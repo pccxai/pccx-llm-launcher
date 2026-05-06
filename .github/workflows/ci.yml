@@ -325,6 +325,8 @@ jobs:
         run: python3 scripts/tests/device_session_status_contract_test.py
       - name: run runtime readiness contract tests
         run: python3 scripts/tests/runtime_readiness_contract_test.py
+      - name: run KV260 serial connection tests
+        run: python3 scripts/tests/kv260_serial_connection_test.py
       - name: run chat/session contract tests
         run: python3 scripts/tests/chat_session_contract_test.py
       - name: run chat model status contract tests
