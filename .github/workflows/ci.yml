@@ -334,6 +334,8 @@ jobs:
         run: python3 scripts/tests/axi_cmd_mock_backend_test.py
       - name: run dummy e2e contract tests
         run: python3 scripts/tests/dummy_e2e_contract_test.py
+      - name: run trace capture client tests
+        run: python3 scripts/tests/trace_capture_client_test.py
       - name: run chat/session contract tests
         run: python3 scripts/tests/chat_session_contract_test.py
       - name: run chat model status contract tests
