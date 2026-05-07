@@ -207,6 +207,12 @@ there is no real inference engine to hand off to. They will be replaced
 by real implementations only after `pccxai/pccx-FPGA-NPU-LLM-kv260`
 publishes verified bring-up evidence.
 
+The mock Gemma path formats chat history with `GemmaChatTemplate` before
+tokenization. The checked formatter supports Gemma `user` / `model`
+turns, optional first-message system instructions folded into the first
+user turn, and an open `<start_of_turn>model\n` generation prefix. See
+[docs/GEMMA_CHAT_TEMPLATE_SPEC.md](./docs/GEMMA_CHAT_TEMPLATE_SPEC.md).
+
 ### pccx-lab status backend (opt-in)
 
 `scripts/status-stub.sh` can call the `pccx-lab status --format json`
