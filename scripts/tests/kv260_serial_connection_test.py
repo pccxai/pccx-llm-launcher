@@ -68,6 +68,18 @@ def reset_fake(reads: list[bytes]) -> None:
     FakeSerial.reads = reads
 
 
+class TransientFailingSerialFactory:
+    def __init__(self, failures_before_success: int) -> None:
+        self.failures_before_success = failures_before_success
+        self.calls = 0
+
+    def __call__(self, *args, **kwargs) -> FakeSerial:
+        self.calls += 1
+        if self.calls <= self.failures_before_success:
+            raise OSError("transient serial port busy")
+        return FakeSerial(*args, **kwargs)
+
+
 def test_type_contract_and_env_presence_only() -> None:
     module = load_module()
     fake_env = {
@@ -123,6 +135,33 @@ def test_reachable_accepts_login_or_shell_prompt() -> None:
         serial_factory=FakeSerial,
     )
     assert shell_connection.is_reachable() is True
+    assert FakeSerial.instances[-1].closed is True
+
+
+def test_retry_policy_recovers_after_three_transient_port_failures() -> None:
+    module = load_module()
+    fake_env = {"KVFPGA_TTY": "/tmp/tty-kv260"}
+    retry_delays: list[float] = []
+    retry_policy = module.RetryPolicy(
+        max_attempts=4,
+        base_delay=0.01,
+        max_delay=1.0,
+        jitter_ratio=0.0,
+        sleeper=retry_delays.append,
+    )
+    serial_factory = TransientFailingSerialFactory(failures_before_success=3)
+
+    reset_fake([b"kv260 login: "])
+    connection = module.KV260SerialConnection.from_env(
+        fake_env,
+        serial_factory=serial_factory,
+        retry_policy=retry_policy,
+    )
+
+    assert connection.is_reachable() is True
+    assert serial_factory.calls == 4
+    assert retry_delays == [0.01, 0.02, 0.04]
+    assert len(FakeSerial.instances) == 1
     assert FakeSerial.instances[-1].closed is True
 
 
@@ -282,6 +321,7 @@ def test_source_headers_for_touched_python_files() -> None:
 test_type_contract_and_env_presence_only()
 test_tty_override_and_auto_detect_helpers()
 test_reachable_accepts_login_or_shell_prompt()
+test_retry_policy_recovers_after_three_transient_port_failures()
 test_login_uname_and_logout_over_serial()
 test_xrt_present_and_xmutil_listapps_use_serial_commands()
 test_live_serial_probe_skips_gracefully_without_tty()
