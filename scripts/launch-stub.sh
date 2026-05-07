@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 # scripts/launch-stub.sh — dry-run preview of the *intended* launcher
 # sequence. This script does NOT run inference, does NOT open a model,
 # and does NOT talk to a target device. It only describes what the

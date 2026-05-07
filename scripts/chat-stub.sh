@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 # scripts/chat-stub.sh — dry-run chat stub
 # Requires --dry-run. No model is executed. No network call is made.
 # Accepts a prompt via --prompt "..." or stdin.

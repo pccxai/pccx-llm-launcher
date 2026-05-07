@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 """Data-only model/runtime descriptor contract placeholder.
 
 The contract describes model and runtime vocabulary for future launcher

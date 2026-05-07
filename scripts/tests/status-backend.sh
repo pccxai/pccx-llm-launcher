@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 # scripts/tests/status-backend.sh — pccx-lab backend smoke tests for status-stub.sh
 #
 # Usage: bash scripts/tests/status-backend.sh [path/to/status-stub.sh]
