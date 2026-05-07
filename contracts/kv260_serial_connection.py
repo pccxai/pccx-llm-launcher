@@ -11,11 +11,12 @@ Raw environment values are not exposed through repr or public status fields.
 from __future__ import annotations
 
 import os
+import random
 import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping, Protocol, Sequence, runtime_checkable
+from typing import Any, Callable, Mapping, Protocol, Sequence, TypeVar, runtime_checkable
 
 
 DEFAULT_BAUDRATE = 115200
@@ -24,11 +25,16 @@ DEFAULT_COMMAND_TIMEOUT = 12.0
 DEFAULT_WRITE_TIMEOUT = 1.0
 READ_CHUNK_SIZE = 1024
 END_MARKER = "__PCCX_KV260_SERIAL_DONE__"
+DEFAULT_RETRY_ATTEMPTS = 3
+DEFAULT_RETRY_BASE_DELAY = 0.1
+DEFAULT_RETRY_MAX_DELAY = 1.0
+DEFAULT_RETRY_JITTER_RATIO = 0.25
 
 LOGIN_PROMPT = re.compile(rb"(?im)(?:^|\r?\n)[^\r\n]*login:\s*$")
 PASSWORD_PROMPT = re.compile(rb"(?im)(?:^|\r?\n)[^\r\n]*password:\s*$")
 SHELL_PROMPT = re.compile(rb"(?m)(?:^|\r?\n)[^\r\n]*[$#]\s*$")
 COMMAND_DONE = re.compile((END_MARKER + r":(\d+)").encode("ascii"))
+T = TypeVar("T")
 
 
 class KV260SerialError(RuntimeError):
@@ -65,6 +71,46 @@ class SerialCommandResult:
 
 
 SerialFactory = Callable[..., Any]
+Sleeper = Callable[[float], None]
+RandomSource = Callable[[], float]
+
+
+@dataclass(frozen=True)
+class RetryPolicy:
+    """Retry settings for transient KV260 serial port failures."""
+
+    max_attempts: int = DEFAULT_RETRY_ATTEMPTS
+    base_delay: float = DEFAULT_RETRY_BASE_DELAY
+    max_delay: float = DEFAULT_RETRY_MAX_DELAY
+    jitter_ratio: float = DEFAULT_RETRY_JITTER_RATIO
+    random_source: RandomSource = field(
+        default=random.random,
+        repr=False,
+        compare=False,
+    )
+    sleeper: Sleeper = field(default=time.sleep, repr=False, compare=False)
+
+    def retry_delay(self, failure_index: int) -> float:
+        """Return exponential backoff delay with bounded jitter."""
+
+        if self.base_delay <= 0 or self.max_delay <= 0:
+            return 0.0
+
+        exponential = self.base_delay * (2**failure_index)
+        delay = min(exponential, self.max_delay)
+        jitter_ratio = max(0.0, self.jitter_ratio)
+        if jitter_ratio == 0:
+            return delay
+
+        jitter = ((self.random_source() * 2.0) - 1.0) * jitter_ratio
+        return max(0.0, delay * (1.0 + jitter))
+
+    def sleep_after_failure(self, failure_index: int) -> None:
+        """Sleep before the next retry attempt."""
+
+        delay = self.retry_delay(failure_index)
+        if delay > 0:
+            self.sleeper(delay)
 
 
 def kv260_tty_candidates(env: Mapping[str, str] | None = None) -> tuple[str, ...]:
@@ -104,6 +150,7 @@ class KV260SerialConnection:
     prompt_timeout: float = DEFAULT_PROMPT_TIMEOUT
     command_timeout: float = DEFAULT_COMMAND_TIMEOUT
     write_timeout: float = DEFAULT_WRITE_TIMEOUT
+    retry_policy: RetryPolicy = field(default_factory=RetryPolicy)
     _tty: str | None = field(default=None, repr=False, compare=False)
     _user: str | None = field(default=None, repr=False, compare=False)
     _password: str | None = field(default=None, repr=False, compare=False)
@@ -119,6 +166,7 @@ class KV260SerialConnection:
         cls,
         env: Mapping[str, str] | None = None,
         serial_factory: SerialFactory | None = None,
+        retry_policy: RetryPolicy | None = None,
     ) -> "KV260SerialConnection":
         source = os.environ if env is None else env
         tty = source.get("KVFPGA_TTY")
@@ -132,6 +180,7 @@ class KV260SerialConnection:
             _user=user,
             _password=password,
             _serial_factory=serial_factory,
+            retry_policy=retry_policy or RetryPolicy(),
         )
 
     def is_configured(self) -> bool:
@@ -142,26 +191,37 @@ class KV260SerialConnection:
     def is_reachable(self) -> bool:
         """Open the tty, send a newline, and check for login or shell prompt."""
 
-        serial_session = None
+        def probe() -> bool:
+            serial_session = None
+            try:
+                serial_session = self._open_serial()
+                self._write(serial_session, b"\r\n")
+                prompt, _buffer = self._read_until_prompt(
+                    serial_session,
+                    timeout=self.prompt_timeout,
+                )
+                return prompt is not None
+            except (OSError, KV260SerialUnavailable):
+                raise
+            except KV260SerialError:
+                return False
+            finally:
+                self._close_serial(serial_session)
+
         try:
-            serial_session = self._open_serial()
-            self._write(serial_session, b"\r\n")
-            prompt, _buffer = self._read_until_prompt(
-                serial_session,
-                timeout=self.prompt_timeout,
-            )
-            return prompt is not None
-        except (OSError, KV260SerialError):
+            return self._retry_transient_port_errors(probe)
+        except (OSError, KV260SerialUnavailable):
             return False
-        finally:
-            self._close_serial(serial_session)
 
     def kernel_uname(self) -> str:
-        with self as connection:
-            result = connection._run_command("uname -a")
-        if result.exit_status != 0:
-            raise KV260SerialError("uname command failed")
-        return result.output.strip()
+        def probe() -> str:
+            with self as connection:
+                result = connection._run_command("uname -a")
+            if result.exit_status != 0:
+                raise KV260SerialError("uname command failed")
+            return result.output.strip()
+
+        return self._retry_transient_port_errors(probe)
 
     def xrt_present(self) -> bool:
         command = (
@@ -170,9 +230,13 @@ class KV260SerialConnection:
             "test -e /usr/lib/libxrt_core.so || "
             "test -e /usr/lib/aarch64-linux-gnu/libxrt_core.so"
         )
-        with self as connection:
-            result = connection._run_command(command)
-        return result.exit_status == 0
+
+        def probe() -> bool:
+            with self as connection:
+                result = connection._run_command(command)
+            return result.exit_status == 0
+
+        return self._retry_transient_port_errors(probe)
 
     def xmutil_listapps(self) -> Sequence[str]:
         with self as connection:
@@ -203,6 +267,29 @@ class KV260SerialConnection:
             self._write(serial_session, b"exit\r\n")
         finally:
             self._close_serial(serial_session)
+
+    def _retry_transient_port_errors(self, operation: Callable[[], T]) -> T:
+        attempts = max(1, self.retry_policy.max_attempts)
+        for failure_index in range(attempts):
+            try:
+                return operation()
+            except (OSError, KV260SerialUnavailable) as exc:
+                if not self._is_transient_port_error(exc):
+                    raise
+                if failure_index >= attempts - 1:
+                    raise
+                self.retry_policy.sleep_after_failure(failure_index)
+
+        raise KV260SerialError("retry operation did not run")
+
+    def _is_transient_port_error(
+        self,
+        exc: OSError | KV260SerialUnavailable,
+    ) -> bool:
+        if isinstance(exc, OSError):
+            return True
+        message = str(exc).lower()
+        return "tty" in message or "port" in message or "device" in message
 
     def _open_serial(self) -> Any:
         tty = self._tty or detect_kv260_tty()
