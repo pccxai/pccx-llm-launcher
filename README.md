@@ -588,7 +588,9 @@ This surface does not execute a model, generate responses, persist
 transcripts, touch KV260 hardware, open serial ports, scan networks, call
 providers, invoke pccx-lab, invoke systemverilog-ide, upload telemetry,
 read artifacts, or write artifacts. See
-[docs/STANDALONE_CHAT_SESSION_CONTRACT.md](./docs/STANDALONE_CHAT_SESSION_CONTRACT.md).
+[docs/STANDALONE_CHAT_SESSION_CONTRACT.md](./docs/STANDALONE_CHAT_SESSION_CONTRACT.md)
+and
+[docs/CHAT_SESSION_STATE_LIFECYCLE.md](./docs/CHAT_SESSION_STATE_LIFECYCLE.md).
 
 The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
