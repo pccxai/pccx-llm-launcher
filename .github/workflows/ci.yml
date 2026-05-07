@@ -365,6 +365,8 @@ jobs:
         run: python3 scripts/tests/chat_error_taxonomy_contract_test.py
       - name: run chat response-stream contract tests
         run: python3 scripts/tests/chat_response_stream_contract_test.py
+      - name: run streaming token renderer tests
+        run: python3 scripts/tests/streaming_token_renderer_test.py
       - name: run chat message-list contract tests
         run: python3 scripts/tests/chat_message_list_contract_test.py
       - name: run chat action-bar contract tests
