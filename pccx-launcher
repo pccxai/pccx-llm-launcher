@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
+"""Command-line entry point for local pccx launcher helpers."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from contracts.gemma_e2e_orchestrator import (
+    RealSerialGemmaE2ENotImplemented,
+    run_mock_gemma_chat,
+)
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(prog="pccx-launcher")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    gemma = subparsers.add_parser("gemma")
+    gemma_subparsers = gemma.add_subparsers(dest="gemma_command", required=True)
+
+    chat = gemma_subparsers.add_parser("chat")
+    chat.add_argument("--prompt", required=True)
+    chat.add_argument(
+        "--transport",
+        choices=("mock", "serial"),
+        default="mock",
+        help="mock is local-only; serial is a placeholder",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(sys.argv[1:] if argv is None else argv)
+    if args.command == "gemma" and args.gemma_command == "chat":
+        if args.transport != "mock":
+            raise RealSerialGemmaE2ENotImplemented(
+                "serial Gemma chat is stubbed pending board evidence",
+            )
+        result = run_mock_gemma_chat(args.prompt)
+        sys.stdout.write(result.output_text + "\n")
+        return 0
+    raise SystemExit("unhandled command")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
