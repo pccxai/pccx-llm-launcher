@@ -5,8 +5,10 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -20,6 +22,7 @@ from contracts.gemma_e2e_orchestrator import (
     ChatSession,
     GemmaE2EOrchestrator,
     RealSerialGemmaE2ENotImplemented,
+    load_chat_history,
     run_mock_gemma_chat,
 )
 from contracts.gemma_tokenizer import GemmaTokenizer
@@ -65,7 +68,10 @@ def test_chat_session_records_history_and_passes_context() -> None:
     first_context = session.context_for("first turn")
     first = session.send("first turn")
     assert first.prompt_tokens == tuple(GemmaTokenizer(spec).encode(first_context))
-    assert session.history == [("first turn", first.output_text)]
+    assert session.history == [
+        ("user", "first turn"),
+        ("assistant", first.output_text),
+    ]
 
     second_context = session.context_for("second turn")
     assert "first turn" in second_context
@@ -75,8 +81,10 @@ def test_chat_session_records_history_and_passes_context() -> None:
     second = session.send("second turn")
     assert second.prompt_tokens == tuple(GemmaTokenizer(spec).encode(second_context))
     assert session.history == [
-        ("first turn", first.output_text),
-        ("second turn", second.output_text),
+        ("user", "first turn"),
+        ("assistant", first.output_text),
+        ("user", "second turn"),
+        ("assistant", second.output_text),
     ]
 
 
@@ -89,6 +97,39 @@ def test_chat_session_same_seed_and_prompts_is_deterministic() -> None:
 
     assert run_session(7) == run_session(7)
     assert run_session(7) != run_session(8)
+
+
+def test_chat_session_persists_jsonl_and_reload_is_deterministic() -> None:
+    prompts = ("alpha", "beta", "gamma")
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        history_path = Path(temp_dir) / "history.jsonl"
+        first_session = ChatSession(seed=31, history_file=history_path)
+        first = first_session.send(prompts[0])
+        second = first_session.send(prompts[1])
+
+        reloaded_session = ChatSession(seed=31, history_file=history_path)
+        third = reloaded_session.send(prompts[2])
+
+        continuous_session = ChatSession(seed=31)
+        continuous_results = [continuous_session.send(prompt) for prompt in prompts]
+
+        assert [first.output_text, second.output_text, third.output_text] == [
+            result.output_text for result in continuous_results
+        ]
+        assert reloaded_session.history == continuous_session.history
+        assert load_chat_history(history_path) == continuous_session.history
+        assert [
+            json.loads(line)
+            for line in history_path.read_text(encoding="utf-8").splitlines()
+        ] == [
+            ["user", prompts[0]],
+            ["assistant", first.output_text],
+            ["user", prompts[1]],
+            ["assistant", second.output_text],
+            ["user", prompts[2]],
+            ["assistant", third.output_text],
+        ]
 
 
 def test_orchestrator_uses_kv260_connection_mock_contract() -> None:
@@ -169,6 +210,7 @@ test_mock_orchestrator_runs_full_prompt_to_text_path()
 test_same_prompt_is_deterministic_and_different_prompt_changes_output()
 test_chat_session_records_history_and_passes_context()
 test_chat_session_same_seed_and_prompts_is_deterministic()
+test_chat_session_persists_jsonl_and_reload_is_deterministic()
 test_orchestrator_uses_kv260_connection_mock_contract()
 test_real_serial_path_is_stubbed()
 test_source_has_offline_and_claim_guards()

@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Sequence
 
 import numpy as np
@@ -57,28 +59,34 @@ class ChatSession:
 
     arch_spec: GemmaArchSpec | None = None
     seed: int = 0
+    history_file: Path | None = None
     history: list[tuple[str, str]] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        if self.history_file is not None:
+            self.history.extend(load_chat_history(self.history_file))
 
     def send(self, prompt: str) -> GemmaE2EResult:
         """Send one user turn through the mock orchestrator and store the reply."""
 
         context = self.context_for(prompt)
         result = run_mock_gemma_chat(context, self.arch_spec, seed=self.seed)
-        self.history.append((prompt, result.output_text))
+        turn = (("user", prompt), ("assistant", result.output_text))
+        self.history.extend(turn)
+        if self.history_file is not None:
+            append_chat_history(self.history_file, turn)
         return result
 
     def context_for(self, prompt: str) -> str:
         """Build a Gemma-style chat prompt including prior turns."""
 
         turns: list[str] = []
-        for user_text, assistant_text in self.history:
+        for role, content in self.history:
+            gemma_role = "model" if role == "assistant" else role
             turns.extend(
                 [
-                    "<start_of_turn>user",
-                    user_text,
-                    "<end_of_turn>",
-                    "<start_of_turn>model",
-                    assistant_text,
+                    f"<start_of_turn>{gemma_role}",
+                    content,
                     "<end_of_turn>",
                 ],
             )
@@ -91,6 +99,45 @@ class ChatSession:
             ],
         )
         return "\n".join(turns)
+
+
+def load_chat_history(path: Path) -> list[tuple[str, str]]:
+    """Load role/content history tuples from a JSONL file if it exists."""
+
+    if not path.exists():
+        return []
+    history: list[tuple[str, str]] = []
+    with path.open("r", encoding="utf-8") as history_stream:
+        for line_number, line in enumerate(history_stream, start=1):
+            line = line.strip()
+            if line == "":
+                continue
+            value = json.loads(line)
+            if (
+                not isinstance(value, list)
+                or len(value) != 2
+                or not isinstance(value[0], str)
+                or not isinstance(value[1], str)
+            ):
+                raise ValueError(
+                    f"invalid chat history tuple at {path}:{line_number}",
+                )
+            role, content = value
+            if role not in {"user", "assistant"}:
+                raise ValueError(
+                    f"invalid chat history role at {path}:{line_number}: {role}",
+                )
+            history.append((role, content))
+    return history
+
+
+def append_chat_history(path: Path, entries: Sequence[tuple[str, str]]) -> None:
+    """Append role/content history tuples to a JSONL file."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as history_stream:
+        for role, content in entries:
+            history_stream.write(json.dumps([role, content], sort_keys=True) + "\n")
 
 
 class ScriptedSerialSession:

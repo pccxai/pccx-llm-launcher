@@ -199,6 +199,7 @@ bash scripts/chat-evidence-manifest-stub.sh --model gemma3n-e4b --target kv260
 bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
 ./pccx-launcher gemma chat --prompt "hello"
 bash scripts/launch-stub.sh --dry-run
+python3 pccx-launcher gemma chat --prompt "hello" --history-file /tmp/pccx-chat-history.jsonl
 bash scripts/chat-stub.sh --dry-run --prompt "hello"
 ```
 
