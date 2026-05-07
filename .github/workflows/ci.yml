@@ -329,6 +329,8 @@ jobs:
         run: python3 scripts/tests/kv260_serial_connection_test.py
       - name: run AXI command mock backend tests
         run: python3 scripts/tests/axi_cmd_mock_backend_test.py
+      - name: run token stream over serial tests
+        run: python3 scripts/tests/token_stream_over_serial_test.py
       - name: run chat/session contract tests
         run: python3 scripts/tests/chat_session_contract_test.py
       - name: run chat model status contract tests
