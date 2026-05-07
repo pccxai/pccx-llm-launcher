@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 # scripts/check.sh — minimal environment / target-device check for
 # pccx-llm-launcher. This is intentionally a lightweight, honest probe:
 # it reports what is present, but it does NOT claim that any particular

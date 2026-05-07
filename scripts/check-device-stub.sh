@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 # scripts/check-device-stub.sh — narrowly-scoped device probe.
 #
 # A focused complement to scripts/check.sh: this stub only inspects what

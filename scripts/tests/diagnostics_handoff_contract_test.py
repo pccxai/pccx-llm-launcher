@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# PCCX(TM) — reusable AI accelerator project.
+# SPDX-FileCopyrightText: 2026 Hyun Woo Kim
+# SPDX-License-Identifier: Apache-2.0
+
 """Fixture tests for the launcher diagnostics handoff contract."""
 
 from __future__ import annotations
