@@ -353,6 +353,17 @@ attempt authentication, load model assets, invoke pccx-lab, start a
 runtime, stream logs, upload telemetry, or write artifacts. See
 [docs/KV260_CONNECTION_AND_STATUS_FLOW.md](./docs/KV260_CONNECTION_AND_STATUS_FLOW.md).
 
+### AXI command channel semantics (planned)
+
+The launcher has a documented `AxiCmdChannel` command/status boundary for
+future runtime integration and offline tests. It defines logical
+`issue(cmd)` and `poll_stat()` framing, the mock command/status register
+packing, and the related hardware `AXIL_CMD_IN` write/FIFO state machine.
+
+This is a documentation boundary only. It does not add hardware access,
+driver code, runtime execution, model loading, or a readiness claim. See
+[docs/AXI_CMD_CHANNEL.md](./docs/AXI_CMD_CHANNEL.md).
+
 ### Standalone chat/session contract (planned)
 
 The launcher now has a data-only standalone chat/session contract for
