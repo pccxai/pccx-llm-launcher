@@ -82,6 +82,11 @@ runs inference, contacts a remote device, or installs anything. They
 exist so contributors can see the planned shape of the launcher flow
 and verify host-side prerequisites before the real engine lands.
 
+Test labels and evidence expectations are defined in
+[docs/TEST_TAXONOMY.md](./docs/TEST_TAXONOMY.md). The current default suite is
+mostly contract tests and local mock/smoke tests; real integration and e2e
+coverage remains opt-in/future until the required external evidence exists.
+
 | Script | What it does |
 |---|---|
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
