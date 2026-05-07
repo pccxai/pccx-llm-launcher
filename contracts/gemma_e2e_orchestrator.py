@@ -13,6 +13,7 @@ import numpy as np
 
 from contracts.axi_cmd_channel import AxiCmdChannel, AxiCmdMockBackend, NpuCmd, NpuStat
 from contracts.gemma_arch_spec import GemmaArchSpec, default_gemma3n_e4b_kv260_arch_spec
+from contracts.gemma_chat_template import GemmaChatMessage, GemmaChatTemplate
 from contracts.gemma_tokenizer import GemmaTokenizer
 from contracts.gemma_weight_prep_contract import GemmaWeightPrep, Manifest
 from contracts.kv260_connection_mock import KV260ConnectionMock
@@ -58,6 +59,7 @@ class ChatSession:
     arch_spec: GemmaArchSpec | None = None
     seed: int = 0
     history: list[tuple[str, str]] = field(default_factory=list)
+    chat_template: GemmaChatTemplate = field(default_factory=GemmaChatTemplate)
 
     def send(self, prompt: str) -> GemmaE2EResult:
         """Send one user turn through the mock orchestrator and store the reply."""
@@ -70,27 +72,12 @@ class ChatSession:
     def context_for(self, prompt: str) -> str:
         """Build a Gemma-style chat prompt including prior turns."""
 
-        turns: list[str] = []
+        messages: list[GemmaChatMessage] = []
         for user_text, assistant_text in self.history:
-            turns.extend(
-                [
-                    "<start_of_turn>user",
-                    user_text,
-                    "<end_of_turn>",
-                    "<start_of_turn>model",
-                    assistant_text,
-                    "<end_of_turn>",
-                ],
-            )
-        turns.extend(
-            [
-                "<start_of_turn>user",
-                prompt,
-                "<end_of_turn>",
-                "<start_of_turn>model",
-            ],
-        )
-        return "\n".join(turns)
+            messages.append(GemmaChatMessage(role="user", content=user_text))
+            messages.append(GemmaChatMessage(role="assistant", content=assistant_text))
+        messages.append(GemmaChatMessage(role="user", content=prompt))
+        return self.chat_template.format(messages, add_generation_prompt=True)
 
 
 class ScriptedSerialSession:
