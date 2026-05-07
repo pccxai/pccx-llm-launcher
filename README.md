@@ -54,6 +54,8 @@ publishes a verified end-to-end path.
 - Local assistant mode (controlled local workflow with a reviewed
   tool boundary). The later-track plan is tracked in
   [docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
+- Potential standalone chat UI redesign direction is tracked in
+  [docs/CHAT_UI_REDESIGN_BRIEF.md](./docs/CHAT_UI_REDESIGN_BRIEF.md).
 - VS Code and other editor bridge planning for guided launches and log
   inspection.
 - Additional target models beyond Gemma 3N E4B and additional edge devices
