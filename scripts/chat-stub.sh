@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
 # scripts/chat-stub.sh — dry-run chat stub
 # Requires --dry-run. No model is executed. No network call is made.
 # Accepts a prompt via --prompt "..." or stdin.
 
 set -u
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)"
 
 INFO() { printf '[INFO]  %s\n' "$*"; }
 NOTE() { printf '[NOTE]  %s\n' "$*"; }
@@ -48,5 +53,8 @@ HEAD "pccx-launcher chat-stub | dry-run"
 INFO "prompt   : ${PROMPT}"
 NOTE "no model executed"
 NOTE "no network call made"
-NOTE "response : [placeholder — real inference requires pccx-FPGA bring-up evidence]"
+printf '[NOTE]  response : '
+PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:$PYTHONPATH}" \
+    python3 -m pccx_launcher.chat_repl --dry-run --prompt "$PROMPT" --flush token
+printf '\n'
 exit 0
