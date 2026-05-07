@@ -319,6 +319,8 @@ jobs:
         run: python3 scripts/tests/launcher_ide_contract_test.py
       - name: run model/runtime descriptor tests
         run: python3 scripts/tests/model_runtime_descriptor_test.py
+      - name: run Gemma tokenizer tests
+        run: python3 scripts/tests/gemma_tokenizer_test.py
       - name: run diagnostics handoff contract tests
         run: python3 scripts/tests/diagnostics_handoff_contract_test.py
       - name: run device/session status contract tests
