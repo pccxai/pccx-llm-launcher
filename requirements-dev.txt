@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
+
+# Current Python development dependency snapshot.
+#
+# The repository's Python contract checks use only the standard library.
+# Shell linting depends on shellcheck, installed by CI as an OS package.
+# No third-party pip development packages are required at this time.
