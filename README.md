@@ -352,6 +352,9 @@ This surface does not probe hardware, open serial ports, scan networks,
 attempt authentication, load model assets, invoke pccx-lab, start a
 runtime, stream logs, upload telemetry, or write artifacts. See
 [docs/KV260_CONNECTION_AND_STATUS_FLOW.md](./docs/KV260_CONNECTION_AND_STATUS_FLOW.md).
+That document also includes the KV260 connection quickstart for
+presence-only env var setup, tty selection, and the current mock /
+fixture fallback.
 
 ### Standalone chat/session contract (planned)
 
