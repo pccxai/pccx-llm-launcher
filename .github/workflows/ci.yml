@@ -307,6 +307,8 @@ jobs:
         run: ./scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
       - name: run scripts/chat-stub.sh --dry-run
         run: ./scripts/chat-stub.sh --dry-run --prompt "hello"
+      - name: run pccx-launcher Gemma mock chat
+        run: ./pccx-launcher gemma chat --prompt "hello"
       - name: chat-stub refuses without --dry-run
         run: |
           set -e
@@ -333,6 +335,12 @@ jobs:
         run: python3 scripts/tests/token_stream_over_serial_test.py
       - name: run full-mock Gemma W4 path integration tests
         run: python3 scripts/tests/full_mock_gemma_path_integration_test.py
+      - name: run Gemma tokenizer and arch spec tests
+        run: python3 scripts/tests/gemma_tokenizer_arch_spec_test.py
+      - name: run Gemma E2E orchestrator tests
+        run: python3 scripts/tests/gemma_e2e_orchestrator_test.py
+      - name: run pccx-launcher CLI tests
+        run: python3 scripts/tests/pccx_launcher_cli_test.py
       - name: run chat/session contract tests
         run: python3 scripts/tests/chat_session_contract_test.py
       - name: run chat model status contract tests
