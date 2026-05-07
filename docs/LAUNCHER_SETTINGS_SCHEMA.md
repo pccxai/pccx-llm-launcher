@@ -12,6 +12,11 @@ missing from TOML, the loader can fill that field from its matching
 environment variable. After TOML plus environment fallback are merged,
 all fields are required.
 
+Source: `contracts/launcher_config.py` defines `DEFAULT_CONFIG_PATH`,
+`CONFIG_FIELDS`, `ENV_VARS`, `LOG_LEVELS`, `LOG_LEVEL_ALIASES`, and
+`MAX_BAUD`; `LauncherConfig.from_sources()` raises an error when any
+required field is missing after TOML and environment fallback are merged.
+
 ## Example
 
 ```toml
@@ -31,6 +36,27 @@ log_level = "INFO"
 | `capture_dir` | `PCCX_LAUNCHER_CAPTURE_DIR` | String path |
 | `history_dir` | `PCCX_LAUNCHER_HISTORY_DIR` | String path |
 | `log_level` | `PCCX_LAUNCHER_LOG_LEVEL` | String |
+
+## Defaults
+
+`LauncherConfig` has one built-in default: the config file path is
+`~/.config/pccx-launcher/config.toml` when no explicit path is supplied.
+
+The individual settings fields do not have built-in value defaults:
+
+| Field | Built-in default value | Source |
+|---|---|---|
+| `tty_path` | None; required from TOML or `PCCX_LAUNCHER_TTY_PATH` | `CONFIG_FIELDS`, `ENV_VARS`, `LauncherConfig.from_sources()` |
+| `baud` | None; required from TOML or `PCCX_LAUNCHER_BAUD` | `CONFIG_FIELDS`, `ENV_VARS`, `LauncherConfig.from_sources()` |
+| `capture_dir` | None; required from TOML or `PCCX_LAUNCHER_CAPTURE_DIR` | `CONFIG_FIELDS`, `ENV_VARS`, `LauncherConfig.from_sources()` |
+| `history_dir` | None; required from TOML or `PCCX_LAUNCHER_HISTORY_DIR` | `CONFIG_FIELDS`, `ENV_VARS`, `LauncherConfig.from_sources()` |
+| `log_level` | None; required from TOML or `PCCX_LAUNCHER_LOG_LEVEL` | `CONFIG_FIELDS`, `ENV_VARS`, `LauncherConfig.from_sources()` |
+
+Validation constants are not value defaults. `baud` must be in
+`1..4000000`, `log_level` must be one of `DEBUG`, `INFO`, `WARNING`,
+`ERROR`, or `CRITICAL`, and `WARN` is normalized to `WARNING`; these
+rules come from `MAX_BAUD`, `LOG_LEVELS`, and `LOG_LEVEL_ALIASES` in
+`contracts/launcher_config.py`.
 
 `tty_path`
 : Serial device path used by launcher-side target access. The value must

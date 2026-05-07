@@ -600,7 +600,8 @@ serial access, capture/history directories, and logging level, with
 per-field environment fallbacks for values omitted from TOML.
 
 See [docs/LAUNCHER_SETTINGS_SCHEMA.md](./docs/LAUNCHER_SETTINGS_SCHEMA.md)
-for the complete `config.toml` field reference and validation rules.
+for the complete `config.toml` field reference, default-value behavior,
+source citations, and validation rules.
 
 ## Source provenance
 
