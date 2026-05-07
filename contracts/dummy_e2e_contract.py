@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 from contracts.axi_cmd_channel import AxiCmdMockBackend, NpuCmd, NpuStat
 from contracts.gemma_weight_prep_contract import GemmaWeightPrep, Manifest
+from contracts.trace_capture_client import TraceCaptureFrame
 
 
 SCHEMA_VERSION = "pccx.dummyE2EResultStream.v0"
@@ -134,6 +135,21 @@ def format_dummy_e2e_summary(stream: ResultStream) -> str:
             "offline: board=false ssh=false hf=false network=false",
         ),
     ) + "\n"
+
+
+def dummy_e2e_trace_frames(stream: ResultStream) -> tuple[TraceCaptureFrame, ...]:
+    """Map the offline command trace into lab v2 serial trace frames."""
+
+    return tuple(
+        TraceCaptureFrame(
+            frame_idx=index,
+            axi_stat=trace.mmio_stat,
+            engine_completion=trace.status.completion_count & 0xFF,
+            cycles=(index + 1) * 128,
+            err=None,
+        )
+        for index, trace in enumerate(stream.command_trace)
+    )
 
 
 def _scripted_commands(
