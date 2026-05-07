@@ -76,6 +76,11 @@ The checked KV260 runtime uses `kv260_pccx_placeholder`. It is planned,
 unavailable, and not configured. Status checks are descriptor-only and
 explicitly record no hardware access and no runtime execution.
 
+The launcher-side descriptor names the KV260 integration path. It does
+not make `pccx-v002` a direct launcher dependency; the v002 IP-core is
+consumed through the KV260 integration repository's submodule boundary.
+See [`V002_CONSUMPTION_PATH.md`](./V002_CONSUMPTION_PATH.md).
+
 The model descriptor also names `cpu_reference_placeholder` as an
 expected future runtime kind. That is vocabulary only; this PR does not
 add a CPU runtime descriptor or execution path.

@@ -71,6 +71,11 @@ bring-up and verification work that is happening in
 claim KV260 inference until that repository publishes a verified
 end-to-end path (RTL bring-up, simulation evidence, timing closure).
 
+The launcher does not consume the reusable v002 IP-core directly. Its
+allowed path is through the KV260 integration repository, which owns the
+`third_party/pccx-v002` submodule pin and board-specific evidence. See
+[`V002_CONSUMPTION_PATH.md`](./V002_CONSUMPTION_PATH.md).
+
 ---
 
 *See also*:
