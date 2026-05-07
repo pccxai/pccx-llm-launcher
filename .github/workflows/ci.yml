@@ -337,6 +337,8 @@ jobs:
         run: python3 scripts/tests/full_mock_gemma_path_integration_test.py
       - name: run Gemma tokenizer and arch spec tests
         run: python3 scripts/tests/gemma_tokenizer_arch_spec_test.py
+      - name: run Gemma chat-template tests
+        run: python3 scripts/tests/gemma_chat_template_test.py
       - name: run Gemma E2E orchestrator tests
         run: python3 scripts/tests/gemma_e2e_orchestrator_test.py
       - name: run pccx-launcher CLI tests

@@ -70,7 +70,12 @@ def test_chat_session_records_history_and_passes_context() -> None:
     second_context = session.context_for("second turn")
     assert "first turn" in second_context
     assert first.output_text in second_context
-    assert second_context.endswith("<start_of_turn>model")
+    assert second_context.endswith("<start_of_turn>model\n")
+    assert (
+        "<start_of_turn>user\n"
+        "first turn<end_of_turn>\n"
+        "<start_of_turn>model\n"
+    ) in second_context
 
     second = session.send("second turn")
     assert second.prompt_tokens == tuple(GemmaTokenizer(spec).encode(second_context))
