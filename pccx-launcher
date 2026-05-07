@@ -35,6 +35,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     chat_input.add_argument("--interactive", action="store_true")
     chat.add_argument("--seed", type=int, default=0)
     chat.add_argument(
+        "--history-file",
+        type=Path,
+        help="load and append local chat history JSONL role/content tuples",
+    )
+    chat.add_argument(
         "--transport",
         choices=("mock", "serial"),
         default="mock",
@@ -47,12 +52,13 @@ def run_interactive_gemma_chat(
     stdin: TextIO | None = None,
     stdout: TextIO | None = None,
     seed: int = 0,
+    history_file: Path | None = None,
 ) -> int:
     """Run a local-only mock Gemma chat REPL."""
 
     input_stream = sys.stdin if stdin is None else stdin
     output_stream = sys.stdout if stdout is None else stdout
-    session = ChatSession(seed=seed)
+    session = ChatSession(seed=seed, history_file=history_file)
     while True:
         output_stream.write("user> ")
         output_stream.flush()
@@ -77,8 +83,16 @@ def main(argv: list[str] | None = None) -> int:
                 "serial Gemma chat is stubbed pending board evidence",
             )
         if args.interactive:
-            return run_interactive_gemma_chat(seed=args.seed)
-        result = run_mock_gemma_chat(args.prompt, seed=args.seed)
+            return run_interactive_gemma_chat(
+                seed=args.seed,
+                history_file=args.history_file,
+            )
+        if args.history_file is not None:
+            result = ChatSession(seed=args.seed, history_file=args.history_file).send(
+                args.prompt,
+            )
+        else:
+            result = run_mock_gemma_chat(args.prompt, seed=args.seed)
         sys.stdout.write(result.output_text + "\n")
         return 0
     raise SystemExit("unhandled command")

@@ -5,8 +5,10 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -15,18 +17,25 @@ CLI = ROOT / "pccx-launcher"
 TEST_PATH = Path(__file__).resolve()
 
 
-def run_cli(prompt: str, seed: int = 0) -> subprocess.CompletedProcess[str]:
+def run_cli(
+    prompt: str,
+    seed: int = 0,
+    history_file: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
+    command = [
+        sys.executable,
+        str(CLI),
+        "gemma",
+        "chat",
+        "--prompt",
+        prompt,
+        "--seed",
+        str(seed),
+    ]
+    if history_file is not None:
+        command.extend(["--history-file", str(history_file)])
     return subprocess.run(
-        [
-            sys.executable,
-            str(CLI),
-            "gemma",
-            "chat",
-            "--prompt",
-            prompt,
-            "--seed",
-            str(seed),
-        ],
+        command,
         cwd=ROOT,
         check=False,
         text=True,
@@ -38,17 +47,21 @@ def run_cli(prompt: str, seed: int = 0) -> subprocess.CompletedProcess[str]:
 def run_interactive_cli(
     prompts: list[str],
     seed: int = 0,
+    history_file: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
+    command = [
+        sys.executable,
+        str(CLI),
+        "gemma",
+        "chat",
+        "--interactive",
+        "--seed",
+        str(seed),
+    ]
+    if history_file is not None:
+        command.extend(["--history-file", str(history_file)])
     return subprocess.run(
-        [
-            sys.executable,
-            str(CLI),
-            "gemma",
-            "chat",
-            "--interactive",
-            "--seed",
-            str(seed),
-        ],
+        command,
         cwd=ROOT,
         check=False,
         input="\n".join(prompts) + "\n",
@@ -104,6 +117,37 @@ def test_gemma_chat_interactive_repl_keeps_multi_turn_state() -> None:
     assert first.stdout.count("assistant> mock-gemma:") == 2
 
 
+def test_gemma_chat_history_file_loads_and_appends_jsonl() -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        history_path = Path(temp_dir) / "history.jsonl"
+        first = run_cli("persist one", seed=9, history_file=history_path)
+        second = run_cli("persist two", seed=9, history_file=history_path)
+
+        replay_path = Path(temp_dir) / "replay.jsonl"
+        replay_first = run_cli("persist one", seed=9, history_file=replay_path)
+        replay_second = run_cli("persist two", seed=9, history_file=replay_path)
+
+        assert first.returncode == 0
+        assert second.returncode == 0
+        assert replay_first.returncode == 0
+        assert replay_second.returncode == 0
+        assert first.stderr == ""
+        assert second.stderr == ""
+        assert replay_first.stderr == ""
+        assert replay_second.stderr == ""
+        assert first.stdout == replay_first.stdout
+        assert second.stdout == replay_second.stdout
+        assert [
+            json.loads(line)
+            for line in history_path.read_text(encoding="utf-8").splitlines()
+        ] == [
+            ["user", "persist one"],
+            ["assistant", first.stdout.strip()],
+            ["user", "persist two"],
+            ["assistant", second.stdout.strip()],
+        ]
+
+
 def test_serial_transport_is_stubbed() -> None:
     result = subprocess.run(
         [
@@ -141,6 +185,7 @@ test_gemma_chat_cli_prints_mock_output_text_only()
 test_gemma_chat_cli_is_deterministic_for_same_prompt()
 test_gemma_chat_cli_seed_controls_deterministic_output()
 test_gemma_chat_interactive_repl_keeps_multi_turn_state()
+test_gemma_chat_history_file_loads_and_appends_jsonl()
 test_serial_transport_is_stubbed()
 test_source_headers_for_cli_files()
 
