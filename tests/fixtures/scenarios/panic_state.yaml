@@ -1,0 +1,4 @@
+kernel_uname: "Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)"
+xrt_present: false
+xrt_version: ""
+xmutil_listapps: []

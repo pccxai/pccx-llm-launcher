@@ -96,6 +96,60 @@ def test_partial_apps_scenario_returns_configured_listapps_subset() -> None:
     assert connection.xmutil_listapps() == ("app: pccx-npu",)
 
 
+def test_boot_in_progress_scenario_returns_incomplete_boot_without_xrt() -> None:
+    module, _serial_module = load_module()
+
+    connection = module.KV260ConnectionMock.from_scenario("boot_in_progress")
+
+    assert connection.is_reachable() is True
+    assert connection.kernel_uname() == "boot incomplete"
+    assert connection.xrt_present() is False
+    assert connection.xrt_version() == ""
+    assert connection.xmutil_listapps() == ()
+
+
+def test_xrt_present_no_apps_scenario_returns_empty_listapps() -> None:
+    module, _serial_module = load_module()
+
+    connection = module.KV260ConnectionMock.from_scenario("xrt_present_no_apps")
+
+    assert connection.is_reachable() is True
+    assert connection.kernel_uname() == (
+        "Linux kv260-xrt-no-apps 6.6.0-pccx-mock #1 SMP PREEMPT aarch64 GNU/Linux"
+    )
+    assert connection.xrt_present() is True
+    assert connection.xrt_version() == "XRT mock 2.16.0-no-apps"
+    assert connection.xmutil_listapps() == ()
+
+
+def test_single_app_loaded_scenario_returns_one_listapps_entry() -> None:
+    module, _serial_module = load_module()
+
+    connection = module.KV260ConnectionMock.from_scenario("single_app_loaded")
+
+    assert connection.is_reachable() is True
+    assert connection.kernel_uname() == (
+        "Linux kv260-single-app 6.6.0-pccx-mock #1 SMP PREEMPT aarch64 GNU/Linux"
+    )
+    assert connection.xrt_present() is True
+    assert connection.xrt_version() == "XRT mock 2.16.0-single-app"
+    assert connection.xmutil_listapps() == ("app: pccx-npu",)
+
+
+def test_panic_state_scenario_returns_last_panic_line() -> None:
+    module, _serial_module = load_module()
+
+    connection = module.KV260ConnectionMock.from_scenario("panic_state")
+
+    assert connection.is_reachable() is True
+    assert connection.kernel_uname() == (
+        "Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)"
+    )
+    assert connection.xrt_present() is False
+    assert connection.xrt_version() == ""
+    assert connection.xmutil_listapps() == ()
+
+
 def test_direct_state_builder_defaults_xrt_presence_from_version() -> None:
     module, _serial_module = load_module()
 
@@ -133,9 +187,13 @@ def test_expected_scenario_fixture_count() -> None:
     )
 
     assert [path.stem for path in scenario_files] == [
+        "boot_in_progress",
         "happy_path",
+        "panic_state",
         "partial_apps",
+        "single_app_loaded",
         "xrt_missing",
+        "xrt_present_no_apps",
     ]
 
 
@@ -207,6 +265,10 @@ def test_source_headers_for_touched_python_files() -> None:
 test_happy_path_scenario_implements_serial_connection_protocol()
 test_xrt_missing_scenario_keeps_board_reachable_without_xrt()
 test_partial_apps_scenario_returns_configured_listapps_subset()
+test_boot_in_progress_scenario_returns_incomplete_boot_without_xrt()
+test_xrt_present_no_apps_scenario_returns_empty_listapps()
+test_single_app_loaded_scenario_returns_one_listapps_entry()
+test_panic_state_scenario_returns_last_panic_line()
 test_direct_state_builder_defaults_xrt_presence_from_version()
 test_scenario_loader_rejects_missing_or_path_like_names()
 test_expected_scenario_fixture_count()
