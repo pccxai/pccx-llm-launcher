@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 import numpy as np
@@ -49,6 +49,48 @@ class GemmaE2EResult:
     manifest_sha256: str
     serial_payload: bytes
     axi_completion_count: int
+
+
+@dataclass
+class ChatSession:
+    """Stateful mock Gemma chat session with deterministic turn history."""
+
+    arch_spec: GemmaArchSpec | None = None
+    seed: int = 0
+    history: list[tuple[str, str]] = field(default_factory=list)
+
+    def send(self, prompt: str) -> GemmaE2EResult:
+        """Send one user turn through the mock orchestrator and store the reply."""
+
+        context = self.context_for(prompt)
+        result = run_mock_gemma_chat(context, self.arch_spec, seed=self.seed)
+        self.history.append((prompt, result.output_text))
+        return result
+
+    def context_for(self, prompt: str) -> str:
+        """Build a Gemma-style chat prompt including prior turns."""
+
+        turns: list[str] = []
+        for user_text, assistant_text in self.history:
+            turns.extend(
+                [
+                    "<start_of_turn>user",
+                    user_text,
+                    "<end_of_turn>",
+                    "<start_of_turn>model",
+                    assistant_text,
+                    "<end_of_turn>",
+                ],
+            )
+        turns.extend(
+            [
+                "<start_of_turn>user",
+                prompt,
+                "<end_of_turn>",
+                "<start_of_turn>model",
+            ],
+        )
+        return "\n".join(turns)
 
 
 class ScriptedSerialSession:
@@ -112,6 +154,7 @@ class GemmaE2EOrchestrator:
         cls,
         prompt: str,
         arch_spec: GemmaArchSpec | None = None,
+        seed: int = 0,
     ) -> "GemmaE2EOrchestrator":
         """Create a full offline mock path with scripted serial and AXI replies."""
 
@@ -120,7 +163,7 @@ class GemmaE2EOrchestrator:
         prompt_tokens = tokenizer.encode(prompt)
         manifest = _prepare_mock_manifest(spec)
         reply_tokens = tokenizer.encode_generated_text(
-            deterministic_mock_reply(prompt, spec, manifest),
+            deterministic_mock_reply(prompt, spec, manifest, seed),
         )
         serial_factory = ScriptedSerialFactory([encode_output_stream(reply_tokens)])
         axi = AxiCmdMockBackend(_scripted_axi_replies(prompt_tokens, manifest, spec))
@@ -207,10 +250,11 @@ class GemmaE2EOrchestrator:
 def run_mock_gemma_chat(
     prompt: str,
     arch_spec: GemmaArchSpec | None = None,
+    seed: int = 0,
 ) -> GemmaE2EResult:
     """Convenience entry point for the CLI mock chat path."""
 
-    orchestrator = GemmaE2EOrchestrator.create_mock(prompt, arch_spec)
+    orchestrator = GemmaE2EOrchestrator.create_mock(prompt, arch_spec, seed)
     return orchestrator.run(prompt)
 
 
@@ -218,6 +262,7 @@ def deterministic_mock_reply(
     prompt: str,
     arch_spec: GemmaArchSpec,
     manifest: Manifest,
+    seed: int = 0,
 ) -> str:
     """Return stable local mock output text for a prompt/config pair."""
 
@@ -227,6 +272,7 @@ def deterministic_mock_reply(
                 arch_spec.model_id,
                 arch_spec.target,
                 manifest.packed_sha256,
+                str(seed),
                 prompt,
             ],
         ).encode("utf-8"),

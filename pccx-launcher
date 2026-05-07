@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import TextIO
 
 
 ROOT = Path(__file__).resolve().parent
@@ -15,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from contracts.gemma_e2e_orchestrator import (
+    ChatSession,
     RealSerialGemmaE2ENotImplemented,
     run_mock_gemma_chat,
 )
@@ -28,7 +30,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     gemma_subparsers = gemma.add_subparsers(dest="gemma_command", required=True)
 
     chat = gemma_subparsers.add_parser("chat")
-    chat.add_argument("--prompt", required=True)
+    chat_input = chat.add_mutually_exclusive_group(required=True)
+    chat_input.add_argument("--prompt")
+    chat_input.add_argument("--interactive", action="store_true")
+    chat.add_argument("--seed", type=int, default=0)
     chat.add_argument(
         "--transport",
         choices=("mock", "serial"),
@@ -38,6 +43,32 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def run_interactive_gemma_chat(
+    stdin: TextIO | None = None,
+    stdout: TextIO | None = None,
+    seed: int = 0,
+) -> int:
+    """Run a local-only mock Gemma chat REPL."""
+
+    input_stream = sys.stdin if stdin is None else stdin
+    output_stream = sys.stdout if stdout is None else stdout
+    session = ChatSession(seed=seed)
+    while True:
+        output_stream.write("user> ")
+        output_stream.flush()
+        prompt = input_stream.readline()
+        if prompt == "":
+            break
+        prompt = prompt.rstrip("\n")
+        if prompt.strip() in {":exit", ":quit", "exit", "quit"}:
+            break
+        if prompt == "":
+            continue
+        result = session.send(prompt)
+        output_stream.write(f"assistant> {result.output_text}\n")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     if args.command == "gemma" and args.gemma_command == "chat":
@@ -45,7 +76,9 @@ def main(argv: list[str] | None = None) -> int:
             raise RealSerialGemmaE2ENotImplemented(
                 "serial Gemma chat is stubbed pending board evidence",
             )
-        result = run_mock_gemma_chat(args.prompt)
+        if args.interactive:
+            return run_interactive_gemma_chat(seed=args.seed)
+        result = run_mock_gemma_chat(args.prompt, seed=args.seed)
         sys.stdout.write(result.output_text + "\n")
         return 0
     raise SystemExit("unhandled command")
