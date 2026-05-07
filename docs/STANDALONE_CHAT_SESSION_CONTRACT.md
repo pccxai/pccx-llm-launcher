@@ -6,6 +6,12 @@ answer blocked until model, runtime, and target-session evidence exists.
 
 Current answer: **blocked / no local chat runtime is active**.
 
+The `ChatSession` open, append, persist, and close lifecycle is documented
+separately in
+[CHAT_SESSION_STATE_LIFECYCLE.md](./CHAT_SESSION_STATE_LIFECYCLE.md).
+That note records the intended state machine while keeping current
+append and persistence behavior blocked or not configured.
+
 The implementation lives in:
 
 - `contracts/chat_session_contract.py`
