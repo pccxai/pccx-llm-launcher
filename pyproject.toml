@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pccx-llm-launcher"
+version = "0.0.0"
+description = "Lightweight launcher for PCCX-oriented local LLM workflows."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["contracts*"]
+namespaces = true
