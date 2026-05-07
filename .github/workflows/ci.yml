@@ -336,6 +336,8 @@ jobs:
         run: python3 scripts/tests/dummy_e2e_contract_test.py
       - name: run trace capture client tests
         run: python3 scripts/tests/trace_capture_client_test.py
+      - name: run full mock integration tests
+        run: python3 scripts/tests/full_mock_integration_test.py
       - name: run KV260 serial connection tests
         run: python3 scripts/tests/kv260_serial_connection_test.py
       - name: run KV260 connection mock tests
