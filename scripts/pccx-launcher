@@ -44,9 +44,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "dummy-e2e":
         stream = dummy_e2e(args.seed)
         if args.capture is not None:
-            with TraceCaptureClient(file_path=args.capture) as client:
-                for frame in dummy_e2e_trace_frames(stream):
-                    client.write_frame(frame)
+            client = TraceCaptureClient(file_path=args.capture)
+            try:
+                client.capture(dummy_e2e_trace_frames(stream))
+            finally:
+                client.close()
         sys.stdout.write(format_dummy_e2e_summary(stream))
         return 0
     raise AssertionError(f"unhandled command: {args.command}")

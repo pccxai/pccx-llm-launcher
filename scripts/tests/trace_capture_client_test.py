@@ -149,6 +149,38 @@ def test_cli_dummy_e2e_capture_writes_v2_framed_fixture_file() -> None:
     assert [frame["frame_idx"] for frame in frames] == [0, 1, 2]
 
 
+def test_cli_dummy_e2e_capture_smoke_tmp_x_jsonl() -> None:
+    capture_path = Path("/tmp/x.jsonl")
+    capture_path.unlink(missing_ok=True)
+    try:
+        out = subprocess.run(
+            [
+                str(CLI_PATH),
+                "dummy-e2e",
+                "--seed",
+                "42",
+                "--capture",
+                str(capture_path),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        assert out.stderr == ""
+        assert capture_path.exists()
+        lines = split_capture(read_text(capture_path))
+
+        assert lines[0] == PCCX_TRACE_BEGIN_MARKER
+        expected_frames = dummy_e2e_trace_frames(dummy_e2e(42))
+        assert len(lines[1:-1]) == len(expected_frames)
+        assert lines[-1] == f"===PCCX_TRACE_END seq={len(lines[1:-1])}==="
+        for index, line in enumerate(lines[1:-1]):
+            assert_valid_v2_frame(line, seq=index)
+    finally:
+        capture_path.unlink(missing_ok=True)
+
+
 def test_trace_capture_source_headers_and_no_runtime_claims() -> None:
     expected_headers = {
         MODULE_PATH: [
@@ -175,6 +207,7 @@ test_trace_capture_client_writes_stdout_style_text_sink()
 test_trace_capture_client_writes_bytes_serial_sink_without_real_serial()
 test_dummy_e2e_trace_frames_are_v2_capture_ready()
 test_cli_dummy_e2e_capture_writes_v2_framed_fixture_file()
+test_cli_dummy_e2e_capture_smoke_tmp_x_jsonl()
 test_trace_capture_source_headers_and_no_runtime_claims()
 
 print("trace capture client tests ok")
