@@ -104,6 +104,10 @@ Every error carries a claim boundary in the JSON fixture so the launcher
 can show a clear user message without implying runtime, hardware, or
 performance success.
 
+The offline AXI command mock backend also exposes `NpuStat` status codes for
+launcher-side tests. See [NpuStat Error Codes](./NPU_STAT_ERROR_CODES.md) for
+the mock-only code table and packed `MMIO_STAT` semantics.
+
 ## Safety Notes
 
 This status surface does not add:
