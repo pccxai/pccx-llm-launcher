@@ -17,10 +17,12 @@ TEST_PATH = Path(__file__).resolve()
 
 from contracts.gemma_arch_spec import GemmaArchSpec
 from contracts.gemma_e2e_orchestrator import (
+    ChatSession,
     GemmaE2EOrchestrator,
     RealSerialGemmaE2ENotImplemented,
     run_mock_gemma_chat,
 )
+from contracts.gemma_tokenizer import GemmaTokenizer
 from contracts.kv260_connection_mock import KV260ConnectionMock
 from contracts.token_stream_over_serial import encode_input_stream
 
@@ -54,6 +56,39 @@ def test_same_prompt_is_deterministic_and_different_prompt_changes_output() -> N
 
     assert first == second
     assert first.output_text != third.output_text
+
+
+def test_chat_session_records_history_and_passes_context() -> None:
+    spec = GemmaArchSpec()
+    session = ChatSession(arch_spec=spec, seed=19)
+
+    first_context = session.context_for("first turn")
+    first = session.send("first turn")
+    assert first.prompt_tokens == tuple(GemmaTokenizer(spec).encode(first_context))
+    assert session.history == [("first turn", first.output_text)]
+
+    second_context = session.context_for("second turn")
+    assert "first turn" in second_context
+    assert first.output_text in second_context
+    assert second_context.endswith("<start_of_turn>model")
+
+    second = session.send("second turn")
+    assert second.prompt_tokens == tuple(GemmaTokenizer(spec).encode(second_context))
+    assert session.history == [
+        ("first turn", first.output_text),
+        ("second turn", second.output_text),
+    ]
+
+
+def test_chat_session_same_seed_and_prompts_is_deterministic() -> None:
+    prompts = ("alpha", "beta", "gamma")
+
+    def run_session(seed: int) -> tuple[str, ...]:
+        session = ChatSession(seed=seed)
+        return tuple(session.send(prompt).output_text for prompt in prompts)
+
+    assert run_session(7) == run_session(7)
+    assert run_session(7) != run_session(8)
 
 
 def test_orchestrator_uses_kv260_connection_mock_contract() -> None:
@@ -132,6 +167,8 @@ def test_source_headers_for_touched_python_files() -> None:
 
 test_mock_orchestrator_runs_full_prompt_to_text_path()
 test_same_prompt_is_deterministic_and_different_prompt_changes_output()
+test_chat_session_records_history_and_passes_context()
+test_chat_session_same_seed_and_prompts_is_deterministic()
 test_orchestrator_uses_kv260_connection_mock_contract()
 test_real_serial_path_is_stubbed()
 test_source_has_offline_and_claim_guards()
