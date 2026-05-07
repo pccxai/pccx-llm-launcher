@@ -9,9 +9,12 @@ and target configuration exist**.
 
 The implementation lives in:
 
+- `docs/KV260_SERIAL_BACKEND_SPEC.md`
 - `contracts/device_session_status_contract.py`
+- `contracts/kv260_serial_connection.py`
 - `contracts/fixtures/device-session-status.gemma3n-e4b-kv260.json`
 - `scripts/device-session-status-stub.sh`
+- `scripts/tests/kv260_serial_connection_test.py`
 - `scripts/tests/device_session_status_contract_test.py`
 - `scripts/tests/status-device-session.sh`
 
@@ -29,10 +32,16 @@ The launcher now exposes a deterministic local status shape for:
 - a gated connection and launch flow
 - user-facing error taxonomy with remediation text
 
-The status data is read-only. It does not probe hardware, open serial
-ports, scan networks, attempt authentication, load model assets, invoke
-pccx-lab, start runtime code, stream logs, upload telemetry, or write
-artifacts.
+The status fixture data is read-only. It does not probe hardware, open
+serial ports, scan networks, attempt authentication, load model assets,
+invoke pccx-lab, start runtime code, stream logs, upload telemetry, or
+write artifacts.
+
+The separate `KV260SerialConnection` backend is documented in
+[`KV260_SERIAL_BACKEND_SPEC.md`](./KV260_SERIAL_BACKEND_SPEC.md). That
+backend is an explicit USB TTY serial-console status-check boundary, not
+a replacement for the placeholder fixture and not a runtime or inference
+claim.
 
 ## Status Panel
 
