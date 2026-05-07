@@ -33,6 +33,11 @@ exact source commit and what was / was not imported.
 Steps 3–4 will only become real once the PCCX FPGA / KV260 bring-up
 publishes a verified end-to-end path.
 
+The launcher consumes the v002 IP-core only through the KV260 integration
+repository's `third_party/pccx-v002` submodule path; it does not carry a
+direct `pccx-v002` dependency. See
+[docs/V002_CONSUMPTION_PATH.md](./docs/V002_CONSUMPTION_PATH.md).
+
 ## Target user
 
 - Owns or uses a supported edge device such as Xilinx Kria KV260.
