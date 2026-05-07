@@ -109,9 +109,15 @@
 
 set -u
 
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+PCCX_LAUNCHER_ROOT="$ROOT_DIR"
+# shellcheck source=scripts/lib/errors.sh
+. "$ROOT_DIR/scripts/lib/errors.sh"
+
 INFO()  { printf '[INFO]  %s\n' "$*"; }
 NOTE()  { printf '[NOTE]  %s\n' "$*"; }
-ERROR() { printf '[ERROR] %s\n' "$*" >&2; }
+ERROR() { TRACE_ERROR "$*"; }
 HEAD()  { printf '\n=== %s ===\n' "$*"; }
 
 BACKEND=""

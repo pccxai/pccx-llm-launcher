@@ -315,6 +315,8 @@ jobs:
             exit 1
           fi
           echo "chat-stub correctly refused without --dry-run"
+      - name: run typed launcher error tests
+        run: python3 scripts/tests/pccx_launcher_errors_test.py
       - name: run launcher/IDE contract tests
         run: python3 scripts/tests/launcher_ide_contract_test.py
       - name: run model/runtime descriptor tests

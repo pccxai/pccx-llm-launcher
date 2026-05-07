@@ -12,6 +12,9 @@ set -eu
 
 SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
 ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+PCCX_LAUNCHER_ROOT="$ROOT_DIR"
+# shellcheck source=scripts/lib/errors.sh
+. "$ROOT_DIR/scripts/lib/errors.sh"
 
 MODEL="gemma3n-e4b"
 TARGET="kv260"
@@ -21,7 +24,7 @@ while [ $# -gt 0 ]; do
         --model)
             MODEL="${2:-}"
             if [ -z "$MODEL" ]; then
-                printf '[ERROR] --model requires an argument\n' >&2
+                TRACE_ERROR "--model requires an argument"
                 exit 2
             fi
             shift 2
@@ -29,13 +32,13 @@ while [ $# -gt 0 ]; do
         --target)
             TARGET="${2:-}"
             if [ -z "$TARGET" ]; then
-                printf '[ERROR] --target requires an argument\n' >&2
+                TRACE_ERROR "--target requires an argument"
                 exit 2
             fi
             shift 2
             ;;
         *)
-            printf '[ERROR] unknown option: %s\n' "$1" >&2
+            TRACE_ERROR "unknown option: $1"
             exit 2
             ;;
     esac

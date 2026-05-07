@@ -5,7 +5,11 @@
 
 set -eu
 
-ERROR() { printf '[ERROR] %s\n' "$*" >&2; }
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+PCCX_LAUNCHER_ROOT="$ROOT_DIR"
+# shellcheck source=scripts/lib/errors.sh
+. "$ROOT_DIR/scripts/lib/errors.sh"
 
 usage() {
     cat <<'EOF'
@@ -25,7 +29,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --model)
             if [ -z "${2:-}" ]; then
-                ERROR "--model requires an argument"
+                TRACE_ERROR "--model requires an argument"
                 exit 1
             fi
             MODEL="$2"
@@ -33,7 +37,7 @@ while [ $# -gt 0 ]; do
             ;;
         --target)
             if [ -z "${2:-}" ]; then
-                ERROR "--target requires an argument"
+                TRACE_ERROR "--target requires an argument"
                 exit 1
             fi
             TARGET="$2"
@@ -44,15 +48,12 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         *)
-            ERROR "unknown option: $1"
+            TRACE_ERROR "unknown option: $1"
             usage >&2
             exit 1
             ;;
     esac
 done
-
-SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
-ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
 
 python3 "$ROOT_DIR/contracts/chat_session_lifecycle_contract.py" \
     --model "$MODEL" \

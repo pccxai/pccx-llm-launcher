@@ -17,6 +17,13 @@ import argparse
 import copy
 import json
 import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from pccx_launcher.errors import TraceError
 
 
 SCHEMA_VERSION = "pccx.chatPreferences.v0"
@@ -378,24 +385,24 @@ def _iter_state_values(value):
 
 def _validate_preferences(preferences: dict) -> None:
     if tuple(preferences.keys()) != CHAT_PREFERENCES_FIELDS:
-        raise ValueError("chat preferences fields changed")
+        raise TraceError("chat preferences fields changed")
     if preferences["schemaVersion"] != SCHEMA_VERSION:
-        raise ValueError("unexpected chat preferences schema version")
+        raise TraceError("unexpected chat preferences schema version")
 
     allowed = set(CHAT_PREFERENCES_STATE_VALUES)
     for state in _iter_state_values(preferences):
         if state not in allowed:
-            raise ValueError(f"unexpected chat preferences state: {state}")
+            raise TraceError(f"unexpected chat preferences state: {state}")
 
     for panel in preferences["preferencePanels"]:
         if tuple(panel.keys()) != PREFERENCE_PANEL_FIELDS:
-            raise ValueError("preference panel fields changed")
+            raise TraceError("preference panel fields changed")
     for control in preferences["preferenceControls"]:
         if tuple(control.keys()) != PREFERENCE_CONTROL_FIELDS:
-            raise ValueError("preference control fields changed")
+            raise TraceError("preference control fields changed")
     for reason in preferences["blockedReasons"]:
         if tuple(reason.keys()) != BLOCKED_REASON_FIELDS:
-            raise ValueError("blocked reason fields changed")
+            raise TraceError("blocked reason fields changed")
 
 
 def create_gemma3n_e4b_kv260_chat_preferences() -> dict:
