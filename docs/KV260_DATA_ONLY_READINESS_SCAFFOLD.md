@@ -20,6 +20,11 @@ status, and result streams without touching a board or reading model assets.
   into low/high 32-bit words and the 32-bit status register shape.
 - `ResultStream` is a typed iterator over future token or tensor outputs.
 
+The opcode and AXI command/status vocabulary is a narrow mirror of the sibling
+KV260 `isa_pkg.sv` source. See
+[`ISA_MIRROR_SYNC_POLICY.md`](./ISA_MIRROR_SYNC_POLICY.md) for the source path,
+placeholder location, and sync rules.
+
 ## Boundaries
 
 The scaffold does not open SSH, run target commands, scan networks, read XRT
