@@ -1,0 +1,6 @@
+{
+  "kernel_uname": "Linux kv260-no-xrt 6.6.0-pccx-mock #1 SMP PREEMPT aarch64 GNU/Linux",
+  "xrt_present": false,
+  "xrt_version": "",
+  "xmutil_listapps": []
+}
