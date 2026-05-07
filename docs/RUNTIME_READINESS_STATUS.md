@@ -65,7 +65,9 @@ The fixture reflects the current PCCX ecosystem state as launcher data:
 - Gemma 3N E4B has no KV260 hardware runtime evidence in this launcher
   fixture
 - throughput measurement is unavailable
-- 20 tok/s remains a target until measured
+- 20 tok/s target remains target-only until measured
+- the 20 tok/s target rationale and launcher-side software timing budget
+  are tracked in [docs/PERFORMANCE_TARGET.md](./PERFORMANCE_TARGET.md)
 
 ## State Separation
 
@@ -112,7 +114,7 @@ This readiness surface does not add:
 - telemetry, upload, or write-back
 - release or tag behavior
 - versioned API or ABI commitment
-- a performance achievement claim
+- a performance claim
 
 Evidence from FPGA closure, KV260 board smoke, runtime execution, and
 throughput measurement is required before this status can move beyond
