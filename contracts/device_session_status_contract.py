@@ -391,8 +391,8 @@ _DEVICE_SESSION_STATUS = {
         "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#10",
-        "pccxai/pccx-llm-launcher#2",
+        "pccxai/pccx-launcher#10",
+        "pccxai/pccx-launcher#2",
     ],
 }
 

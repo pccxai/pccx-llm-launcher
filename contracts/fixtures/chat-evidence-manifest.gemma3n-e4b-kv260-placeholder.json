@@ -222,7 +222,7 @@
   "fixtureVersion": "chat-evidence-manifest.gemma3n-e4b-kv260.2026-05-06-empty-state-ref",
   "gapState": "blocked",
   "issueRefs": [
-    "pccxai/pccx-llm-launcher#9"
+    "pccxai/pccx-launcher#9"
   ],
   "lastUpdatedSource": "pccx_launcher_issue_9_chat_empty_state_evidence_ref_2026-05-06",
   "limitations": [

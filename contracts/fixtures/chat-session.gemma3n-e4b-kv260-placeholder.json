@@ -46,7 +46,7 @@
   ],
   "inputState": "ready_for_inputs",
   "issueRefs": [
-    "pccxai/pccx-llm-launcher#9"
+    "pccxai/pccx-launcher#9"
   ],
   "lastUpdatedSource": "pccx_launcher_issue_9_boundary_2026-05-03",
   "limitations": [

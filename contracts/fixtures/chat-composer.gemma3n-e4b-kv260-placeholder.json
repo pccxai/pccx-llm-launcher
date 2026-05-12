@@ -111,7 +111,7 @@
     "summary": "Composer fixture carries input control state only; no draft text is stored."
   },
   "issueRefs": [
-    "pccxai/pccx-llm-launcher#9"
+    "pccxai/pccx-launcher#9"
   ],
   "lastUpdatedSource": "pccx_launcher_issue_9_chat_composer_boundary_2026-05-04",
   "limitations": [

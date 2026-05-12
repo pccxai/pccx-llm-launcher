@@ -52,7 +52,7 @@ The handoff records:
 - `limitations`
 - `issueRefs`
 
-The producer is `pccx-llm-launcher`. The consumer is pccx-lab as a
+The producer is `pccx-launcher`. The consumer is pccx-lab as a
 future CLI/core consumer. The current fixture uses placeholder values and
 checked references only.
 

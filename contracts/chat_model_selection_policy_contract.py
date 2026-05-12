@@ -381,7 +381,7 @@ _CHAT_MODEL_SELECTION_POLICY = {
         "This is not a release, tag, compatibility commitment, marketplace flow, provider integration, storage layer, runtime, model-loader, or hardware implementation.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

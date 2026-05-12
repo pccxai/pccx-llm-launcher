@@ -13,7 +13,7 @@ hkimw/llm-bottleneck-lab @ 129c524
 That repository has since pivoted to a benchmark / bottleneck-analysis
 focus (`llm-bottleneck-lab`). The launcher-era pieces are preserved here as
 a starting point for the user-facing launcher track that this repo
-(`pccx-llm-launcher`) is meant to grow into.
+(`pccx-launcher`) is meant to grow into.
 
 ## Files
 
@@ -29,7 +29,7 @@ These scripts were authored against a working tree that contained an
 inference engine directory (`x64/gemma3N_E4B/`), a `pynq_env/` virtualenv,
 compiled `.so` shared libraries, and a deprecated native ImGui front-end.
 None of that is present in this repository, and importing it is **not** the
-goal of `pccx-llm-launcher`.
+goal of `pccx-launcher`.
 
 The launcher engine that this repo is meant to drive will instead come from
 the PCCX hardware track once the FPGA / KV260 bring-up evidence is

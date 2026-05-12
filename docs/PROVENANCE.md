@@ -2,7 +2,7 @@
 
 ## Origin
 
-`pccx-llm-launcher` was bootstrapped in part from the launcher-era of the
+`pccx-launcher` was bootstrapped in part from the launcher-era of the
 upstream project `hkimw/llm-bottleneck-lab` (formerly `llm-lite`). The
 chosen import point is:
 
@@ -65,7 +65,7 @@ this repository today. Treat them as documentation of past intent.
 
 ## Authoritative inference path
 
-Hardware-side inference readiness for `pccx-llm-launcher` depends on the
+Hardware-side inference readiness for `pccx-launcher` depends on the
 bring-up and verification work that is happening in
 `pccxai/pccx-FPGA-NPU-LLM-kv260`. No release of this repository should
 claim KV260 inference until that repository publishes a verified
