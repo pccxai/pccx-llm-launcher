@@ -1,0 +1,5 @@
+kernel_uname: "Linux kv260-single-app 6.6.0-pccx-mock #1 SMP PREEMPT aarch64 GNU/Linux"
+xrt_present: true
+xrt_version: "XRT mock 2.16.0-single-app"
+xmutil_listapps:
+  - "app: pccx-npu"
