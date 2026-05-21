@@ -17,6 +17,12 @@
 
 set -u
 
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+PCCX_LAUNCHER_ROOT="$ROOT_DIR"
+# shellcheck source=scripts/lib/errors.sh
+. "$ROOT_DIR/scripts/lib/errors.sh"
+
 INFO()  { printf '[INFO]  %s\n' "$*"; }
 NOTE()  { printf '[NOTE]  %s\n' "$*"; }
 HEAD()  { printf '\n=== %s ===\n' "$*"; }
@@ -25,12 +31,12 @@ DRY_RUN=0
 while [ $# -gt 0 ]; do
     case "$1" in
         --dry-run) DRY_RUN=1; shift ;;
-        *) printf '[ERROR] unknown option: %s\n' "$1" >&2; exit 1 ;;
+        *) TRACE_ERROR "unknown option: $1"; exit 1 ;;
     esac
 done
 
 if [ "$DRY_RUN" -eq 0 ]; then
-    printf '[ERROR] --dry-run is required. This stub does not execute a real launch.\n' >&2
+    GEMMA_ERROR "--dry-run is required. This stub does not execute a real launch."
     printf '        Pass --dry-run to see the planned launch sequence preview.\n' >&2
     exit 1
 fi

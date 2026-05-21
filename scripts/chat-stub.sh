@@ -9,6 +9,12 @@
 
 set -u
 
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+PCCX_LAUNCHER_ROOT="$ROOT_DIR"
+# shellcheck source=scripts/lib/errors.sh
+. "$ROOT_DIR/scripts/lib/errors.sh"
+
 INFO() { printf '[INFO]  %s\n' "$*"; }
 NOTE() { printf '[NOTE]  %s\n' "$*"; }
 HEAD() { printf '\n=== %s ===\n' "$*"; }
@@ -27,20 +33,20 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         *)
-            printf '[ERROR] unknown option: %s\n' "$1" >&2
+            TRACE_ERROR "unknown option: $1"
             exit 1
             ;;
     esac
 done
 
 if [ "$DRY_RUN" -eq 0 ]; then
-    printf '[ERROR] --dry-run is required. No model is available for execution.\n' >&2
+    GEMMA_ERROR "--dry-run is required. No model is available for execution."
     printf '        Real chat requires pccx-FPGA verified bring-up.\n' >&2
     exit 1
 fi
 
 if [ -z "$PROMPT" ] && [ -t 0 ]; then
-    printf '[ERROR] provide --prompt "..." or pipe input via stdin.\n' >&2
+    TRACE_ERROR 'provide --prompt "..." or pipe input via stdin.'
     exit 1
 fi
 

@@ -9,7 +9,11 @@
 
 set -eu
 
-ERROR() { printf '[ERROR] %s\n' "$*" >&2; }
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+PCCX_LAUNCHER_ROOT="$ROOT_DIR"
+# shellcheck source=scripts/lib/errors.sh
+. "$ROOT_DIR/scripts/lib/errors.sh"
 
 MODEL=""
 TARGET=""
@@ -23,7 +27,7 @@ while [ $# -gt 0 ]; do
         --model)
             MODEL="${2:-}"
             if [ -z "$MODEL" ]; then
-                ERROR "--model requires an argument"
+                TRACE_ERROR "--model requires an argument"
                 exit 1
             fi
             shift 2
@@ -31,7 +35,7 @@ while [ $# -gt 0 ]; do
         --target)
             TARGET="${2:-}"
             if [ -z "$TARGET" ]; then
-                ERROR "--target requires an argument"
+                TRACE_ERROR "--target requires an argument"
                 exit 1
             fi
             shift 2
@@ -41,7 +45,7 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         *)
-            ERROR "unknown option: $1"
+            TRACE_ERROR "unknown option: $1"
             usage >&2
             exit 1
             ;;
@@ -49,17 +53,14 @@ while [ $# -gt 0 ]; do
 done
 
 if [ "$MODEL" != "gemma3n-e4b" ]; then
-    ERROR "--model must be gemma3n-e4b"
+    GEMMA_ERROR "--model must be gemma3n-e4b"
     exit 1
 fi
 
 if [ "$TARGET" != "kv260" ]; then
-    ERROR "--target must be kv260"
+    KV260_ERROR "--target must be kv260"
     exit 1
 fi
-
-SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
-ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
 
 python3 "$ROOT_DIR/contracts/runtime_readiness_contract.py" \
     --model "$MODEL" \

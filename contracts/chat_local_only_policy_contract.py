@@ -18,6 +18,13 @@ import argparse
 import copy
 import json
 import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from pccx_launcher.errors import TraceError
 
 
 SCHEMA_VERSION = "pccx.chatLocalOnlyPolicy.v0"
@@ -329,27 +336,27 @@ def _iter_state_values(value):
 
 def _validate_policy(policy: dict) -> None:
     if tuple(policy.keys()) != CHAT_LOCAL_ONLY_POLICY_FIELDS:
-        raise ValueError("chat local-only policy fields changed")
+        raise TraceError("chat local-only policy fields changed")
     if policy["schemaVersion"] != SCHEMA_VERSION:
-        raise ValueError("unexpected chat local-only policy schema version")
+        raise TraceError("unexpected chat local-only policy schema version")
 
     allowed = set(CHAT_LOCAL_ONLY_POLICY_STATE_VALUES)
     for state in _iter_state_values(policy):
         if state not in allowed:
-            raise ValueError(f"unexpected chat local-only policy state: {state}")
+            raise TraceError(f"unexpected chat local-only policy state: {state}")
 
     for control in policy["policyControls"]:
         if tuple(control.keys()) != POLICY_CONTROL_FIELDS:
-            raise ValueError("policy control fields changed")
+            raise TraceError("policy control fields changed")
     for check in policy["dependencyChecks"]:
         if tuple(check.keys()) != DEPENDENCY_CHECK_FIELDS:
-            raise ValueError("dependency check fields changed")
+            raise TraceError("dependency check fields changed")
     for reason in policy["blockedReasons"]:
         if tuple(reason.keys()) != BLOCKED_REASON_FIELDS:
-            raise ValueError("blocked reason fields changed")
+            raise TraceError("blocked reason fields changed")
     for ref in policy["handoffRefs"]:
         if tuple(ref.keys()) != HANDOFF_REF_FIELDS:
-            raise ValueError("handoff ref fields changed")
+            raise TraceError("handoff ref fields changed")
 
 
 def create_gemma3n_e4b_kv260_chat_local_only_policy() -> dict:
