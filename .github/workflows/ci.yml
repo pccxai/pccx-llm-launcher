@@ -389,6 +389,8 @@ jobs:
         run: python3 scripts/tests/chat_evidence_manifest_contract_test.py
       - name: run chat surface preview tests
         run: python3 scripts/tests/chat_surface_preview_test.py
+      - name: run gemma arch-spec contract tests
+        run: python3 scripts/tests/gemma_arch_spec_contract_test.py
 
   status-backend:
     name: status-backend-tests
