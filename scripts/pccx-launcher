@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 pccxai
+"""Small launcher CLI dispatcher for local contract utilities."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from contracts.dummy_e2e_contract import dummy_e2e, format_dummy_e2e_summary
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(prog="pccx-launcher")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    dummy = subparsers.add_parser(
+        "dummy-e2e",
+        help="run the offline dummy manifest -> AXI mock -> ResultStream path",
+    )
+    dummy.add_argument("--seed", required=True, type=int, help="deterministic seed")
+
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(sys.argv[1:] if argv is None else argv)
+    if args.command == "dummy-e2e":
+        sys.stdout.write(format_dummy_e2e_summary(dummy_e2e(args.seed)))
+        return 0
+    raise AssertionError(f"unhandled command: {args.command}")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
