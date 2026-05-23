@@ -86,6 +86,7 @@ and verify host-side prerequisites before the real engine lands.
 |---|---|
 | [`scripts/check.sh`](./scripts/check.sh) | Probe host info, tooling availability, edge-device hints. Always exits 0. |
 | [`scripts/check-device-stub.sh`](./scripts/check-device-stub.sh) | Narrowly scoped device-tree / FPGA-node probe (KV260 / Kria detection only). Always exits 0. |
+| [`scripts/local-synth.sh`](./scripts/local-synth.sh) | Local synthesis wrapper for user-installed Vivado or Quartus. Dry-run by default; calls the local tool only with `--run`. |
 | [`scripts/install-stub.sh`](./scripts/install-stub.sh) | Preview of the planned install flow; reports which host runtime pieces are present, lists device-side pieces as future deliverables. Always exits 0. |
 | [`scripts/status-stub.sh`](./scripts/status-stub.sh) | Launcher state summary. Default mode: local scaffold output, always exits 0. With `--include-chat-action-bar`, adds read-only disabled chat action-bar data. With `--include-chat-clipboard-policy`, adds read-only disabled chat clipboard-policy data. With `--include-chat-redaction-policy`, adds read-only disabled chat redaction-policy data. With `--include-chat-attachment-policy`, adds read-only disabled chat attachment-policy data. With `--include-chat-shortcut-map`, adds read-only disabled chat shortcut-map data. With `--include-chat-accessibility`, adds read-only chat accessibility metadata. With `--include-chat-status-summary`, adds read-only aggregate chat status-summary data. With `--include-chat-review-packet`, adds read-only chat review-packet data over existing checked fixture references. With `--include-chat-gap-matrix`, adds read-only chat implementation gap-matrix data over existing checked fixture references. With `--include-chat-evidence-manifest`, adds read-only chat evidence-manifest data over existing checked fixture references. With `--include-chat-message-list`, adds read-only empty chat message-list data. With `--include-chat-response-stream`, adds read-only blocked chat response stream data. With `--include-chat-error-taxonomy`, adds read-only chat error taxonomy data. With `--include-chat-audit-event`, adds read-only blocked chat audit-event metadata. With `--include-chat-surface-layout`, adds read-only chat surface layout data. With `--include-chat-empty-state`, adds read-only display-only chat empty-state data. With `--include-chat-local-only-policy`, adds read-only local-only/cloud-block policy data. With `--include-chat-preferences`, adds read-only chat preferences/settings data. With `--include-chat-session-index`, adds read-only empty chat session index data. With `--include-chat-session-store-policy`, adds read-only disabled chat session-store policy data. With `--include-chat-session-title-policy`, adds read-only placeholder session-title policy data. With `--include-chat-transcript-policy`, adds read-only chat transcript retention/export policy data. With `--include-chat-send-result`, adds read-only blocked chat send-result data. With `--include-chat-composer`, adds read-only chat composer/input-control data. With `--include-chat-model-status`, adds read-only blocked chat model-status display data. With `--include-chat-model-selection-policy`, adds read-only disabled chat model-selection data. With `--include-chat-context-policy`, adds read-only disabled chat context-window/tokenization policy data. With `--include-chat-model-load-request`, adds read-only disabled chat model-load request data. With `--include-chat-session`, adds read-only blocked chat/session and lifecycle summaries. With `--include-chat-readiness`, adds read-only chat readiness checks and recovery actions. With `--include-device-session`, adds a read-only device/session status panel. With `--include-runtime-readiness`, adds a read-only runtime readiness summary. With `--backend pccx-lab`, calls `pccx-lab status --format json` and forwards the run-status envelope (exits non-zero if binary is missing or output is invalid). |
 | [`scripts/device-session-status-stub.sh`](./scripts/device-session-status-stub.sh) | Data-only device/session status JSON for the Gemma 3N E4B + KV260 target. Reports connection, model load, session, diagnostics, readiness, discovery paths, flow steps, and error taxonomy as placeholder / blocked. |
@@ -128,6 +129,8 @@ and verify host-side prerequisites before the real engine lands.
 ```bash
 bash scripts/check.sh
 bash scripts/check-device-stub.sh
+bash scripts/local-synth.sh --detect-only
+bash scripts/local-synth.sh --vendor auto --script path/to/synth.tcl --dry-run
 bash scripts/install-stub.sh
 bash scripts/status-stub.sh
 bash scripts/status-stub.sh --include-chat-model-status
@@ -232,6 +235,14 @@ The pccx-lab status output is an early, pre-compatibility run-status envelope.
 It operates in host-dry-run mode: no real KV260 device probing is
 performed, no model is executed, and no inference is started. This is a
 planned KV260-oriented launcher path, not a readiness claim.
+
+### Local desktop mode
+
+Local desktop mode is documented in
+[docs/LOCAL_DESKTOP_MODE.md](./docs/LOCAL_DESKTOP_MODE.md) and structured under
+[`modules/local-mode/`](./modules/local-mode/). It covers local synthesis,
+BYOL Vivado/Quartus detection, user-owned chat provider credentials, optional
+cloud sync, and DesktopApp / IDE extension boundaries.
 
 ### Launcher / IDE bridge contract (planned)
 

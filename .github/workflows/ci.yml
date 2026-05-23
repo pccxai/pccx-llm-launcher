@@ -107,6 +107,7 @@ jobs:
         run: |
           for f in scripts/check.sh \
                    scripts/check-device-stub.sh \
+                   scripts/local-synth.sh \
                    scripts/install-stub.sh \
                    scripts/launch-stub.sh \
                    scripts/status-stub.sh \
@@ -156,6 +157,8 @@ jobs:
           else
             echo "scripts/check-device-stub.sh not present; skipping"
           fi
+      - name: run scripts/local-synth.sh tests
+        run: bash scripts/tests/local-synth.sh
       - name: run scripts/install-stub.sh (preview only)
         run: |
           if [ -x scripts/install-stub.sh ]; then
