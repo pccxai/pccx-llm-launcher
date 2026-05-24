@@ -544,7 +544,7 @@ _CHAT_EVIDENCE_MANIFEST = {
         "This manifest does not close issue #9, approve review gates, accept evidence, close gaps, or enable standalone chat.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

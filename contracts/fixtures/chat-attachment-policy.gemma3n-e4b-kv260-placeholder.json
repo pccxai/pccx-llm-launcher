@@ -234,7 +234,7 @@
   ],
   "importState": "disabled",
   "issueRefs": [
-    "pccxai/pccx-llm-launcher#9"
+    "pccxai/pccx-launcher#9"
   ],
   "lastUpdatedSource": "pccx_launcher_issue_9_chat_attachment_policy_boundary_2026-05-04",
   "limitations": [

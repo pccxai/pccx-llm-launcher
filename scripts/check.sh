@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # scripts/check.sh — minimal environment / target-device check for
-# pccx-llm-launcher. This is intentionally a lightweight, honest probe:
+# pccx-launcher. This is intentionally a lightweight, honest probe:
 # it reports what is present, but it does NOT claim that any particular
 # inference path is wired up. The launcher engine itself is not yet
 # imported into this repository.
@@ -46,7 +46,7 @@ else
 fi
 
 HEAD "launcher status"
-NOTE "pccx-llm-launcher does not yet ship a working inference path."
+NOTE "pccx-launcher does not yet ship a working inference path."
 NOTE "KV260 / Gemma 3N E4B support is a target, not a current claim."
 NOTE "Hardware readiness depends on pccxai/pccx-FPGA-NPU-LLM-kv260 bring-up."
 

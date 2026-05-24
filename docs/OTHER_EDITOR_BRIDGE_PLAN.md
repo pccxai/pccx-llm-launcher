@@ -94,6 +94,6 @@ Before adding editor-specific code, the launcher should have:
 ## Issue Alignment
 
 This plan addresses
-[`pccx-llm-launcher#11`](https://github.com/pccxai/pccx-llm-launcher/issues/11)
+[`pccx-launcher#11`](https://github.com/pccxai/pccx-launcher/issues/11)
 by recording JetBrains and generic editor direction while keeping the current
 launcher work data-only and pre-compatibility.

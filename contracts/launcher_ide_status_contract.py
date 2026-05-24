@@ -117,10 +117,10 @@ _CONTRACT = {
         "The contract shape may change before a versioned compatibility commitment.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#4",
-        "pccxai/pccx-llm-launcher#3",
-        "pccxai/pccx-llm-launcher#5",
-        "pccxai/pccx-llm-launcher#12",
+        "pccxai/pccx-launcher#4",
+        "pccxai/pccx-launcher#3",
+        "pccxai/pccx-launcher#5",
+        "pccxai/pccx-launcher#12",
     ],
 }
 

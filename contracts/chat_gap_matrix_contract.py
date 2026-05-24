@@ -451,7 +451,7 @@ _CHAT_GAP_MATRIX = {
         "This matrix does not close issue #9 or approve standalone chat enablement; it records remaining blocker rows only.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

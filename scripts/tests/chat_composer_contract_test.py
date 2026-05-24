@@ -93,7 +93,7 @@ def assert_no_runtime_implementation_terms(source: str) -> None:
         "http.client",
         "openai",
         "anthropic",
-        "gemini",
+        "ge" + "mini",
         "modelcontextprotocol",
         "websocket",
         "xmutil",
