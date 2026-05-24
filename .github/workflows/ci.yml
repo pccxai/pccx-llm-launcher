@@ -108,6 +108,7 @@ jobs:
           for f in scripts/check.sh \
                    scripts/check-device-stub.sh \
                    scripts/install-stub.sh \
+                   scripts/desktop-installer-distribution-stub.sh \
                    scripts/launch-stub.sh \
                    scripts/status-stub.sh \
                    scripts/device-session-status-stub.sh \
@@ -163,6 +164,8 @@ jobs:
           else
             echo "scripts/install-stub.sh not present; skipping"
           fi
+      - name: run scripts/desktop-installer-distribution-stub.sh
+        run: ./scripts/desktop-installer-distribution-stub.sh
       - name: run scripts/launch-stub.sh (dry-run)
         run: ./scripts/launch-stub.sh --dry-run
       - name: launch-stub refuses without --dry-run
@@ -319,6 +322,8 @@ jobs:
         run: python3 scripts/tests/launcher_ide_contract_test.py
       - name: run model/runtime descriptor tests
         run: python3 scripts/tests/model_runtime_descriptor_test.py
+      - name: run desktop installer distribution tests
+        run: python3 scripts/tests/desktop_installer_distribution_contract_test.py
       - name: run diagnostics handoff contract tests
         run: python3 scripts/tests/diagnostics_handoff_contract_test.py
       - name: run device/session status contract tests
