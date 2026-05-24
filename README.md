@@ -636,6 +636,17 @@ The legacy launcher scripts from the `llm-lite` era are preserved
 read-only under [`scripts/legacy/`](./scripts/legacy/) as historical
 reference (see that directory's README for status).
 
+## Launcher settings
+
+`LauncherConfig` reads a flat TOML settings file from
+`~/.config/pccx-launcher/config.toml` by default. The schema covers
+serial access, capture/history directories, and logging level, with
+per-field environment fallbacks for values omitted from TOML.
+
+See [docs/LAUNCHER_SETTINGS_SCHEMA.md](./docs/LAUNCHER_SETTINGS_SCHEMA.md)
+for the complete `config.toml` field reference, default-value behavior,
+source citations, and validation rules.
+
 ## Source provenance
 
 The launcher-shaped pieces in this repository were taken from
