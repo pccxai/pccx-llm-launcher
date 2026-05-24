@@ -1,6 +1,7 @@
 # pccx-launcher
 
-Lightweight launcher for PCCX-oriented local LLM workflows.
+Lightweight launcher for PCCX-oriented local LLM workflows. PCCX™
+technology and Altifigence™ are owned by Hyun Woo Kim.
 
 ## What this repo is
 
