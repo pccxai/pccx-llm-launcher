@@ -1,0 +1,312 @@
+{
+  "schemaVersion": "pccx.desktopInstallerDistribution.v0",
+  "contractId": "desktop_installer_distribution_multi_os_placeholder",
+  "fixtureVersion": "desktop-installer-distribution.multi-os.2026-05-24",
+  "lastUpdatedSource": "pccx_launcher_issue_122_desktop_installer_distribution_boundary",
+  "productId": "pccx-launcher",
+  "preferredDesktopShell": "tauri",
+  "fallbackDesktopShell": "electron",
+  "supportedHostPlatforms": [
+    {
+      "platformId": "macos",
+      "osFamily": "darwin",
+      "packageFormats": [
+        "dmg",
+        "app"
+      ],
+      "state": "planned",
+      "notes": "Tauri macOS packaging and notarization metadata are planned gates"
+    },
+    {
+      "platformId": "windows",
+      "osFamily": "windows",
+      "packageFormats": [
+        "msi",
+        "exe"
+      ],
+      "state": "planned",
+      "notes": "Windows installer signing and update metadata are planned gates"
+    },
+    {
+      "platformId": "linux",
+      "osFamily": "linux",
+      "packageFormats": [
+        "appimage",
+        "deb",
+        "rpm"
+      ],
+      "state": "planned",
+      "notes": "Linux packages remain local desktop artifacts until reviewed"
+    }
+  ],
+  "distributionChannels": [
+    {
+      "channelId": "user_download_page",
+      "surface": "download_page",
+      "state": "planned",
+      "artifactSource": "signed_release_manifest",
+      "userAction": "select_host_package",
+      "launcherAction": "render_metadata_only",
+      "securityPolicy": "show checksums and signature state before download"
+    },
+    {
+      "channelId": "github_release_artifacts",
+      "surface": "release_artifacts",
+      "state": "requires_review",
+      "artifactSource": "reviewed_release_job",
+      "userAction": "manual_download",
+      "launcherAction": "none",
+      "securityPolicy": "artifacts require checksums and platform signing metadata"
+    },
+    {
+      "channelId": "automatic_update_manifest",
+      "surface": "update_manifest",
+      "state": "requires_signed_metadata",
+      "artifactSource": "signed_release_manifest",
+      "userAction": "opt_in_update",
+      "launcherAction": "blocked_until_reviewed",
+      "securityPolicy": "manifest and package signatures are required before update execution"
+    }
+  ],
+  "releaseArtifacts": [
+    {
+      "artifactId": "macos_dmg",
+      "targetPlatform": "macos",
+      "packageFormat": "dmg",
+      "signingState": "requires_signature",
+      "notarizationState": "requires_notarization",
+      "checksumState": "requires_checksum",
+      "updateEligible": false,
+      "state": "planned"
+    },
+    {
+      "artifactId": "windows_msi",
+      "targetPlatform": "windows",
+      "packageFormat": "msi",
+      "signingState": "requires_signature",
+      "notarizationState": "not_applicable",
+      "checksumState": "requires_checksum",
+      "updateEligible": false,
+      "state": "planned"
+    },
+    {
+      "artifactId": "linux_appimage",
+      "targetPlatform": "linux",
+      "packageFormat": "appimage",
+      "signingState": "requires_signature",
+      "notarizationState": "not_applicable",
+      "checksumState": "requires_checksum",
+      "updateEligible": false,
+      "state": "planned"
+    }
+  ],
+  "updatePolicy": {
+    "policyId": "signed_opt_in_updates",
+    "updateMode": "automatic_after_user_opt_in",
+    "state": "gated",
+    "manifestState": "requires_signed_metadata",
+    "signatureState": "requires_signature",
+    "rolloutState": "manual_review_required",
+    "networkState": "requires_user_consent",
+    "userConsentRequired": true,
+    "downgradePolicy": "blocked"
+  },
+  "toolchainDetectionPlan": [
+    {
+      "toolchainId": "vivado",
+      "vendor": "xilinx",
+      "byolRequired": true,
+      "state": "planned",
+      "detectionInputs": [
+        "PATH command lookup",
+        "standard install roots",
+        "user-provided toolchain setting"
+      ],
+      "executionPolicy": "metadata_only_no_synthesis",
+      "secretPolicy": "no license, credential, token, or environment secret values",
+      "resultPolicy": "name, version, edition, and capability summary only"
+    },
+    {
+      "toolchainId": "quartus",
+      "vendor": "intel",
+      "byolRequired": true,
+      "state": "planned",
+      "detectionInputs": [
+        "PATH command lookup",
+        "standard install roots",
+        "user-provided toolchain setting"
+      ],
+      "executionPolicy": "metadata_only_no_synthesis",
+      "secretPolicy": "no license, credential, token, or environment secret values",
+      "resultPolicy": "name, version, edition, and capability summary only"
+    }
+  ],
+  "localSynthesisPlan": {
+    "planId": "local_synthesis_handoff",
+    "state": "gated",
+    "projectBoundary": "user_selected_project_only",
+    "toolchainRequirement": "BYOL Vivado or Quartus detection must pass first",
+    "invocationPolicy": "separate reviewed command boundary",
+    "artifactPolicy": "no artifact reads or writes in this contract",
+    "logPolicy": "summary metadata only until reviewed log redaction exists"
+  },
+  "cloudSyncPlan": {
+    "planId": "cloud_sync_handoff",
+    "state": "gated",
+    "syncMode": "explicit_user_action",
+    "consentPolicy": "user consent required for every sync boundary",
+    "credentialPolicy": "credential lookup and storage are out of this contract",
+    "uploadPolicy": "no upload in this contract",
+    "redactionPolicy": "artifact and log redaction gate required first",
+    "conflictPolicy": "manual review before remote overwrite"
+  },
+  "moduleBoundaries": [
+    {
+      "boundaryId": "desktop_shell",
+      "ownerLayer": "tauri_ui",
+      "state": "preferred",
+      "allowedResponsibility": "window, menus, download-page entry point, update prompts",
+      "forbiddenResponsibility": "synthesis execution, credential storage, cloud upload"
+    },
+    {
+      "boundaryId": "rust_backend",
+      "ownerLayer": "tauri_rust_backend",
+      "state": "planned",
+      "allowedResponsibility": "validated local metadata and explicit command handoff",
+      "forbiddenResponsibility": "silent updater, implicit toolchain run, implicit network call"
+    },
+    {
+      "boundaryId": "toolchain_detector",
+      "ownerLayer": "local_backend",
+      "state": "metadata_only",
+      "allowedResponsibility": "BYOL Vivado and Quartus capability summary",
+      "forbiddenResponsibility": "license content reads, synthesis, project mutation"
+    },
+    {
+      "boundaryId": "cloud_sync_bridge",
+      "ownerLayer": "sync_backend",
+      "state": "requires_review",
+      "allowedResponsibility": "future reviewed sync request summary",
+      "forbiddenResponsibility": "uploads, provider calls, credential reads"
+    }
+  ],
+  "securityGates": [
+    {
+      "gateId": "artifact_signing",
+      "state": "requires_signature",
+      "requiredBefore": "download page promotes installer artifacts",
+      "summary": "platform packages require signing metadata"
+    },
+    {
+      "gateId": "checksum_manifest",
+      "state": "requires_checksum",
+      "requiredBefore": "download page exposes installer artifacts",
+      "summary": "packages require checksum metadata"
+    },
+    {
+      "gateId": "update_signature_manifest",
+      "state": "requires_signed_metadata",
+      "requiredBefore": "automatic update execution",
+      "summary": "update manifests require signed metadata"
+    },
+    {
+      "gateId": "toolchain_detection_review",
+      "state": "requires_review",
+      "requiredBefore": "automatic BYOL detection runs on a user host",
+      "summary": "toolchain detection needs a reviewed local-only command boundary"
+    },
+    {
+      "gateId": "cloud_sync_review",
+      "state": "requires_review",
+      "requiredBefore": "cloud sync can move artifacts or logs",
+      "summary": "cloud sync needs consent, credential, redaction, and conflict gates"
+    }
+  ],
+  "blockedReasons": [
+    {
+      "reasonId": "desktop_app_tree_absent",
+      "state": "blocked",
+      "summary": "Tauri app files are not present in this snapshot",
+      "requiredBefore": "build desktop packages"
+    },
+    {
+      "reasonId": "signed_release_manifest_absent",
+      "state": "requires_signed_metadata",
+      "summary": "signed release and update metadata are not present",
+      "requiredBefore": "enable automatic update execution"
+    },
+    {
+      "reasonId": "toolchain_detector_not_reviewed",
+      "state": "requires_review",
+      "summary": "BYOL Vivado and Quartus detection is defined as a plan only",
+      "requiredBefore": "run host discovery"
+    },
+    {
+      "reasonId": "cloud_sync_not_reviewed",
+      "state": "requires_review",
+      "summary": "cloud sync remains a future reviewed boundary",
+      "requiredBefore": "upload or synchronize artifacts"
+    }
+  ],
+  "handoffRefs": [
+    {
+      "refId": "runtime_readiness",
+      "schemaVersion": "pccx.runtimeReadiness.v0",
+      "fixturePath": "contracts/fixtures/runtime-readiness.gemma3n-e4b-kv260.json",
+      "state": "available_as_data",
+      "summary": "runtime readiness remains a separate evidence gate"
+    },
+    {
+      "refId": "local_desktop_mode_pr",
+      "schemaVersion": "pccx.launcherLocalDesktopMode.v0",
+      "fixturePath": "pccxai/pccx-launcher#120",
+      "state": "requires_review",
+      "summary": "local synthesis mode is tracked separately from installer packaging"
+    }
+  ],
+  "safetyFlags": {
+    "readOnly": true,
+    "dataOnly": true,
+    "deterministic": true,
+    "desktopInstallerBoundaryOnly": true,
+    "tauriPreferred": true,
+    "electronFallbackOnly": true,
+    "packageBuildAttempted": false,
+    "releasePublished": false,
+    "downloadPagePublished": false,
+    "updaterExecution": false,
+    "updateManifestFetched": false,
+    "networkCalls": false,
+    "cloudCalls": false,
+    "cloudSyncExecution": false,
+    "providerCalls": false,
+    "credentialRead": false,
+    "environmentRead": false,
+    "secretsRead": false,
+    "tokensRead": false,
+    "toolchainDetectionExecuted": false,
+    "toolchainExecutableRun": false,
+    "vivadoRun": false,
+    "quartusRun": false,
+    "synthesisExecution": false,
+    "localArtifactRead": false,
+    "localArtifactWrite": false,
+    "modelExecution": false,
+    "runtimeExecution": false,
+    "kv260Access": false,
+    "hardwareAccess": false,
+    "telemetry": false,
+    "executesPccxLab": false,
+    "executesSystemverilogIde": false
+  },
+  "limitations": [
+    "contract records installer distribution metadata only",
+    "Tauri app files, package builds, and release jobs are not added here",
+    "automatic update execution is blocked until signed metadata and review gates exist",
+    "BYOL Vivado and Quartus discovery is a plan and does not run in this contract",
+    "local synthesis and cloud sync require separate reviewed command boundaries"
+  ],
+  "issueRefs": [
+    "pccxai/pccx-launcher#122"
+  ]
+}
