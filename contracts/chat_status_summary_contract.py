@@ -363,7 +363,7 @@ _CHAT_STATUS_SUMMARY = {
         "Send and response streaming remain disabled until separate reviewed runtime, model, device-session, content, and persistence boundaries exist.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

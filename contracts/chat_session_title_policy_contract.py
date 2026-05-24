@@ -344,7 +344,7 @@ _CHAT_SESSION_TITLE_POLICY = {
         "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model, or session-store implementation.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

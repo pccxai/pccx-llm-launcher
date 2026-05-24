@@ -5,7 +5,7 @@
 
 """Data-only diagnostics handoff contract placeholder.
 
-The contract describes a future read-only handoff from pccx-llm-launcher
+The contract describes a future read-only handoff from pccx-launcher
 to pccx-lab. It does not execute pccx-lab, start launcher runtime code,
 probe hardware, load models, call providers, or write artifacts.
 """
@@ -77,7 +77,7 @@ _DIAGNOSTICS_HANDOFF = {
     "handoffId": "launcher_diagnostics_handoff_gemma3n_e4b_kv260_placeholder",
     "handoffKind": "read_only_handoff",
     "producer": {
-        "id": "pccx-llm-launcher",
+        "id": "pccx-launcher",
         "role": "launcher_generated_summary",
         "execution": "data_only",
     },
@@ -120,7 +120,7 @@ _DIAGNOSTICS_HANDOFF = {
             "diagnosticId": "launcher_target_not_configured",
             "severity": "warning",
             "category": "configuration",
-            "source": "pccx-llm-launcher",
+            "source": "pccx-launcher",
             "title": "Launcher target is not configured",
             "summary": "The handoff records a placeholder target state only.",
             "relatedContractRefs": [
@@ -134,7 +134,7 @@ _DIAGNOSTICS_HANDOFF = {
             "diagnosticId": "gemma3n_e4b_descriptor_reference_only",
             "severity": "info",
             "category": "model_descriptor",
-            "source": "pccx-llm-launcher",
+            "source": "pccx-launcher",
             "title": "Model descriptor is referenced by id",
             "summary": "Gemma 3N E4B is represented as descriptor_ref_only with no bundled assets.",
             "relatedContractRefs": [
@@ -148,7 +148,7 @@ _DIAGNOSTICS_HANDOFF = {
             "diagnosticId": "kv260_runtime_placeholder_not_configured",
             "severity": "blocked",
             "category": "runtime_descriptor",
-            "source": "pccx-llm-launcher",
+            "source": "pccx-launcher",
             "title": "KV260 runtime remains placeholder",
             "summary": "The runtime descriptor is planned, unavailable, and not configured.",
             "relatedContractRefs": [
@@ -163,7 +163,7 @@ _DIAGNOSTICS_HANDOFF = {
             "diagnosticId": "hardware_and_measurement_evidence_missing",
             "severity": "blocked",
             "category": "evidence",
-            "source": "pccx-llm-launcher",
+            "source": "pccx-launcher",
             "title": "Hardware and measurement evidence are missing",
             "summary": "Compatibility stays provisional until checked evidence exists.",
             "relatedContractRefs": [
@@ -177,7 +177,7 @@ _DIAGNOSTICS_HANDOFF = {
             "diagnosticId": "read_only_privacy_boundary",
             "severity": "info",
             "category": "safety",
-            "source": "pccx-llm-launcher",
+            "source": "pccx-launcher",
             "title": "Read-only privacy boundary is active",
             "summary": "The fixture carries no telemetry, upload, write-back, raw logs, prompts, or private paths.",
             "relatedContractRefs": [
@@ -290,9 +290,9 @@ _DIAGNOSTICS_HANDOFF = {
         "The contract is not a versioned compatibility commitment.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#5",
-        "pccxai/pccx-llm-launcher#3",
-        "pccxai/pccx-llm-launcher#12",
+        "pccxai/pccx-launcher#5",
+        "pccxai/pccx-launcher#3",
+        "pccxai/pccx-launcher#12",
     ],
 }
 

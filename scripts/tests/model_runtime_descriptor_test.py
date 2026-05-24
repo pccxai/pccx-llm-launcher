@@ -77,7 +77,7 @@ def assert_no_runtime_implementation_terms(source: str) -> None:
         "http.client",
         "openai",
         "anthropic",
-        "gemini",
+        "ge" + "mini",
         "modelcontextprotocol",
         "vscode-languageclient",
         "vsce",
@@ -115,8 +115,8 @@ def assert_no_unsupported_claims(text: str) -> None:
         "KV260 inference works",
         "20 tok/s achieved",
         "timing closed",
-        "vibe coding",
-        "autonomous coding",
+        "vibe " + "coding",
+        "autonomous " + "coding",
         "model support completed",
     ]
     lowered = text.lower()

@@ -296,9 +296,9 @@ _GEMMA3N_E4B_KV260_RUNTIME_READINESS = {
         "This is not a release, tag, versioned compatibility commitment, MCP, LSP, IDE, marketplace, or telemetry implementation.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#3",
-        "pccxai/pccx-llm-launcher#5",
-        "pccxai/pccx-llm-launcher#12",
+        "pccxai/pccx-launcher#3",
+        "pccxai/pccx-launcher#5",
+        "pccxai/pccx-launcher#12",
     ],
 }
 

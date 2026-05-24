@@ -1,4 +1,4 @@
-# pccx-llm-launcher
+# pccx-launcher
 
 Lightweight launcher for PCCX-oriented local LLM workflows.
 
@@ -21,6 +21,50 @@ upstream `llm-lite` launcher era. There is no working KV260 inference
 path yet, and no model is actually executed by anything in this
 repository today. See [docs/PROVENANCE.md](./docs/PROVENANCE.md) for the
 exact source commit and what was / was not imported.
+
+## Install
+
+Clone the public repository and run the local scripts directly:
+
+```bash
+git clone https://github.com/pccxai/pccx-launcher.git
+cd pccx-launcher
+bash scripts/check.sh
+```
+
+No model weights, board credentials, provider keys, or runtime daemon are
+required for the public scaffold.
+
+## Quickstart
+
+Run the checked status and readiness surfaces:
+
+```bash
+bash scripts/status-stub.sh
+bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
+bash scripts/chat-surface-preview.sh --model gemma3n-e4b --target kv260
+```
+
+For a short first-run path, see [QUICKSTART.md](./QUICKSTART.md).
+
+## Smoke Test
+
+Run the repository smoke test before opening a pull request or cutting a
+release:
+
+```bash
+bash scripts/smoke.sh
+```
+
+The smoke test is local and deterministic. It verifies the checked shell
+surfaces and contract fixtures; it does not execute a model, contact hardware,
+call providers, upload data, or publish artifacts.
+
+## Release And Contribution
+
+This repository is Apache-2.0 licensed. See [LICENSE](./LICENSE),
+[CONTRIBUTING.md](./CONTRIBUTING.md), [SECURITY.md](./SECURITY.md), and
+[docs/RELEASE.md](./docs/RELEASE.md).
 
 ## Intended workflow (target)
 
@@ -53,7 +97,7 @@ publishes a verified end-to-end path.
 
 - Local assistant mode (controlled local workflow with a reviewed
   tool boundary). The later-track plan is tracked in
-  [docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
+  [docs/LOCAL_WORKFLOW_MODE_PLAN.md](./docs/LOCAL_WORKFLOW_MODE_PLAN.md).
 - VS Code and other editor bridge planning for guided launches and log
   inspection.
 - Additional target models beyond Gemma 3N E4B and additional edge devices
@@ -62,9 +106,9 @@ publishes a verified end-to-end path.
 - Integration with `pccx-lab` diagnostics so device / kernel state can be
   surfaced through the launcher UI.
 
-Release readiness depends on verification evidence published by
+Runtime readiness depends on verification evidence published by
 `pccxai/pccx-FPGA-NPU-LLM-kv260` (RTL bring-up, simulation, timing
-closure). This repository will not cut a non-alpha release until that
+closure). Public source releases keep the runtime path blocked until that
 evidence lands.
 
 ## Non-goals
@@ -254,7 +298,7 @@ promise. See
 The later-track JetBrains and generic editor direction is tracked in
 [docs/OTHER_EDITOR_BRIDGE_PLAN.md](./docs/OTHER_EDITOR_BRIDGE_PLAN.md).
 The later-track local assistant mode direction is tracked in
-[docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md](./docs/LOCAL_CODING_ASSISTANT_MODE_PLAN.md).
+[docs/LOCAL_WORKFLOW_MODE_PLAN.md](./docs/LOCAL_WORKFLOW_MODE_PLAN.md).
 
 ### Model / runtime descriptor boundary (planned)
 

@@ -125,6 +125,6 @@ Before adding executable model or device behavior, the launcher should have:
 ## Issue Alignment
 
 This plan addresses
-[`pccx-llm-launcher#13`](https://github.com/pccxai/pccx-llm-launcher/issues/13)
+[`pccx-launcher#13`](https://github.com/pccxai/pccx-launcher/issues/13)
 by recording the multi-model and multi-device support direction while keeping
 the current launcher work descriptor-only and evidence-gated.

@@ -307,7 +307,7 @@ _CHAT_LOCAL_ONLY_POLICY = {
         "send controls remain disabled until separate reviewed boundaries exist",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

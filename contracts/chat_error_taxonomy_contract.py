@@ -369,7 +369,7 @@ _CHAT_ERROR_TAXONOMY = {
         "no compatibility promise is made",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

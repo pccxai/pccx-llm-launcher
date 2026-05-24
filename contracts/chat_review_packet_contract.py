@@ -399,7 +399,7 @@ _CHAT_REVIEW_PACKET = {
         "This packet does not approve standalone chat enablement; it records remaining review and evidence gates only.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

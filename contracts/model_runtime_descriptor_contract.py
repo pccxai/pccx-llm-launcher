@@ -396,9 +396,9 @@ def create_gemma3n_e4b_kv260_placeholder_example() -> dict:
             compatibility,
         ),
         "issueRefs": [
-            "pccxai/pccx-llm-launcher#3",
-            "pccxai/pccx-llm-launcher#5",
-            "pccxai/pccx-llm-launcher#12",
+            "pccxai/pccx-launcher#3",
+            "pccxai/pccx-launcher#5",
+            "pccxai/pccx-launcher#12",
         ],
     }
 

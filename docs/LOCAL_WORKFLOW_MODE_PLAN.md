@@ -102,6 +102,6 @@ Before adding runtime behavior, the launcher should have:
 ## Issue Alignment
 
 This plan addresses
-[`pccx-llm-launcher#12`](https://github.com/pccxai/pccx-llm-launcher/issues/12)
+[`pccx-launcher#12`](https://github.com/pccxai/pccx-launcher/issues/12)
 by recording the local workflow mode direction while keeping the
 current launcher work data-only and evidence-gated.

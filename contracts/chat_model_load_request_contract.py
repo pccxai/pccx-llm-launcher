@@ -481,7 +481,7 @@ _CHAT_MODEL_LOAD_REQUEST = {
         "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model-loader, provider, storage, or hardware implementation.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

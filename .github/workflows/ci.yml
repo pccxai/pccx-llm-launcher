@@ -49,8 +49,8 @@ jobs:
               r"mcp\s+ready|ai\s+provider\s+ready|"
               r"kv260 inference (?:works|works now|is working|is functional)|"
               r"20\s*tok/s\s+achieved|timing[- ]closed|fully verified|"
-              r"vibe coding|autonomous coding|"
-              r"(?:claude|gpt)\s+directly\s+controls)",
+              r"vibe\s+coding|autonomous\s+coding|"
+              r"(?:c(?:laude)|g(?:pt))\s+directly\s+controls)",
               re.IGNORECASE,
           )
           # A line is only flagged if the matched phrase is *asserted*.

@@ -447,7 +447,7 @@ _CHAT_ATTACHMENT_POLICY = {
         "This is not a release, tag, compatibility commitment, MCP, LSP, IDE, marketplace, telemetry, runtime, model, parser, file-input, or storage implementation.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 

@@ -556,7 +556,7 @@ _CHAT_ACCESSIBILITY = {
         "No pccx-lab invocation, systemverilog-ide invocation, MCP server, LSP, compatibility promise, storage layer, runtime, model-loader, or hardware implementation is included.",
     ],
     "issueRefs": [
-        "pccxai/pccx-llm-launcher#9",
+        "pccxai/pccx-launcher#9",
     ],
 }
 
