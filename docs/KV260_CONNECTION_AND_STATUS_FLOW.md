@@ -58,6 +58,105 @@ Raw JSON is available with:
 bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
 ```
 
+## KV260 Connection Quickstart
+
+This quickstart is for the planned USB-serial connection path. It keeps
+the current launcher boundary intact: status commands are still
+read-only, and serial login / runtime start remain unavailable until the
+reviewed backend and readiness evidence land.
+
+### 1. Check the local status surface first
+
+Run the checked local status before configuring target access:
+
+```bash
+bash scripts/status-stub.sh --include-device-session
+bash scripts/device-session-status-stub.sh --model gemma3n-e4b --target kv260
+```
+
+The expected answer is still `not_configured` / `blocked`. Treat any
+future connection work as setup for a reviewed backend, not as proof that
+inference or board bring-up works.
+
+### 2. Choose a tty without printing env values
+
+List candidate serial devices, then choose one in your shell. Prefer a
+stable `/dev/serial/by-id` symlink when it exists; use `/dev/ttyUSB*`
+only when the by-id path is unavailable.
+
+```bash
+find /dev/serial/by-id -maxdepth 1 -type l -print 2>/dev/null
+find /dev -maxdepth 1 -type c -name 'ttyUSB*' -print 2>/dev/null
+```
+
+Set `KVFPGA_TTY` without echoing the selected value back to the
+terminal:
+
+```bash
+read -r -s -p 'KVFPGA_TTY: ' KVFPGA_TTY; printf '\n'
+export KVFPGA_TTY
+```
+
+Use presence-only checks when confirming configuration:
+
+```bash
+[ -n "${KVFPGA_TTY:-}" ] && printf 'KVFPGA_TTY configured\n'
+```
+
+Do not run `env`, `printenv`, `set`, or shell traces while these values
+are present unless output is redirected through a reviewed redaction
+path.
+
+### 3. Set serial login env vars
+
+The planned USB-serial backend uses these environment variable names:
+
+| Variable | Purpose | Notes |
+|---|---|---|
+| `KVFPGA_TTY` | Optional tty override | If unset, the backend may try reviewed tty auto-detection. |
+| `KVFPGA_USER` | Serial-console user name | Required before login-style serial checks. |
+| `KVFPGA_PASSWORD` | Serial-console credential | Required before login-style serial checks; never print or commit it. |
+| `KVFPGA_HOST` | Not used by USB serial | The serial backend ignores this; the launcher must not scan or guess hosts. |
+
+Read the user and credential silently, then export only the names:
+
+```bash
+read -r -s -p 'KVFPGA_USER: ' KVFPGA_USER; printf '\n'
+read -r -s -p 'KVFPGA_PASSWORD: ' KVFPGA_PASSWORD; printf '\n'
+export KVFPGA_USER KVFPGA_PASSWORD
+```
+
+Confirm only presence, not values:
+
+```bash
+[ -n "${KVFPGA_USER:-}" ] && printf 'KVFPGA_USER configured\n'
+[ -n "${KVFPGA_PASSWORD:-}" ] && printf 'KVFPGA_PASSWORD configured\n'
+```
+
+### 4. Use the current mock / fixture fallback
+
+If no tty is visible, `pyserial` is unavailable, or credentials are not
+configured, stay on the board-less path. For the current branch, that
+means the checked local fixtures:
+
+```bash
+bash scripts/status-stub.sh --include-device-session
+bash scripts/runtime-readiness-stub.sh --model gemma3n-e4b --target kv260
+```
+
+For the planned mock backend, use named board-less scenarios such as
+`happy_path`, `partial_apps`, or `xrt_missing` in tests. Do not create
+fake `KVFPGA_*` values to force a mock path; select the mock explicitly
+in the test harness so serial setup remains separate from fixture setup.
+
+### 5. Clear the shell state after a session
+
+When finished, clear the names from the current shell:
+
+```bash
+unset KVFPGA_TTY KVFPGA_USER KVFPGA_PASSWORD KVFPGA_HOST
+```
+
 ## Flow Diagram
 
 ```text
